@@ -7,7 +7,9 @@ $(document).ready(function(){
 			//alert(classifications.Results.length);
 			//alert(classifications.length)
 			for(var i=0; i<classifications.Results.length; i++){
-				$("#classification-treeview ul").append("<li>" + classifications.Results[i].ClassificationName.Value + "</li>");
+				if(!classifications.Results[i].hasOwnProperty("ClassificationParentClassification")){
+					$("#classification-treeview ul").append("<li>" + classifications.Results[i].ClassificationName.Value + "</li>");
+						}
 					}
 				}
 			});
