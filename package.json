@@ -1,0 +1,19 @@
+{
+  "name": "moonshot",
+  "version": "1.0.0",
+  "description": "Bespoke Web Client for Micro Focus Content Manager by Records Transformation Ltd.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Neal O'kelly - CTO, Records Transformation Ltd.",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^3.1.5",
+    "express": "^4.17.1",
+    "express-ejs-layouts": "^2.5.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.5"
+  }
+}
