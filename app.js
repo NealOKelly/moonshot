@@ -2,13 +2,23 @@
 // nodemon - https://www.npmjs.com/package/nodemon
 // express-ejm-layouts - https://www.npmjs.com/package/express-ejs-layouts
 
-// Imports
+// Dependencies
 const express = require('express') // node.js web server
 const expressLayouts = require('express-ejs-layouts')
+const axios = require('axios');
+//const dateFormat = require('dateformat');
+
+// Included Files
+require('dotenv').config();
+const agent = require('./modules/https-auth/agent'); 
 
 // Constants
 const app = express()
 const port= 3000
+const contentManagerUsername = process.env['CONTENT_MANAGER_USERNAME'];
+const contentManagerPassword = process.env['CONTENT_MANAGER_PASSWORD'];
+const authorizationHeaderValue = "Basic " + Buffer.from(contentManagerUsername + ":" + contentManagerPassword).toString('base64');
+const contentManagerServiceAPIBaseUrl = process.env['CONTENT_MANAGER_API_BASE_URL'];
 
 // Static Files
 app.use(express.static('public'))
@@ -20,36 +30,15 @@ app.use('/img', express.static(__dirname + 'public/img'))
 app.use(expressLayouts)
 app.set('view engine', 'ejs')
 
-//  Navigation
+//  Routes
 app.get('', (req, res) => {
 	res.render('index', { title: 'Moonshot'})
 })
 
-// Listen on Port 300
-app.listen(port, () => console.info('App listening on port ' + port))
 
-///////  CONTENT MANAGER INTEGRATION ///////
-//get dependencies
-const axios = require('axios');
-require('dotenv').config();
-//const dateFormat = require('dateformat');
-
-// constants
-const contentManagerUsername = process.env['CONTENT_MANAGER_USERNAME'];
-const contentManagerPassword = process.env['CONTENT_MANAGER_PASSWORD'];
-const authorizationHeaderValue = "Basic " + Buffer.from(contentManagerUsername + ":" + contentManagerPassword).toString('base64');
-const contentManagerServiceAPIBaseUrl = process.env['CONTENT_MANAGER_API_BASE_URL'];
-
-const agent = require('./modules/https-auth/agent'); 
-
-console.log(contentManagerUsername)
-
-// invoke the CMServiceAPI
-//https://api.gilbyim.com/CMServiceAPI/Classification?q=all&properties=ClassificationName
-function invokeCMServiceAPI()
-	{
-		console.log('invokeCMServiceAPI has been called.')
-		var config = {
+app.get("/get-classifications", (req, res, next) => {
+    console.log("Call to '/get-classifications' received")
+	var config = {
 		  httpsAgent: agent('api-client'),
 		  method: 'get',
 		  url: contentManagerServiceAPIBaseUrl + '/Classification?q=all&properties=ClassificationName',
@@ -59,20 +48,17 @@ function invokeCMServiceAPI()
 		  },
 		  //data : JSON.stringify(jsonData)
 		};
-		axios(config)
-		
-		.then(function (response) {
+  //console.log(getTimeStamp(), green + "New Content Manager record successfully created.", resetColor)
+  console.log("Calling CMServiceAPI.")
+  axios(config)
+    .then( function (response)  {
+	  console.log("Response from CMServiceAPI recieved.")
+	  console.log("Sending response to browser.")
+	  res.status(200).send(response.data)
+  } 
+ )
+    .catch(err => next(err));
+})
 
-			console.log(response.data)
-			//console.log(getTimeStamp(), green + "New Content Manager record successfully created.", resetColor)
-			
-		})
-		.catch(function (error) {
-		  //console.log(getTimeStamp(), red + "Error creating Content Manager record.", resetColor)
-		  console.log(error);
-		});
-	}
-
-invokeCMServiceAPI()
-
-
+// Listen on Port 300
+app.listen(port, () => console.info('App listening on port ' + port))
