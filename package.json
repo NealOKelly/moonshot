@@ -9,9 +9,13 @@
   "author": "Neal O'kelly - CTO, Records Transformation Ltd.",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.20.0",
+    "dotenv": "^8.2.0",
     "ejs": "^3.1.5",
     "express": "^4.17.1",
-    "express-ejs-layouts": "^2.5.0"
+    "express-ejs-layouts": "^2.5.0",
+    "https": "^1.0.0",
+    "path": "^0.12.7"
   },
   "devDependencies": {
     "nodemon": "^2.0.5"
