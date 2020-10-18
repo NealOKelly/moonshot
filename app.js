@@ -59,6 +59,35 @@ app.get("/get-classifications", (req, res, next) => {
  )
     .catch(err => next(err));
 })
+//Classification/{Id*}
+app.get("/get-classification-details", (req, res, next) => {
+    console.log("Call to '/get-classification-details' received")
+	var classificationUri = req.query.uri
+		
+	var config = {
+		  httpsAgent: agent('api-client'),
+		  method: 'get',
+		  url: contentManagerServiceAPIBaseUrl + '/Classification/' + classificationUri + '/?properties=ClassificationName&properties=ClassificationParentClassification&properties=ClassificationAccessControl&properties=ClassificationRetentionSchedule&properties=ClassificationCanAttachRecords',
+		  headers: { 
+			'Authorization': authorizationHeaderValue, 
+			//'Content-Type': 'application/json', 
+		  },
+		  //data : JSON.stringify(jsonData)
+		};
+  //console.log(getTimeStamp(), green + "New Content Manager record successfully created.", resetColor)
+  console.log("Calling CMServiceAPI.")
+  axios(config)
+    .then( function (response)  {
+	  console.log("Response from CMServiceAPI recieved.")
+	  console.log("Sending response to browser.")
+	  res.status(200).send(response.data)
+  } 
+ )
+    .catch(err => next(err));
+})
+
+
+
 
 // Listen on Port 300
 app.listen(port, () => console.info('App listening on port ' + port))

@@ -12,7 +12,7 @@ $(document).ready(function(){
 				
 				if(!classifications.Results[i].hasOwnProperty("ClassificationParentClassification"))
 					{
-						console.log("Top Level: " + classifications.Results[i].ClassificationName.Value)
+						//console.log("Top Level: " + classifications.Results[i].ClassificationName.Value)
 
 					if(!$("#classification-uri-" + classifications.Results[i].Uri).length){
 
@@ -23,7 +23,7 @@ $(document).ready(function(){
 					else{
 					//var strNewListItemId = "#classification-uri-" + classifications.Results[i].Uri;
 						
-						console.log("Name: " + classifications.Results[i].ClassificationName.Value + "; ParentName: " + classifications.Results[i].ClassificationParentClassification.ClassificationTitle.Value + "; ParentURI: " + classifications.Results[i].ClassificationParentClassification.Uri + "; Exists: " + $(strParentListItemId).length)
+						//console.log("Name: " + classifications.Results[i].ClassificationName.Value + "; ParentName: " + classifications.Results[i].ClassificationParentClassification.ClassificationTitle.Value + "; ParentURI: " + classifications.Results[i].ClassificationParentClassification.Uri + "; Exists: " + $(strParentListItemId).length)
 					
 						var strParentListItemId = "#classification-uri-" + classifications.Results[i].ClassificationParentClassification.Uri;  //get the ID of he parenet Classification.
 						//console.log(strParentListItemId)
@@ -56,4 +56,44 @@ $(document).ready(function(){
   	}, error: function(result){
 		console.log("Oooops!")
 	}});
+	
+		
+
+	
+	
+	
 	})
+
+ //classification-uri- 19
+//// Handle Events  ////
+	$(document).on("click", ".folder", function(){
+		//alert("A folder Icon was clicked.")
+		
+		var eventTargetParent = $(event.target).parent();
+		var classificationUri = eventTargetParent.attr("id").substr(19)
+		//alert(eventTargetParent.attr("id").substr(19));
+		getClassificationProperties(classificationUri)
+
+	})
+
+function getClassificationProperties(classificationUri){
+	
+			$.ajax({url: "/get-classification-details?uri=" + classificationUri, success: function(result){
+    	
+		var details = JSON.stringify(result);
+		////		var details = result;
+
+			//$("#details-panel").html(details);
+			console.log("result=" + result.Results[0].ClassificationCanAttachRecords.Value)		
+			$("#classificationNameValue").html(result.Results[0].ClassificationName.Value)
+			$("#classificationAccessControlValue").html(result.Results[0].ClassificationAccessControl.Value)
+			$("#classificationCanAttachRecordsValue").html(result.Results[0].ClassificationCanAttachRecords.Value)
+
+  	}, error: function(result){
+		console.log("Oooops!")
+	}});
+	
+}
+
+
+
