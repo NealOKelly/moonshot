@@ -1,0 +1,60 @@
+#classification-treeview > ul{
+	padding-inline-start: 0px;
+}
+
+#classification-treeview > ul > li ul{
+	padding-inline-start: 34px;
+}
+.expand{
+
+
+  display: inline-block;
+	text-align: center;
+  content: "";
+  background-image: url("../img/icons/caret-right.svg");
+	 background-size: cover;
+  background-repeat: no-repeat;
+
+	    width: 24px;
+    height: 24px;
+/*  background-size: 1rem 1rem;*/
+}
+
+
+
+.folder{
+
+
+  display: inline-block;
+	text-align: center;
+  content: "";
+  background-image: url("../img/icons/folder.svg");
+	 background-size: cover;
+  background-repeat: no-repeat;
+	padding-top: 8px;
+	    width: 24px;
+    height: 24px;
+/*  background-size: 1rem 1rem;*/
+}
+
+
+.folder-plus{
+
+
+  display: inline-block;
+	text-align: center;
+  content: "";
+  background-image: url("../img/icons/folder-plus.svg");
+	 background-size: cover;
+  background-repeat: no-repeat;
+	padding-top: 8px;
+	    width: 24px;
+    height: 24px;
+/*  background-size: 1rem 1rem;*/
+}
+
+.classificationName{
+	display: inline-block;
+	vertical-align: top;
+	padding-left: 10px;
+}

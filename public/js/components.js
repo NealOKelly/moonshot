@@ -16,7 +16,7 @@ $(document).ready(function(){
 
 					if(!$("#classification-uri-" + classifications.Results[i].Uri).length){
 
-					$("#classification-treeview > ul").append("<li id='classification-uri-" + classifications.Results[i].Uri + "'><span class='classificationName'>" + classifications.Results[i].ClassificationName.Value + "</span></li>");	
+					$("#classification-treeview > ul").append("<li id='classification-uri-" + classifications.Results[i].Uri + "'><span class='expand'></span><span class='folder'></span><span class='classificationName'>" + classifications.Results[i].ClassificationName.Value + "</span></li>");	
 					intClassificationsDisplayed++;
 					}
 					}
@@ -35,7 +35,7 @@ $(document).ready(function(){
 							}
 							if(!$("#classification-uri-" + classifications.Results[i].Uri).length)
 								{
-								$(strParentListItemId + "> ul").append("<li id='classification-uri-" + classifications.Results[i].Uri + "'><span class='classificationName'>" + classifications.Results[i].ClassificationName.Value + "</span></li>")
+								$(strParentListItemId + "> ul").append("<li id='classification-uri-" + classifications.Results[i].Uri + "'><span class='expand'></span><span class='folder'></span><span class='classificationName'>" + classifications.Results[i].ClassificationName.Value + "</span></li>")
 								intClassificationsDisplayed++;
 								}
 						}
