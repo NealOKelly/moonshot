@@ -1,50 +1,59 @@
 $(document).ready(function(){
 
 	// populate the #classification-data div
-	if($('#classification-treeview').length){
-		$.ajax({url: "get-classifications", success: function(result){
-			var classifications = result;
+	$.ajax({url: "/get-classifications", success: function(result){
+    	
+		var classifications = result;
 		var intClassificationsDisplayed = 0;
-		while (intClassificationsDisplayed < classifications.Results.length){
+		while (intClassificationsDisplayed < classifications.Results.length)
+		{
 			
 			for(var i=0; i<classifications.Results.length; i++){
+				
 				if(!classifications.Results[i].hasOwnProperty("ClassificationParentClassification"))
 					{
+						console.log("Top Level: " + classifications.Results[i].ClassificationName.Value)
+
 					if(!$("#classification-uri-" + classifications.Results[i].Uri).length){
 
-					$("#classification-treeview ul").append("<li id='classification-uri-" + classifications.Results[i].Uri + "'><span class='expand-icon'>+</span><span class='folder-icon'></span>" + classifications.Results[i].ClassificationName.Value + "</li>");	
-					intClassificationsDisplayed = intClassificationsDisplayed + 1;
+					$("#classification-treeview > ul").append("<li id='classification-uri-" + classifications.Results[i].Uri + "'><span class='classificationName'>" + classifications.Results[i].ClassificationName.Value + "</span></li>");	
+					intClassificationsDisplayed++;
 					}
 					}
 					else{
-						var strNewListItemId = "#classification-uri-" + classifications.Results[i].Uri;
-						console.log(strNewListItemId)
+					//var strNewListItemId = "#classification-uri-" + classifications.Results[i].Uri;
 						
-						var strParentListItemId = "#classification-uri-" + classifications.Results[i].ClassificationParentClassification.Uri;
-						//$(strParentListItemId).addClass("has-children");
-						//$(strParentListItemId).children(".expand-icon").css("background-color","lime")		
-						//$(strParentListItemId).children(".expand-icon").html("+")	
-
-						if(!$(strNewListItemId).length){
-							if($(strParentListItemId).length)
-								{
-								if(!$(strParentListItemId + " ul").length){
-									$(strParentListItemId).append("<ul class='classification-hidden'></ul>");
-								}
-								if(!$("#classification-uri-" + classifications.Results[i].Uri).length)
-									{
-									$(strParentListItemId + " ul").append("<li style='list-style-type:none;' id='classification-uri-" + classifications.Results[i].Uri + "'><span class='expand-icon'>-</span><span class='folder-icon'></span>" + classifications.Results[i].ClassificationName.Value + "</li>")
-									intClassificationsDisplayed++;
-									}
+						console.log("Name: " + classifications.Results[i].ClassificationName.Value + "; ParentName: " + classifications.Results[i].ClassificationParentClassification.ClassificationTitle.Value + "; ParentURI: " + classifications.Results[i].ClassificationParentClassification.Uri + "; Exists: " + $(strParentListItemId).length)
+					
+						var strParentListItemId = "#classification-uri-" + classifications.Results[i].ClassificationParentClassification.Uri;  //get the ID of he parenet Classification.
+						//console.log(strParentListItemId)
+						
+						if($(strParentListItemId).length)  // if lis item for the parent Classification exists
+							{
+							if(!$(strParentListItemId + " ul").length){  // add a new unordered list if none exists.
+								$(strParentListItemId).append("<ul class='classification-hidden' style='list-style-type:none;list-style-position: outside;'></ul>");
 							}
+							if(!$("#classification-uri-" + classifications.Results[i].Uri).length)
+								{
+								$(strParentListItemId + "> ul").append("<li id='classification-uri-" + classifications.Results[i].Uri + "'><span class='classificationName'>" + classifications.Results[i].ClassificationName.Value + "</span></li>")
+								intClassificationsDisplayed++;
+								}
 						}
-						//console.log($(strParentListItemId + ">ul>li span .expand-icon").html(""));
-						//$(".expand-icon").parent().addClass("has-children");
-
 					}
-			}		
+				}		
 		}
-				}
-			});
-		}
+		// sort	
+
+		$('ul').each(function(_, ul) {
+		// get all the nodes to be sorted
+		var $toSort = $(ul).children('li');
+		$toSort.sort((li1, li2) => $(li1).children(".classificationName").text().localeCompare($(li2).children(".classificationName").text()));
+		$toSort.each(function() {
+		  $(this).appendTo(ul);
+		});
+	 });
+
+  	}, error: function(result){
+		console.log("Oooops!")
+	}});
 	})
