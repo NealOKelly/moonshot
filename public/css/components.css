@@ -53,6 +53,11 @@
 	background-image: url("../img/icons/caret-down-fill.svg");
 }
 
+.folder-node-selected > span.record-title {
+	font-weight: bold;
+}
+
+
 
 
 .folder{
@@ -87,6 +92,12 @@
 
 
 .classification-name{
+	display: inline-block;
+	vertical-align: top;
+	padding-left: 10px;
+}
+
+.record-title{
 	display: inline-block;
 	vertical-align: top;
 	padding-left: 10px;

@@ -107,6 +107,24 @@ $(document).on("click", ".classification-name>a", function(){
 	getClassificationProperties(classificationUri)
 })
 
+// Click on folder-fill Icon //
+$(document).on("click", ".folder-fill", function(){
+	var eventTargetParent = $(event.target).parent();
+	highlightSelectedFolder(eventTargetParent)
+	var recordUri = eventTargetParent.attr("id").substr(11)
+	//getRecordProperties(recordUri)
+
+})
+
+// Click on folder-fill Icon //
+$(document).on("click", ".record-title>a", function(){
+	var eventTargetParent = $(event.target).parent();
+	highlightSelectedFolder(eventTargetParent.parent())
+	var recordUri = eventTargetParent.attr("id").substr(11)
+	//getRecordProperties(recordUri)
+
+})
+
 // Click on collpased caret
 $(document).on("click", ".collapsed", function(){
 	var parentNodeId = $(event.target).parent().attr("id");
@@ -128,13 +146,13 @@ $(document).on("click", ".collapsed", function(){
 				$("#" + parentNodeId).append("<ul style='list-style-type:none;list-style-position: outside;'></ul>")
 				for(var i=0; i<result.TotalResults; i++){
 					//alert("Uri: " + result.Results[i].Uri)
-					$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + result.Results[i].Uri + "'><span style='padding: 12px 20px;'></span><span class='folder-fill'></span><span class='classification-name'><a href='#'>" + result.Results[i].RecordTitle.Value + "</a></span></li>")
+					$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + result.Results[i].Uri + "'><span style='padding: 12px 20px;'></span><span class='folder-fill'></span><span class='record-title'><a href='#'>" + result.Results[i].RecordTitle.Value + "</a></span></li>")
 				}
 				
 						$('ul').each(function(_, ul) {
 		// get all the nodes to be sorted
 		var $toSort = $(ul).children('li');
-		$toSort.sort((li1, li2) => $(li1).children(".classification-name").text().localeCompare($(li2).children(".classification-name").text()));
+		$toSort.sort((li1, li2) => $(li1).children(".record-title").text().localeCompare($(li2).children(".record-title").text()));
 		$toSort.each(function() {
 		  $(this).appendTo(ul);
 		});
@@ -160,12 +178,20 @@ $(document).on("click", ".expanded", function(){
 	$("#" + parentNodeId + " > span.folder-open").addClass("folder")
 	$("#" + parentNodeId +" > span.folder-open").removeClass("folder-open")
 	classificationUri = parentNodeId.substr(19)
+	if($("#" + parentNodeId).hasClass("classification-can-attach-records")){
+		$("#" + parentNodeId + " ul").remove() //clear folder when parent is collapsed.
+	}
 })
 
 // Functions // 
 function highlightSelectedClassification(eventTargetParent){
 	$("#classification-treeview li").removeClass("classification-node-selected")
 	$("#" + eventTargetParent.attr("id")).addClass("classification-node-selected")
+}
+
+function highlightSelectedFolder(eventTargetParent){
+	$("#classification-treeview li").removeClass("folder-node-selected")
+	$("#" + eventTargetParent.attr("id")).addClass("folder-node-selected")
 }
 
 function getClassificationProperties(classificationUri){
