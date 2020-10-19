@@ -35,7 +35,7 @@ app.get('', (req, res) => {
 	res.render('index', { title: 'Moonshot'})
 })
 
-
+// get-classifications
 app.get("/get-classifications", (req, res, next) => {
     console.log("Call to '/get-classifications' received")
 	var config = {
@@ -59,7 +59,8 @@ app.get("/get-classifications", (req, res, next) => {
  )
     .catch(err => next(err));
 })
-//Classification/{Id*}
+
+// get-classification-details
 app.get("/get-classification-details", (req, res, next) => {
     console.log("Call to '/get-classification-details' received")
 	var classificationUri = req.query.uri
@@ -67,7 +68,7 @@ app.get("/get-classification-details", (req, res, next) => {
 	var config = {
 		  httpsAgent: agent('api-client'),
 		  method: 'get',
-		  url: contentManagerServiceAPIBaseUrl + '/Classification/' + classificationUri + '/?properties=ClassificationName&properties=ClassificationParentClassification&properties=ClassificationAccessControl&properties=ClassificationRetentionSchedule&properties=ClassificationCanAttachRecords',
+		  url: contentManagerServiceAPIBaseUrl + '/Classification/' + classificationUri + '/?properties=ClassificationName, ClassificationParentClassification, ClassificationAccessControl, ClassificationRetentionSchedule, ClassificationCanAttachRecords',
 		  headers: { 
 			'Authorization': authorizationHeaderValue, 
 			//'Content-Type': 'application/json', 
@@ -86,7 +87,38 @@ app.get("/get-classification-details", (req, res, next) => {
     .catch(err => next(err));
 })
 
-
+// get-classiciation-records (folder)
+app.get("/get-classification-records", (req, res, next) => {
+    console.log("Call to '/get-classification-records' received")
+	var classificationUri = req.query.uri
+	
+	var jsonData = {
+					"TrimType": "Record",
+  					"q": "classification:" + classificationUri,
+					"Properties": "RecordTitle"
+			}
+	
+	var config = {
+		  httpsAgent: agent('api-client'),
+		  method: 'post',
+		  url: contentManagerServiceAPIBaseUrl + '/Search',
+		  headers: { 
+			'Authorization': authorizationHeaderValue, 
+			'Content-Type': 'application/json', 
+		  },
+		  data : JSON.stringify(jsonData)
+		};
+  //console.log(getTimeStamp(), green + "New Content Manager record successfully created.", resetColor)
+  console.log("Calling CMServiceAPI.")
+  axios(config)
+    .then( function (response)  {
+	  console.log("Response from CMServiceAPI recieved.")
+	  console.log("Sending response to browser.")
+	  res.status(200).send(response.data)
+  } 
+ )
+    .catch(err => next(err));
+})
 
 
 // Listen on Port 300

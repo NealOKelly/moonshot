@@ -90,6 +90,15 @@ $(document).on("click", ".folder", function(){
 
 })
 
+$(document).on("click", ".folder-open", function(){
+	var eventTargetParent = $(event.target).parent();
+	highlightSelectedClassification(eventTargetParent)
+	var classificationUri = eventTargetParent.attr("id").substr(19)
+	getClassificationProperties(classificationUri)
+
+})
+
+
 // Click on Classification Name Hyperlink //
 $(document).on("click", ".classification-name>a", function(){
 	var eventTargetParent = $(event.target).parent();
@@ -107,26 +116,50 @@ $(document).on("click", ".collapsed", function(){
 	$("#" + parentNodeId +" > span.collapsed").removeClass("collapsed")
 	$("#" + parentNodeId + " > span.folder").addClass("folder-open")
 	$("#" + parentNodeId +" > span.folder").removeClass("folder")
-})
+	//alert(parentNodeId)
+	
+	
+	if($("#" + parentNodeId).hasClass("classification-can-attach-records")){
+		classificationUri = parentNodeId.substr(19)
+		//alert(classificationUri)
+		$.ajax({url: "/get-classification-records?uri=" + classificationUri, success: function(result){
+			if(result.TotalResults>0){
+				$("#" + parentNodeId + " ul").remove()  // clear existing list of folders.
+				$("#" + parentNodeId).append("<ul style='list-style-type:none;list-style-position: outside;'></ul>")
+				for(var i=0; i<result.TotalResults; i++){
+					//alert("Uri: " + result.Results[i].Uri)
+					$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + result.Results[i].Uri + "'><span style='padding: 12px 20px;'></span><span class='folder-fill'></span><span class='classification-name'><a href='#'>" + result.Results[i].RecordTitle.Value + "</a></span></li>")
+				}
+				
+						$('ul').each(function(_, ul) {
+		// get all the nodes to be sorted
+		var $toSort = $(ul).children('li');
+		$toSort.sort((li1, li2) => $(li1).children(".classification-name").text().localeCompare($(li2).children(".classification-name").text()));
+		$toSort.each(function() {
+		  $(this).appendTo(ul);
+		});
+	 });
+				
+				
+				
+			}
+			
+			}, error: function(result){
+				console.log("Oooops!")
+				}});
+			}
+	})
+
+
 // Click on expanded caret
 $(document).on("click", ".expanded", function(){
 	var parentNodeId = $(event.target).parent().attr("id");
+	$("#" + parentNodeId +" > ul > li").addClass("classification-hidden")
 	$("#" + parentNodeId + " > span.expanded").addClass("collapsed")
 	$("#" + parentNodeId +" > span.expanded").removeClass("expanded")
 	$("#" + parentNodeId + " > span.folder-open").addClass("folder")
 	$("#" + parentNodeId +" > span.folder-open").removeClass("folder-open")
-})
-
-
-
-
-// Click on expanded caret
-$(document).on("click", ".expanded", function(){
-	var parentNodeId = $(event.target).parent().attr("id");
-	//alert(parentNodeId)
-	$("#" + parentNodeId +" > ul > li").addClass("classification-hidden")
-	//alert($("#" + event.target).attr("id"))
-	//$("#" + event.target + "> ul > li").removeClass("classification-hidden")
+	classificationUri = parentNodeId.substr(19)
 })
 
 // Functions // 
@@ -153,6 +186,20 @@ function getClassificationProperties(classificationUri){
 	}});
 	
 }
+
+function getClassificationRecords(classificationUri){
+	
+			$.ajax({url: "/get-classification-records", success: function(result){
+    	
+		var details = JSON.stringify(result);
+			console.log("Success")
+
+  	}, error: function(result){
+		console.log("Oooops!")
+	}});
+	
+}
+
 
 
 
