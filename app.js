@@ -41,7 +41,7 @@ app.get("/get-classifications", (req, res, next) => {
 	var config = {
 		  httpsAgent: agent('api-client'),
 		  method: 'get',
-		  url: contentManagerServiceAPIBaseUrl + '/Classification?q=all&properties=ClassificationName%2C%20ClassificationParentClassification',
+		  url: contentManagerServiceAPIBaseUrl + '/Classification?q=all&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords',
 		  headers: { 
 			'Authorization': authorizationHeaderValue, 
 			//'Content-Type': 'application/json', 
