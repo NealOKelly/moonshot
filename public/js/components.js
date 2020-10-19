@@ -16,6 +16,12 @@ $(document).ready(function(){
 					if(!$("#classification-uri-" + classifications.Results[i].Uri).length){
 
 					$("#classification-treeview > ul").append("<li id='classification-uri-" + classifications.Results[i].Uri + "'><span class='collapsed'></span><span class='folder'></span><span class='classification-name'><a href='#'>" + classifications.Results[i].ClassificationName.Value + "</a></span></li>");	
+					// If records can be attached to the classification then add a class.
+					if(classifications.Results[i].ClassificationCanAttachRecords.Value==true){
+						$("#classification-uri-" + classifications.Results[i].Uri).addClass("classification-can-attach-records")
+					}
+
+						
 					intClassificationsDisplayed++;
 					}
 					}
@@ -30,6 +36,13 @@ $(document).ready(function(){
 							if(!$("#classification-uri-" + classifications.Results[i].Uri).length)
 								{
 								$(strParentListItemId + "> ul").append("<li id='classification-uri-" + classifications.Results[i].Uri + "'><span class='collapsed'></span><span class='folder'></span><span class='classification-name'><a href='#'>" + classifications.Results[i].ClassificationName.Value + "</a></span></li>")
+									
+								// If records can be attached to the classification then add a class.
+								if(classifications.Results[i].ClassificationCanAttachRecords.Value==true){
+									$("#classification-uri-" + classifications.Results[i].Uri).addClass("classification-can-attach-records")
+								}
+									
+									
 								intClassificationsDisplayed++;
 								}
 						}
