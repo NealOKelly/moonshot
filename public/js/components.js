@@ -16,7 +16,7 @@ $(document).ready(function(){
 
 					if(!$("#classification-uri-" + classifications.Results[i].Uri).length){
 
-					$("#classification-treeview > ul").append("<li id='classification-uri-" + classifications.Results[i].Uri + "'><span class='expand'></span><span class='folder'></span><span class='classificationName'>" + classifications.Results[i].ClassificationName.Value + "</span></li>");	
+					$("#classification-treeview > ul").append("<li id='classification-uri-" + classifications.Results[i].Uri + "'><span class='collapsed'></span><span class='folder'></span><span class='classification-name'><a href='#'>" + classifications.Results[i].ClassificationName.Value + "</a></span></li>");	
 					intClassificationsDisplayed++;
 					}
 					}
@@ -35,7 +35,7 @@ $(document).ready(function(){
 							}
 							if(!$("#classification-uri-" + classifications.Results[i].Uri).length)
 								{
-								$(strParentListItemId + "> ul").append("<li id='classification-uri-" + classifications.Results[i].Uri + "'><span class='expand'></span><span class='folder'></span><span class='classificationName'>" + classifications.Results[i].ClassificationName.Value + "</span></li>")
+								$(strParentListItemId + "> ul").append("<li id='classification-uri-" + classifications.Results[i].Uri + "'><span class='collapsed'></span><span class='folder'></span><span class='classification-name'><a href='#'>" + classifications.Results[i].ClassificationName.Value + "</a></span></li>")
 								intClassificationsDisplayed++;
 								}
 						}
@@ -47,7 +47,7 @@ $(document).ready(function(){
 		$('ul').each(function(_, ul) {
 		// get all the nodes to be sorted
 		var $toSort = $(ul).children('li');
-		$toSort.sort((li1, li2) => $(li1).children(".classificationName").text().localeCompare($(li2).children(".classificationName").text()));
+		$toSort.sort((li1, li2) => $(li1).children(".classification-name").text().localeCompare($(li2).children(".classification-name").text()));
 		$toSort.each(function() {
 		  $(this).appendTo(ul);
 		});
@@ -64,17 +64,34 @@ $(document).ready(function(){
 	
 	})
 
- //classification-uri- 19
-//// Handle Events  ////
-	$(document).on("click", ".folder", function(){
-		//alert("A folder Icon was clicked.")
-		
-		var eventTargetParent = $(event.target).parent();
-		var classificationUri = eventTargetParent.attr("id").substr(19)
-		//alert(eventTargetParent.attr("id").substr(19));
-		getClassificationProperties(classificationUri)
+//////// Handle Events  /////////
 
-	})
+///// Classiciation Control Events /////
+
+// Click on folder Icon //
+$(document).on("click", ".folder", function(){
+	var eventTargetParent = $(event.target).parent();
+	highlightSelectedClassification(eventTargetParent)
+	var classificationUri = eventTargetParent.attr("id").substr(19)
+	getClassificationProperties(classificationUri)
+
+})
+
+// Click on Classification Name Hyperlink //
+$(document).on("click", ".classification-name>a", function(){
+	var eventTargetParent = $(event.target).parent();
+	highlightSelectedClassification(eventTargetParent.parent())
+	alert($(eventTargetParent).parent().attr("id"))
+	var classificationUri = eventTargetParent.parent().attr("id").substr(19)
+	getClassificationProperties(classificationUri)
+})
+
+
+// Functions // 
+function highlightSelectedClassification(eventTargetParent){
+	$("#classification-treeview li").removeClass("classification-node-selected")
+	$("#" + eventTargetParent.attr("id")).addClass("classification-node-selected")
+}
 
 function getClassificationProperties(classificationUri){
 	
