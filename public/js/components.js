@@ -81,7 +81,6 @@ $(document).on("click", ".folder", function(){
 $(document).on("click", ".classification-name>a", function(){
 	var eventTargetParent = $(event.target).parent();
 	highlightSelectedClassification(eventTargetParent.parent())
-	alert($(eventTargetParent).parent().attr("id"))
 	var classificationUri = eventTargetParent.parent().attr("id").substr(19)
 	getClassificationProperties(classificationUri)
 })
