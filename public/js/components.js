@@ -18,8 +18,6 @@ $(document).ready(function(){
 				
 				if(!classifications.Results[i].hasOwnProperty("ClassificationParentClassification"))
 					{
-						//console.log("Top Level: " + classifications.Results[i].ClassificationName.Value)
-
 					if(!$("#classification-uri-" + classifications.Results[i].Uri).length){
 
 					$("#classification-treeview > ul").append("<li id='classification-uri-" + classifications.Results[i].Uri + "'><span class='collapsed'></span><span class='folder'></span><span class='classification-name'><a href='#'>" + classifications.Results[i].ClassificationName.Value + "</a></span></li>");	
@@ -141,85 +139,76 @@ $(document).on("click", ".collapsed", function(){
 	$("#" + parentNodeId +" > span.collapsed").removeClass("collapsed")
 	$("#" + parentNodeId + " > span.folder").addClass("folder-open")
 	$("#" + parentNodeId +" > span.folder").removeClass("folder")
-	//alert(parentNodeId)
-	
+
 	// for records attached directly to classifications.
 	if($("#" + parentNodeId).hasClass("classification-can-attach-records")){
 		//alert(parentNodeId)
-		$("#" + parentNodeId).append("<ul style='list-style-type:none;'></ul>")
-		var classificationUri = parentNodeId.substr(19)	
-		$.ajax({url: "/get-classification-records?uri=" + classificationUri, 
-				success: function(result){
-					var classificationRecords = result;
-					//console.log(classificationRecords.TotalResults)
-					for(var i=0; i<classificationRecords.TotalResults; i++){
-						var recordTypeUri = classificationRecords.Results[i].RecordRecordType.Uri;
-						var recordUri = classificationRecords.Results[i].Uri;
-						var recordTitle = classificationRecords.Results[i].RecordTitle.Value;
-						
-						
-						
-						
-						
-						getRecordTypeContentsRule(parentNodeId, recordUri, recordTitle, recordTypeUri)
-						
-			
 
-					}
-			}, error: function(result)
-				{
-				console.log("Oooops!")
-				}
-			});
+		$("#" + parentNodeId).append("<ul style='list-style-type:none;'></ul>")
+		var classificationUri = parentNodeId.substr(19)
+		getRecordTypeDefinitions(classificationUri, parentNodeId)
+
 		}
+	
+	
 
 	//if($("#" + parent))
 	
 })
 
-
-function getRecordTypeContentsRule(parentNodeId, recordUri, recordTitle, recordTypeUri)
+function getRecordTypeDefinitions(classificationUri, parentNodeId)
 	{
-		//// need to work out how to cache the recordTypeContents rule.  Curret approach is too slow.
-		
-		
-		
-		
+
 	$.ajax(
 		{
-		url: "/get-record-type-contents-rule?uri=" + "3", 
-
+		url: "/get-record-type-attributes",
 		success: function(result)
-
 			{
-			recordTypeContentsRule = result;
-			console.log(recordTypeContentsRule.Results[0].RecordTypeContentsRule.Value)
-			if(recordTypeContentsRule.Results[0].RecordTypeContentsRule.Value=="ByList")
+			var recordTypeDefinitions = result;
+			$.ajax(
 				{
-				console.log("ByList")
-				// If the contents rule is "ByList" it implies that a define list of record types can be added as content to this record.
-				displayRecordFolderOpen(parentNodeId, recordUri, recordTitle)
-				}
-				else
-				{
-				if(recordTypeContentsRule.Results[0].RecordTypeLevel.Value=="4")
+				url: "/get-classification-records?uri=" + classificationUri,
+				success: function(result)
 					{
-					// Level 4 is the default level for folders.  [Level 2 is the default level for documents.]
-					displayRecordFolderOpen(parentNodeId, recordUri, recordTitle)
-					}
-					else
+					for(i=0; i<result.TotalResults; i++)
 						{
-						displayRecordFolderFill(parentNodeId, recordUri, recordTitle)
+						for(x=0; x<recordTypeDefinitions.TotalResults; x++)
+							{
+							if(result.Results[i].RecordRecordType.Uri==recordTypeDefinitions.Results[x].Uri)
+							   {
+								var recordUri = result.Results[i].Uri;
+								var recordTitle = result.Results[i].RecordTitle.Value;
+								if(recordTypeDefinitions.Results[x].RecordTypeContentsRule.Value=="ByList")
+									{
+									displayRecordFolderOpen(parentNodeId, recordUri, recordTitle)	
+									}
+								else
+									{
+									if(recordTypeDefinitions.Results[x].RecordTypeLevel.Value=="4")
+										{
+										displayRecordFolderFill(parentNodeId, recordUri, recordTitle)
+										}
+									}
+							   }
+							}
 						}
-				}
+					}, 
+				error: function(result)
+					{
+					console.log("Oooops!")
+					}
+				});	
 
 			}, 
 		error: function(result)
 			{
 			console.log("Oooops!")
 			}
-	   });
+		});	
+
 	}
+
+
 
 function displayRecordFolderOpen(parentNodeId, recordUri, recordTitle)
 	{
@@ -258,25 +247,6 @@ function highlightSelectedFolder(eventTargetParent){
 	$("#classification-treeview li").removeClass("classification-node-selected")
 	$("#classification-treeview li").removeClass("folder-node-selected")
 	$("#" + eventTargetParent.attr("id")).addClass("folder-node-selected")
-}
-
-function getClassificationProperties(classificationUri){
-	
-			$.ajax({url: "/get-classification-details?uri=" + classificationUri, success: function(result){
-    	
-		var details = JSON.stringify(result);
-		////		var details = result;
-
-			//$("#details-panel").html(details);
-			console.log("result=" + result.Results[0].ClassificationCanAttachRecords.Value)		
-			$("#classificationNameValue").html(result.Results[0].ClassificationName.Value)
-			$("#classificationAccessControlValue").html(result.Results[0].ClassificationAccessControl.Value)
-			$("#classificationCanAttachRecordsValue").html(result.Results[0].ClassificationCanAttachRecords.Value)
-
-  	}, error: function(result){
-		console.log("Oooops!")
-	}});
-	
 }
 
 function getClassificationRecords(classificationUri){

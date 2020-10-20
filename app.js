@@ -121,8 +121,8 @@ app.get("/get-classification-records", (req, res, next) => {
 })
 
 // get-record-type-containment-details
-app.get("/get-record-type-contents-rule", (req, res, next) => {
-    console.log("Call to '/get-record-type-contents-rule' received")
+app.get("/get-record-type-attributes", (req, res, next) => {
+    console.log("Call to '/get-record-type-attributes' received")
 	
 	var recordTypeUri = req.query.uri;
 	console.log(recordTypeUri)
@@ -132,7 +132,7 @@ app.get("/get-record-type-contents-rule", (req, res, next) => {
 		  method: 'get',
 		
 		//https://api.gilbyim.com/CMServiceAPI
-		  url: contentManagerServiceAPIBaseUrl + '/RecordType?q=' + recordTypeUri + '&properties=RecordTypeLevel, RecordTypeContentsRule, RecordTypeName',
+		  url: contentManagerServiceAPIBaseUrl + '/RecordType?q=all&properties=RecordTypeLevel, RecordTypeContentsRule, RecordTypeName',
 		  headers: { 
 			'Authorization': authorizationHeaderValue, 
 			//'Content-Type': 'application/json', 
