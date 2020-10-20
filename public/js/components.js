@@ -249,6 +249,25 @@ function highlightSelectedFolder(eventTargetParent){
 	$("#" + eventTargetParent.attr("id")).addClass("folder-node-selected")
 }
 
+function getClassificationProperties(classificationUri){
+	
+			$.ajax({url: "/get-classification-details?uri=" + classificationUri, success: function(result){
+    	
+		var details = JSON.stringify(result);
+		////		var details = result;
+
+			//$("#details-panel").html(details);
+			console.log("result=" + result.Results[0].ClassificationCanAttachRecords.Value)		
+			$("#classificationNameValue").html(result.Results[0].ClassificationName.Value)
+			$("#classificationAccessControlValue").html(result.Results[0].ClassificationAccessControl.Value)
+			$("#classificationCanAttachRecordsValue").html(result.Results[0].ClassificationCanAttachRecords.Value)
+
+  	}, error: function(result){
+		console.log("Oooops!")
+	}});
+	
+}
+
 function getClassificationRecords(classificationUri){
 	
 			$.ajax({url: "/get-classification-records", success: function(result){
