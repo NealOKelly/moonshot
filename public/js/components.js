@@ -1,5 +1,12 @@
 $(document).ready(function(){
-
+	// initialize
+	
+	
+	/// write some code to get record type content rule.[]
+	
+	
+	
+	
 	// populate the #classification-data div
 	$.ajax({url: "/get-classifications", success: function(result){
     	
@@ -136,38 +143,95 @@ $(document).on("click", ".collapsed", function(){
 	$("#" + parentNodeId +" > span.folder").removeClass("folder")
 	//alert(parentNodeId)
 	
-	
+	// for records attached directly to classifications.
 	if($("#" + parentNodeId).hasClass("classification-can-attach-records")){
-		classificationUri = parentNodeId.substr(19)
-		//alert(classificationUri)
-		$.ajax({url: "/get-classification-records?uri=" + classificationUri, success: function(result){
-			if(result.TotalResults>0){
-				$("#" + parentNodeId + " ul").remove()  // clear existing list of folders.
-				$("#" + parentNodeId).append("<ul style='list-style-type:none;list-style-position: outside;'></ul>")
-				for(var i=0; i<result.TotalResults; i++){
-					//alert("Uri: " + result.Results[i].Uri)
-					$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + result.Results[i].Uri + "'><span style='padding: 12px 20px;'></span><span class='folder-fill'></span><span class='record-title'><a href='#'>" + result.Results[i].RecordTitle.Value + "</a></span></li>")
-				}
-				
-						$('ul').each(function(_, ul) {
-		// get all the nodes to be sorted
-		var $toSort = $(ul).children('li');
-		$toSort.sort((li1, li2) => $(li1).children(".record-title").text().localeCompare($(li2).children(".record-title").text()));
-		$toSort.each(function() {
-		  $(this).appendTo(ul);
-		});
-	 });
-				
-				
-				
-			}
+		//alert(parentNodeId)
+		$("#" + parentNodeId).append("<ul style='list-style-type:none;'></ul>")
+		var classificationUri = parentNodeId.substr(19)	
+		$.ajax({url: "/get-classification-records?uri=" + classificationUri, 
+				success: function(result){
+					var classificationRecords = result;
+					//console.log(classificationRecords.TotalResults)
+					for(var i=0; i<classificationRecords.TotalResults; i++){
+						var recordTypeUri = classificationRecords.Results[i].RecordRecordType.Uri;
+						var recordUri = classificationRecords.Results[i].Uri;
+						var recordTitle = classificationRecords.Results[i].RecordTitle.Value;
+						
+						
+						
+						
+						
+						getRecordTypeContentsRule(parentNodeId, recordUri, recordTitle, recordTypeUri)
+						
 			
-			}, error: function(result){
-				console.log("Oooops!")
-				}});
-			}
-	})
 
+					}
+			}, error: function(result)
+				{
+				console.log("Oooops!")
+				}
+			});
+		}
+
+	//if($("#" + parent))
+	
+})
+
+
+function getRecordTypeContentsRule(parentNodeId, recordUri, recordTitle, recordTypeUri)
+	{
+		//// need to work out how to cache the recordTypeContents rule.  Curret approach is too slow.
+		
+		
+		
+		
+	$.ajax(
+		{
+		url: "/get-record-type-contents-rule?uri=" + "3", 
+
+		success: function(result)
+
+			{
+			recordTypeContentsRule = result;
+			console.log(recordTypeContentsRule.Results[0].RecordTypeContentsRule.Value)
+			if(recordTypeContentsRule.Results[0].RecordTypeContentsRule.Value=="ByList")
+				{
+				console.log("ByList")
+				// If the contents rule is "ByList" it implies that a define list of record types can be added as content to this record.
+				displayRecordFolderOpen(parentNodeId, recordUri, recordTitle)
+				}
+				else
+				{
+				if(recordTypeContentsRule.Results[0].RecordTypeLevel.Value=="4")
+					{
+					// Level 4 is the default level for folders.  [Level 2 is the default level for documents.]
+					displayRecordFolderOpen(parentNodeId, recordUri, recordTitle)
+					}
+					else
+						{
+						displayRecordFolderFill(parentNodeId, recordUri, recordTitle)
+						}
+				}
+
+			}, 
+		error: function(result)
+			{
+			console.log("Oooops!")
+			}
+	   });
+	}
+
+function displayRecordFolderOpen(parentNodeId, recordUri, recordTitle)
+	{
+	$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + recordUri + "' class='classification-hidden'><span class='collapsed'></span></span><span class='folder'></span><span class='record-title'><a href='#'>" + recordTitle + "</a></span></li>")
+	$("#" + parentNodeId +" > ul > li").removeClass("classification-hidden")
+	
+	}
+
+function displayRecordFolderFill(parentNodeId, recordUri, recordTitle)
+	{
+	$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + recordUri + "'><span style='padding: 12px 20px;'></span><span class='folder-fill'></span><span class='record-title'><a href='#'>" + recordTitle + "</a></span></li>")
+	}
 
 // Click on expanded caret
 $(document).on("click", ".expanded", function(){
@@ -186,10 +250,12 @@ $(document).on("click", ".expanded", function(){
 // Functions // 
 function highlightSelectedClassification(eventTargetParent){
 	$("#classification-treeview li").removeClass("classification-node-selected")
+	$("#classification-treeview li").removeClass("folder-node-selected")
 	$("#" + eventTargetParent.attr("id")).addClass("classification-node-selected")
 }
 
 function highlightSelectedFolder(eventTargetParent){
+	$("#classification-treeview li").removeClass("classification-node-selected")
 	$("#classification-treeview li").removeClass("folder-node-selected")
 	$("#" + eventTargetParent.attr("id")).addClass("folder-node-selected")
 }

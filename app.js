@@ -95,7 +95,7 @@ app.get("/get-classification-records", (req, res, next) => {
 	var jsonData = {
 					"TrimType": "Record",
   					"q": "classification:" + classificationUri,
-					"Properties": "RecordTitle"
+					"Properties": "RecordTitle, RecordRecordType, RecordTypeContentsRule"
 			}
 	
 	var config = {
@@ -119,6 +119,39 @@ app.get("/get-classification-records", (req, res, next) => {
  )
     .catch(err => next(err));
 })
+
+// get-record-type-containment-details
+app.get("/get-record-type-contents-rule", (req, res, next) => {
+    console.log("Call to '/get-record-type-contents-rule' received")
+	
+	var recordTypeUri = req.query.uri;
+	console.log(recordTypeUri)
+	
+	var config = {
+		  httpsAgent: agent('api-client'),
+		  method: 'get',
+		
+		//https://api.gilbyim.com/CMServiceAPI
+		  url: contentManagerServiceAPIBaseUrl + '/RecordType?q=' + recordTypeUri + '&properties=RecordTypeLevel, RecordTypeContentsRule, RecordTypeName',
+		  headers: { 
+			'Authorization': authorizationHeaderValue, 
+			//'Content-Type': 'application/json', 
+		  },
+		  //data : JSON.stringify(jsonData)
+		};
+  //console.log(getTimeStamp(), green + "New Content Manager record successfully created.", resetColor)
+  console.log("Calling CMServiceAPI.")
+  axios(config)
+    .then( function (response)  {
+	  console.log("Response from CMServiceAPI recieved.")
+	  console.log("Sending response to browser.")
+	  res.status(200).send(response.data)
+  } 
+ )
+    .catch(err => next(err));
+})
+
+
 
 
 // Listen on Port 300
