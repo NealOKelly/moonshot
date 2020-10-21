@@ -33,7 +33,7 @@ app.set('view engine', 'ejs')
 //  Routes
 app.get('', (req, res) => {
 	res.render('index', { title: 'Moonshot'})
-})
+	})
 
 // get-classifications
 app.get("/get-classifications", (req, res, next) => {
@@ -42,11 +42,10 @@ app.get("/get-classifications", (req, res, next) => {
 		  httpsAgent: agent('api-client'),
 		  method: 'get',
 		  url: contentManagerServiceAPIBaseUrl + '/Classification?q=all&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords',
-		  headers: { 
+		  headers: 
+			{ 
 			'Authorization': authorizationHeaderValue, 
-			//'Content-Type': 'application/json', 
-		  },
-		  //data : JSON.stringify(jsonData)
+		  	},	
 		};
   //console.log(getTimeStamp(), green + "New Content Manager record successfully created.", resetColor)
   console.log("Calling CMServiceAPI.")
@@ -150,9 +149,6 @@ app.get("/get-record-type-attributes", (req, res, next) => {
  )
     .catch(err => next(err));
 })
-
-
-
 
 // Listen on Port 300
 app.listen(port, () => console.info('App listening on port ' + port))
