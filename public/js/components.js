@@ -26,16 +26,16 @@ $(document).ready(function(){
 					}
 					else
 						{
-						var strParentListItemId = "#classification-uri-" + classifications.Results[i].ClassificationParentClassification.Uri;  //get the ID of he parenet Classification.
-						if($(strParentListItemId).length)  // if list item for the parent Classification exists
+						var parentNodeId = "#classification-uri-" + classifications.Results[i].ClassificationParentClassification.Uri;  //get the ID of he parenet Classification.
+						if($(parentNodeId).length)  // if list item for the parent Classification exists
 							{
-							if(!$(strParentListItemId + " ul").length)
+							if(!$(parentNodeId + " ul").length)
 								{  // add a new unordered list if none exists.
-								$(strParentListItemId).append("<ul style='list-style-type:none;list-style-position: outside;'></ul>");
+								$(parentNodeId).append("<ul style='list-style-type:none;list-style-position: outside;'></ul>");
 								}
 							if(!$("#classification-uri-" + classifications.Results[i].Uri).length)
 								{
-								$(strParentListItemId + "> ul").append("<li id='classification-uri-" + classifications.Results[i].Uri + "'><span class='collapsed'></span><span class='folder'></span><span class='classification-name'><a href='#'>" + classifications.Results[i].ClassificationName.Value + "</a></span></li>")
+								$(parentNodeId + "> ul").append("<li id='classification-uri-" + classifications.Results[i].Uri + "'><span class='collapsed'></span><span class='folder'></span><span class='classification-name'><a href='#'>" + classifications.Results[i].ClassificationName.Value + "</a></span></li>")
 
 								// If records can be attached to the classification then add a class.
 								if(classifications.Results[i].ClassificationCanAttachRecords.Value==true)
@@ -221,6 +221,8 @@ function addFolderNode(classificationUri, parentNodeId)
 			}
 		});	
 	}
+
+//function addClassificationNode(parentNodeId, recordUri, recordTitle)
 
 function addIntermediateFolderNode(parentNodeId, recordUri, recordTitle)
 	{
