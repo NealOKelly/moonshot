@@ -1,12 +1,5 @@
 $(document).ready(function(){
-	// initialize
-	
-	
-	/// write some code to get record type content rule.[]
-	
-	
-	
-	
+
 	// populate the #classification-data div
 	$.ajax({url: "/get-classifications", success: function(result){
     	
@@ -122,13 +115,12 @@ $(document).on("click", ".folder-fill", function(){
 })
 
 // Click on folder-fill Icon //
-$(document).on("click", ".record-title>a", function(){
+$(document).on("click", ".record-title>a", function()
+	{
 	var eventTargetParent = $(event.target).parent();
 	highlightSelectedFolder(eventTargetParent.parent())
 	var recordUri = eventTargetParent.attr("id").substr(11)
-	//getRecordProperties(recordUri)
-
-})
+	})
 
 // Click on collpased caret
 $(document).on("click", ".collapsed", function(){
@@ -149,12 +141,7 @@ $(document).on("click", ".collapsed", function(){
 		getRecordTypeDefinitions(classificationUri, parentNodeId)
 
 		}
-	
-	
-
-	//if($("#" + parent))
-	
-})
+	})
 
 function getRecordTypeDefinitions(classificationUri, parentNodeId)
 	{
@@ -205,10 +192,7 @@ function getRecordTypeDefinitions(classificationUri, parentNodeId)
 			console.log("Oooops!")
 			}
 		});	
-
 	}
-
-
 
 function displayRecordFolderOpen(parentNodeId, recordUri, recordTitle)
 	{
@@ -249,38 +233,35 @@ function highlightSelectedFolder(eventTargetParent){
 	$("#" + eventTargetParent.attr("id")).addClass("folder-node-selected")
 }
 
-function getClassificationProperties(classificationUri){
-	
-			$.ajax({url: "/get-classification-details?uri=" + classificationUri, success: function(result){
-    	
-		var details = JSON.stringify(result);
-		////		var details = result;
-
-			//$("#details-panel").html(details);
-			console.log("result=" + result.Results[0].ClassificationCanAttachRecords.Value)		
+function getClassificationProperties(classificationUri)
+	{
+	$.ajax(
+		{
+		url: "/get-classification-details?uri=" + classificationUri, 
+		success: function(result)
+			{
+			var details = JSON.stringify(result);
 			$("#classificationNameValue").html(result.Results[0].ClassificationName.Value)
 			$("#classificationAccessControlValue").html(result.Results[0].ClassificationAccessControl.Value)
 			$("#classificationCanAttachRecordsValue").html(result.Results[0].ClassificationCanAttachRecords.Value)
+			}, 
+		error: function(result)
+			{
+			console.log("Oooops!")
+			}
+		});
+	}
 
-  	}, error: function(result){
-		console.log("Oooops!")
-	}});
-	
-}
-
-function getClassificationRecords(classificationUri){
-	
-			$.ajax({url: "/get-classification-records", success: function(result){
-    	
-		var details = JSON.stringify(result);
-			console.log("Success")
-
-  	}, error: function(result){
-		console.log("Oooops!")
-	}});
-	
-}
-
-
-
-
+function getClassificationRecords(classificationUri)
+	{
+	$.ajax({url: "/get-classification-records", 
+		success: function(result)
+			{
+			var details = JSON.stringify(result);
+			}, 
+		error: function(result)
+			{
+			console.log("Oooops!")
+			}
+		});
+	}
