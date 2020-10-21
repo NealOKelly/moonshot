@@ -2,7 +2,6 @@ $(document).ready(function(){
 
 	// populate the #classification-data div
 	$.ajax({url: "/get-classifications", success: function(result){
-    	
 		var classifications = result;
 		var intClassificationsDisplayed = 0;
 		while (intClassificationsDisplayed < classifications.Results.length)
@@ -109,9 +108,6 @@ $(document).on("click", ".classification-name>a", function(){
 $(document).on("click", ".folder-fill", function(){
 	var eventTargetParent = $(event.target).parent();
 	highlightSelectedFolder(eventTargetParent)
-	var recordUri = eventTargetParent.attr("id").substr(11)
-	//getRecordProperties(recordUri)
-
 })
 
 // Click on folder-fill Icon //
@@ -119,7 +115,7 @@ $(document).on("click", ".record-title>a", function()
 	{
 	var eventTargetParent = $(event.target).parent();
 	highlightSelectedFolder(eventTargetParent.parent())
-	var recordUri = eventTargetParent.attr("id").substr(11)
+
 	})
 
 // Click on collpased caret
@@ -176,7 +172,7 @@ function getRecordTypeDefinitions(classificationUri, parentNodeId)
 										displayRecordFolderFill(parentNodeId, recordUri, recordTitle)
 										}
 									}
-							   }
+							   	}
 							}
 						}
 					}, 
@@ -198,7 +194,6 @@ function displayRecordFolderOpen(parentNodeId, recordUri, recordTitle)
 	{
 	$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + recordUri + "' class='classification-hidden'><span class='collapsed'></span></span><span class='folder'></span><span class='record-title'><a href='#'>" + recordTitle + "</a></span></li>")
 	$("#" + parentNodeId +" > ul > li").removeClass("classification-hidden")
-	
 	}
 
 function displayRecordFolderFill(parentNodeId, recordUri, recordTitle)
@@ -214,7 +209,6 @@ $(document).on("click", ".expanded", function(){
 	$("#" + parentNodeId +" > span.expanded").removeClass("expanded")
 	$("#" + parentNodeId + " > span.folder-open").addClass("folder")
 	$("#" + parentNodeId +" > span.folder-open").removeClass("folder-open")
-	classificationUri = parentNodeId.substr(19)
 	if($("#" + parentNodeId).hasClass("classification-can-attach-records")){
 		$("#" + parentNodeId + " ul").remove() //clear folder when parent is collapsed.
 	}
