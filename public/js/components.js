@@ -49,7 +49,7 @@ $(document).ready(function(){
 					}		
 				}
 			// sort	 this list.
-			sortClassificationTree()
+			sortClassificationTree(".classification-name")
 
 			// hide everything but top-level classification on load.
 			$("#classification-treeview li").each(function(_, li)
@@ -229,13 +229,13 @@ function addFolderNodes(parentNodeType, parentNodeId)
 		});	
 	}
 		
-function sortClassificationTree()
+function sortClassificationTree(sortBy)
 	{
 	$('ul').each(function(_, ul)
 		{
 		// get all the nodes to be sorted
 		var $toSort = $(ul).children('li');
-		$toSort.sort((li1, li2) => $(li1).children(".classification-name").text().localeCompare($(li2).children(".classification-name").text()));
+		$toSort.sort((li1, li2) => $(li1).children(sortBy).text().localeCompare($(li2).children(sortBy).text()));
 		$toSort.each(function() 
 			{
 			$(this).appendTo(ul);
@@ -249,11 +249,13 @@ function addIntermediateFolderNode(parentNodeId, recordUri, recordTitle)
 	{
 	$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + recordUri + "' class='folder-intermediate'><span class='collapsed'></span></span><span class='folder'></span><span class='record-title'><a href='#'>" + recordTitle + "</a></span></li>")
 	//$("#" + parentNodeId +" > ul > li").removeClass("classification-hidden")
+	sortClassificationTree(".record-title")
 	}
 
 function addTerminalFolderNode(parentNodeId, recordUri, recordTitle)
 	{
 	$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + recordUri + "' class='folder-terminal'><span style='padding: 12px 20px;'></span><span class='folder-fill'></span><span class='record-title'><a href='#'>" + recordTitle + "</a></span></li>")
+	sortClassificationTree(".record-title")
 	}
 
 // Click on expanded caret
