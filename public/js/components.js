@@ -49,17 +49,8 @@ $(document).ready(function(){
 					}		
 				}
 			// sort	 this list.
+			sortClassificationTree()
 
-			$('ul').each(function(_, ul)
-				{
-				// get all the nodes to be sorted
-				var $toSort = $(ul).children('li');
-				$toSort.sort((li1, li2) => $(li1).children(".classification-name").text().localeCompare($(li2).children(".classification-name").text()));
-				$toSort.each(function() 
-					{
-					$(this).appendTo(ul);
-					});
-				});
 			// hide everything but top-level classification on load.
 			$("#classification-treeview li").each(function(_, li)
 				{
@@ -238,7 +229,19 @@ function addFolderNodes(parentNodeType, parentNodeId)
 		});	
 	}
 		
-		
+function sortClassificationTree()
+	{
+	$('ul').each(function(_, ul)
+		{
+		// get all the nodes to be sorted
+		var $toSort = $(ul).children('li');
+		$toSort.sort((li1, li2) => $(li1).children(".classification-name").text().localeCompare($(li2).children(".classification-name").text()));
+		$toSort.each(function() 
+			{
+			$(this).appendTo(ul);
+			});
+		});
+	}
 
 //function addClassificationNode(parentNodeId, recordUri, recordTitle)
 
