@@ -86,17 +86,16 @@ app.get("/get-classification-details", (req, res, next) => {
     .catch(err => next(err));
 })
 
-// get-classiciation-records (folder)
-app.get("/get-classification-records", (req, res, next) => {
-    console.log("Call to '/get-classification-records' received")
-	var classificationUri = req.query.uri
-	
+// Search
+app.get("/Search", (req, res, next) => {
+    console.log("Call to '/Search' received")
+	var classificationUri = req.query.q
+	console.log(req.query.searchQuery)
 	var jsonData = {
 					"TrimType": "Record",
-  					"q": "classification:" + classificationUri,
-					"Properties": "RecordTitle, RecordRecordType, RecordTypeContentsRule"
+					"q": req.query.q,
+					"Properties": req.query.properties
 			}
-	
 	var config = {
 		  httpsAgent: agent('api-client'),
 		  method: 'post',
@@ -149,6 +148,23 @@ app.get("/get-record-type-attributes", (req, res, next) => {
  )
     .catch(err => next(err));
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Listen on Port 300
 app.listen(port, () => console.info('App listening on port ' + port))

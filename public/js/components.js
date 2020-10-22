@@ -150,6 +150,7 @@ function addFolderNodes(parentNodeType, parentNodeUri, parentNodeId)
 
 	if(parentNodeType=="classification")
 		{
+		var includedProperties = "RecordTitle, RecordRecordType, RecordTypeContentsRule";
 		$.ajax(
 			{
 			url: "/get-record-type-attributes",
@@ -158,7 +159,7 @@ function addFolderNodes(parentNodeType, parentNodeUri, parentNodeId)
 				var recordTypeDefinitions = result;
 				$.ajax(
 					{
-					url: "/get-classification-records?uri=" + parentNodeUri,
+					url: "/Search?q=classification:" + parentNodeUri + "&properties=" + includedProperties,
 					success: function(result)
 						{
 						for(i=0; i<result.TotalResults; i++)
