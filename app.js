@@ -90,7 +90,6 @@ app.get("/get-classification-details", (req, res, next) => {
 app.get("/Search", (req, res, next) => {
     console.log("Call to '/Search' received")
 	var classificationUri = req.query.q
-	console.log(req.query.searchQuery)
 	var jsonData = {
 					"TrimType": "Record",
 					"q": req.query.q,
@@ -121,21 +120,14 @@ app.get("/Search", (req, res, next) => {
 // get-record-type-containment-details
 app.get("/get-record-type-attributes", (req, res, next) => {
     console.log("Call to '/get-record-type-attributes' received")
-	
 	var recordTypeUri = req.query.uri;
-	console.log(recordTypeUri)
-	
 	var config = {
 		  httpsAgent: agent('api-client'),
 		  method: 'get',
-		
-		//https://api.gilbyim.com/CMServiceAPI
 		  url: contentManagerServiceAPIBaseUrl + '/RecordType?q=all&properties=RecordTypeLevel, RecordTypeContentsRule, RecordTypeName',
 		  headers: { 
 			'Authorization': authorizationHeaderValue, 
-			//'Content-Type': 'application/json', 
 		  },
-		  //data : JSON.stringify(jsonData)
 		};
   //console.log(getTimeStamp(), green + "New Content Manager record successfully created.", resetColor)
   console.log("Calling CMServiceAPI.")
@@ -148,23 +140,6 @@ app.get("/get-record-type-attributes", (req, res, next) => {
  )
     .catch(err => next(err));
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // Listen on Port 300
 app.listen(port, () => console.info('App listening on port ' + port))
