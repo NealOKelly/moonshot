@@ -133,101 +133,109 @@ $(document).on("click", ".collapsed", function()
 	$("#" + parentNodeId + " > span.folder").addClass("folder-open")
 	$("#" + parentNodeId +" > span.folder").removeClass("folder")
 
+	$("#" + parentNodeId).append("<ul style='list-style-type:none;'></ul>")
 	// for records attached directly to classifications (folders).
 	if($("#" + parentNodeId).hasClass("classification-can-attach-records"))
 		{
-		$("#" + parentNodeId).append("<ul style='list-style-type:none;'></ul>")
 		addFolderNodes("classification", parentNodeId)
+		}
+	if($("#" + parentNodeId).hasClass("folder-intermediate"))
+		{
+		console.log("You have clicked onto the caret next to an intermediate folder.")
+		addFolderNodes("record", parentNodeId)
 		}
 	})
 
+
+
 function addFolderNodes(parentNodeType, parentNodeId)
 	{
-
-	//if(parentNodeType=="classification")
-	//	{
-		var includedProperties = "RecordTitle, RecordRecordType, RecordTypeContentsRule";
-		$.ajax(
+	var includedProperties = "RecordTitle, RecordRecordType, RecordTypeContentsRule";
+	$.ajax(
+		{
+		url: "/get-record-type-attributes",
+		success: function(result)
 			{
-			url: "/get-record-type-attributes",
-			success: function(result)
+			var recordTypeDefinitions = result;
+			if(parentNodeType=="classification")
 				{
-				var recordTypeDefinitions = result;
-				if(parentNodeType=="classification")
+				parentNodeUri=parentNodeId.substr(19)
+				var url = "/Search?q=classification:" + parentNodeUri + "&properties=" + includedProperties
+				}
+			else{
+				if(parentNodeType=="record")
 					{
-					parentNodeUri=parentNodeId.substr(19)
+					parentNodeUri=parentNodeId.substr(11)
+					var url = "/Search?q=container:" + parentNodeUri + "&properties=" + includedProperties
 					}
-					
-					
-					
-				$.ajax(
+			}
+			$.ajax(
+				{
+				url: url,
+				success: function(result)
 					{
-					url: "/Search?q=classification:" + parentNodeUri + "&properties=" + includedProperties,
-					success: function(result)
+					for(i=0; i<result.TotalResults; i++)
 						{
-						for(i=0; i<result.TotalResults; i++)
+						for(x=0; x<recordTypeDefinitions.TotalResults; x++)
 							{
-							for(x=0; x<recordTypeDefinitions.TotalResults; x++)
+							if(result.Results[i].RecordRecordType.Uri==recordTypeDefinitions.Results[x].Uri)
 								{
-								if(result.Results[i].RecordRecordType.Uri==recordTypeDefinitions.Results[x].Uri)
+								var recordUri = result.Results[i].Uri;
+								var recordTitle = result.Results[i].RecordTitle.Value;
+								// Do not display any records where the RecordTypeLevel is <4.
+								if(recordTypeDefinitions.Results[x].RecordTypeLevel.Value>="4")
 									{
-									var recordUri = result.Results[i].Uri;
-									var recordTitle = result.Results[i].RecordTitle.Value;
-									// Do not display any records where the RecordTypeLevel is <4.
-									if(recordTypeDefinitions.Results[x].RecordTypeLevel.Value>="4")
+									console.log(recordTypeDefinitions.Results[x].RecordTypeContentsRule.Value)
+									switch(recordTypeDefinitions.Results[x].RecordTypeContentsRule.Value)
 										{
-										console.log(recordTypeDefinitions.Results[x].RecordTypeContentsRule.Value)
-										switch(recordTypeDefinitions.Results[x].RecordTypeContentsRule.Value)
-											{
-											case "ByLevel":
-												if(recordTypeDefinitions.Results[x].RecordTypeLevel.Value>="5")
-													{
-													addIntermediateFolderNode(parentNodeId, recordUri, recordTitle)
-													}
-												else
-													{
-													if(recordTypeDefinitions.Results[x].RecordTypeLevel.Value<"5")
-														{
-														addTerminalFolderNode(parentNodeId, recordUri, recordTitle)											
-														}
-													}
-												break;
-											case "ByLevelInclusive":
+										case "ByLevel":
+											if(recordTypeDefinitions.Results[x].RecordTypeLevel.Value>="5")
+												{
 												addIntermediateFolderNode(parentNodeId, recordUri, recordTitle)
-												break;
-											case "ByBehavior":
-												addTerminalFolderNode(parentNodeId, recordUri, recordTitle)
-												break;
-											case "ByList":
-												if(recordTypeDefinitions.Results[x].RecordTypeLevel.Value>="4")
+												}
+											else
+												{
+												if(recordTypeDefinitions.Results[x].RecordTypeLevel.Value<"5")
 													{
-													addIntermediateFolderNode(parentNodeId, recordUri, recordTitle)
+													addTerminalFolderNode(parentNodeId, recordUri, recordTitle)											
 													}
-												break;
-											case "Prevented":
-												// Do not add node to classification tree.
-												break;
-											}
+												}
+											break;
+										case "ByLevelInclusive":
+											addIntermediateFolderNode(parentNodeId, recordUri, recordTitle)
+											break;
+										case "ByBehavior":
+											addTerminalFolderNode(parentNodeId, recordUri, recordTitle)
+											break;
+										case "ByList":
+											if(recordTypeDefinitions.Results[x].RecordTypeLevel.Value>="4")
+												{
+												addIntermediateFolderNode(parentNodeId, recordUri, recordTitle)
+												}
+											break;
+										case "Prevented":
+											// Do not add node to classification tree.
+											break;
 										}
 									}
 								}
 							}
-						}, 
-					error: function(result)
-						{
-						console.log("Oooops!")
-						console.log(result)
 						}
-					});	
+					}, 
+				error: function(result)
+					{
+					console.log("Oooops!")
+					console.log(result)
+					}
+				});	
 
-				}, 
-			error: function(result)
-				{
-				console.log("Oooops!")
-				console.log(result)
-				}
-			});	
-	//	}
+			}, 
+		error: function(result)
+			{
+			console.log("Oooops!")
+			console.log(result)
+			}
+		});	
 	}
 		
 		
