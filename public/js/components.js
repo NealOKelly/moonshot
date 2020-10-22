@@ -258,7 +258,7 @@ function addClassificationNode(rootNode, classificationUri, classificationName)
 
 function addIntermediateFolderNode(parentNodeId, recordUri, recordTitle)
 	{
-	$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + recordUri + "' class='folder-intermediate'><span class='collapsed'></span></span><span class='folder'></span><span class='record-title'><a href='#'>" + recordTitle + "</a></span></li>")
+	$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + recordUri + "' class='folder-intermediate'><span class='collapsed'></span></span><span class='folder-green'></span><span class='record-title'><a href='#'>" + recordTitle + "</a></span></li>")
 	//$("#" + parentNodeId +" > ul > li").removeClass("classification-hidden")
 	sortClassificationTree(".record-title")
 	}
