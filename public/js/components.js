@@ -137,19 +137,15 @@ $(document).on("click", ".collapsed", function()
 	if($("#" + parentNodeId).hasClass("classification-can-attach-records"))
 		{
 		$("#" + parentNodeId).append("<ul style='list-style-type:none;'></ul>")
-		var classificationUri = parentNodeId.substr(19)
-		addFolderNodes("classification", classificationUri, parentNodeId)
+		addFolderNodes("classification", parentNodeId)
 		}
-	// for records attached to other records (sub folders and documents)
-	//if($[id*='record-uri-'']
-	
 	})
 
-function addFolderNodes(parentNodeType, parentNodeUri, parentNodeId)
+function addFolderNodes(parentNodeType, parentNodeId)
 	{
 
-	if(parentNodeType=="classification")
-		{
+	//if(parentNodeType=="classification")
+	//	{
 		var includedProperties = "RecordTitle, RecordRecordType, RecordTypeContentsRule";
 		$.ajax(
 			{
@@ -157,6 +153,13 @@ function addFolderNodes(parentNodeType, parentNodeUri, parentNodeId)
 			success: function(result)
 				{
 				var recordTypeDefinitions = result;
+				if(parentNodeType=="classification")
+					{
+					parentNodeUri=parentNodeId.substr(19)
+					}
+					
+					
+					
 				$.ajax(
 					{
 					url: "/Search?q=classification:" + parentNodeUri + "&properties=" + includedProperties,
@@ -224,7 +227,7 @@ function addFolderNodes(parentNodeType, parentNodeUri, parentNodeId)
 				console.log(result)
 				}
 			});	
-		}
+	//	}
 	}
 		
 		
