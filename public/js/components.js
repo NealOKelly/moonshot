@@ -16,7 +16,7 @@ $(document).ready(function(){
 						{
 						if(!$("#classification-uri-" + classifications.Results[i].Uri).length)
 							{
-							$("#classification-treeview > ul").append("<li id='classification-uri-" + classifications.Results[i].Uri + "'><span class='collapsed'></span><span class='folder'></span><span class='classification-name'><a href='#'>" + classifications.Results[i].ClassificationName.Value + "</a></span></li>");	
+							addClassificationNode("#classification-treeview", classifications.Results[i].Uri, classifications.Results[i].ClassificationName.Value)
 							// If records can be attached to the classification then add a class.
 							if(classifications.Results[i].ClassificationCanAttachRecords.Value==true){
 								$("#classification-uri-" + classifications.Results[i].Uri).addClass("classification-can-attach-records")
@@ -35,7 +35,9 @@ $(document).ready(function(){
 								}
 							if(!$("#classification-uri-" + classifications.Results[i].Uri).length)
 								{
-								$(parentNodeId + "> ul").append("<li id='classification-uri-" + classifications.Results[i].Uri + "'><span class='collapsed'></span><span class='folder'></span><span class='classification-name'><a href='#'>" + classifications.Results[i].ClassificationName.Value + "</a></span></li>")
+
+								
+								addClassificationNode(parentNodeId, classifications.Results[i].Uri, classifications.Results[i].ClassificationName.Value)
 
 								// If records can be attached to the classification then add a class.
 								if(classifications.Results[i].ClassificationCanAttachRecords.Value==true)
@@ -137,8 +139,27 @@ $(document).on("click", ".collapsed", function()
 		}
 	})
 
+// Click on expanded caret
+$(document).on("click", ".expanded", function()
+	{
+	var parentNodeId = $(event.target).parent().attr("id");
+	$("#" + parentNodeId +" > ul > li").addClass("classification-hidden")
+	$("#" + parentNodeId + " > span.expanded").addClass("collapsed")
+	$("#" + parentNodeId +" > span.expanded").removeClass("expanded")
+	$("#" + parentNodeId + " > span.folder-open").addClass("folder")
+	$("#" + parentNodeId +" > span.folder-open").removeClass("folder-open")
+	if($("#" + parentNodeId).hasClass("classification-can-attach-records"))
+		{
+		$("#" + parentNodeId + " ul").remove() //clear folder when parent is collapsed.
+		}
+	if($("#" + parentNodeId).hasClass("folder-intermediate"))
+		{
+		$("#" + parentNodeId + " ul").remove() //clear folder when parent is collapsed.
+		}
+	})
 
 
+// Functions // 
 function addFolderNodes(parentNodeType, parentNodeId)
 	{
 	var includedProperties = "RecordTitle, RecordRecordType, RecordTypeContentsRule";
@@ -228,6 +249,26 @@ function addFolderNodes(parentNodeType, parentNodeId)
 			}
 		});	
 	}
+
+
+function addClassificationNode(rootNode, classificationUri, classificationName)
+	{
+	$(rootNode + "> ul").append("<li id='classification-uri-" + classificationUri + "'><span class='collapsed'></span><span class='folder'></span><span class='classification-name'><a href='#'>" + classificationName + "</a></span></li>")
+	}
+
+function addIntermediateFolderNode(parentNodeId, recordUri, recordTitle)
+	{
+	$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + recordUri + "' class='folder-intermediate'><span class='collapsed'></span></span><span class='folder'></span><span class='record-title'><a href='#'>" + recordTitle + "</a></span></li>")
+	//$("#" + parentNodeId +" > ul > li").removeClass("classification-hidden")
+	sortClassificationTree(".record-title")
+	}
+
+function addTerminalFolderNode(parentNodeId, recordUri, recordTitle)
+	{
+	$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + recordUri + "' class='folder-terminal'><span style='padding: 12px 20px;'></span><span class='folder-fill'></span><span class='record-title'><a href='#'>" + recordTitle + "</a></span></li>")
+	sortClassificationTree(".record-title")
+	}
+
 		
 function sortClassificationTree(sortBy)
 	{
@@ -243,37 +284,6 @@ function sortClassificationTree(sortBy)
 		});
 	}
 
-//function addClassificationNode(parentNodeId, recordUri, recordTitle)
-
-function addIntermediateFolderNode(parentNodeId, recordUri, recordTitle)
-	{
-	$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + recordUri + "' class='folder-intermediate'><span class='collapsed'></span></span><span class='folder'></span><span class='record-title'><a href='#'>" + recordTitle + "</a></span></li>")
-	//$("#" + parentNodeId +" > ul > li").removeClass("classification-hidden")
-	sortClassificationTree(".record-title")
-	}
-
-function addTerminalFolderNode(parentNodeId, recordUri, recordTitle)
-	{
-	$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + recordUri + "' class='folder-terminal'><span style='padding: 12px 20px;'></span><span class='folder-fill'></span><span class='record-title'><a href='#'>" + recordTitle + "</a></span></li>")
-	sortClassificationTree(".record-title")
-	}
-
-// Click on expanded caret
-$(document).on("click", ".expanded", function()
-	{
-	var parentNodeId = $(event.target).parent().attr("id");
-	$("#" + parentNodeId +" > ul > li").addClass("classification-hidden")
-	$("#" + parentNodeId + " > span.expanded").addClass("collapsed")
-	$("#" + parentNodeId +" > span.expanded").removeClass("expanded")
-	$("#" + parentNodeId + " > span.folder-open").addClass("folder")
-	$("#" + parentNodeId +" > span.folder-open").removeClass("folder-open")
-	if($("#" + parentNodeId).hasClass("classification-can-attach-records"))
-		{
-		$("#" + parentNodeId + " ul").remove() //clear folder when parent is collapsed.
-		}
-	})
-
-// Functions // 
 function highlightSelectedClassification(eventTargetParent)
 	{
 	$("#classification-treeview li").removeClass("classification-node-selected")
