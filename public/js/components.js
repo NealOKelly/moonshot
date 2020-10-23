@@ -9,45 +9,25 @@ $(document).ready(function()
 			{
 			var classifications = result;
 			var intClassificationsDisplayed = 0;
-			while (intClassificationsDisplayed < classifications.Results.length)
-				{
-				for(var i=0; i<classifications.Results.length; i++)
+				console.log(classifications)
+			//while (intClassificationsDisplayed < classifications.Results.length)
+			//	{
+				for(var i=0; i<classifications.TotalResults; i++)
 					{
 					if(!classifications.Results[i].hasOwnProperty("ClassificationParentClassification"))
 						{
 						if(!$("#classification-uri-" + classifications.Results[i].Uri).length)
 							{
-							addClassificationNode("#classification-treeview", classifications.Results[i].Uri, classifications.Results[i].ClassificationName.Value)
+							addClassificationNode("#classification-treeview > ul", classifications.Results[i].Uri, classifications.Results[i].ClassificationName.Value)
 							// If records can be attached to the classification then add a class.
 							if(classifications.Results[i].ClassificationCanAttachRecords.Value==true){
 								$("#classification-uri-" + classifications.Results[i].Uri).addClass("classification-can-attach-records")
 							}
-						intClassificationsDisplayed++;
+					//	intClassificationsDisplayed++;
 						}
 					}
-					else
-						{
-						var parentNodeId = "#classification-uri-" + classifications.Results[i].ClassificationParentClassification.Uri;  //get the ID of he parenet Classification.
-						if($(parentNodeId).length)  // if list item for the parent Classification exists
-							{
-							if(!$(parentNodeId + " ul").length)
-								{  // add a new unordered list if none exists.
-								$(parentNodeId).append("<ul style='list-style-type:none;list-style-position: outside;'></ul>");
-								}
-							if(!$("#classification-uri-" + classifications.Results[i].Uri).length)
-								{
-								addClassificationNode(parentNodeId, classifications.Results[i].Uri, classifications.Results[i].ClassificationName.Value)
-								// If records can be attached to the classification then add a class.
-								if(classifications.Results[i].ClassificationCanAttachRecords.Value==true)
-									{
-									$("#classification-uri-" + classifications.Results[i].Uri).addClass("classification-can-attach-records")
-									}
-								intClassificationsDisplayed++;
-								}
-							}
-						}
 					}		
-				}
+			//	}
 			// sort	 this list.
 			sortClassificationTree(".classification-name")
 			// hide everything but top-level classification on load.
@@ -123,8 +103,31 @@ $(document).on("click", ".collapsed", function()
 	$("#" + parentNodeId + " > span.folder").addClass("folder-open")
 	$("#" + parentNodeId + " > span.folder").removeClass("folder")
 
-	$("#" + parentNodeId).append("<ul style='list-style-type:none;'></ul>")
-	// for records attached directly to classifications (folders).
+	// check for new classifications.
+	var q="parent:" + parentNodeId.substr(19);
+	$.ajax(
+	{
+	url: "/Search?q=" + q + "&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords&trimtype=Classification",
+	success: function(result)
+		{
+		if(result.TotalResults>0){
+			$("#" + parentNodeId).append("<ul style='list-style-type:none;'></ul>")
+		}
+		for (i=0; i<result.TotalResults; i++)  // for each classification returned in the search result
+			{
+			if(!$("#classification-uri-" + result.Results[i].Uri).length)
+				{
+				addClassificationNode("#" + parentNodeId + " > ul", result.Results[i].Uri, result.Results[i].ClassificationName.Value)
+				}
+			}
+		}, 
+	error: function(result)
+		{
+		console.log("Oooops!")
+		}
+	});
+	
+
 	if($("#" + parentNodeId).hasClass("classification-can-attach-records"))
 		{
 		addFolderNodes("classification", parentNodeId)
@@ -250,7 +253,8 @@ function addFolderNodes(parentNodeType, parentNodeId)
 
 function addClassificationNode(rootNode, classificationUri, classificationName)
 	{
-	$(rootNode + "> ul").append("<li id='classification-uri-" + classificationUri + "'><span class='collapsed'></span><span class='folder'></span><span class='classification-name'><a href='#'>" + classificationName + "</a></span></li>")
+	//	console.log("rootNode: " + rootNode)
+	$(rootNode).append("<li id='classification-uri-" + classificationUri + "'><span class='collapsed'></span><span class='folder'></span><span class='classification-name'><a href='#'>" + classificationName + "</a></span></li>")
 	}
 
 function addIntermediateFolderNode(parentNodeId, recordUri, recordTitle)

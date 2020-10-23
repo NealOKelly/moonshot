@@ -44,8 +44,9 @@ app.get("/Search", (req, res, next) => {
 	var jsonData = {
 					"TrimType": req.query.trimtype,
 					"q": req.query.q,
-					"Properties": req.query.properties
-			}
+					"properties": req.query.properties,
+					"pageSize": 1000000,
+					} 
 	var config = {
 		  httpsAgent: agent('api-client'),
 		  method: 'post',
