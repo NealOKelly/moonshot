@@ -16,24 +16,12 @@ $(document).ready(function()
 						{
 						if(!$("#classification-uri-" + classifications.Results[i].Uri).length)
 							{
-							addClassificationNode("#classification-treeview > ul", classifications.Results[i].Uri, classifications.Results[i].ClassificationName.Value)
-							// If records can be attached to the classification then add a class.
-							if(classifications.Results[i].ClassificationCanAttachRecords.Value==true){
-								$("#classification-uri-" + classifications.Results[i].Uri).addClass("classification-can-attach-records")
-							}
+							addClassificationNode("#classification-treeview > ul", classifications.Results[i].Uri, classifications.Results[i].ClassificationName.Value, classifications.Results[i].ClassificationCanAttachRecords.Value)
 						}
 					}
 				}		
 			// sort	 this list.
 			sortClassificationTree(".classification-name")
-			// hide everything but top-level classification on load.
-			$("#classification-treeview li").each(function(_, li)
-				{
-				if($(this).parent().parent().is("li"))
-					{
-					$(this).addClass("classification-hidden")
-					}
-				});
 			}, 
 		error: function(result)
 			{
@@ -114,15 +102,34 @@ $(document).on("click", ".collapsed", function()
 				}
 			}
 
-		for (i=0; i<result.TotalResults; i++)  // for each classification returned in the search result
+		for(i=0; i<result.TotalResults; i++)  // for each classification returned in the search result
 			{
 				console.log("NUmber of results: ")
 			if(!$("#classification-uri-" + result.Results[i].Uri).length)
 				{
-				addClassificationNode("#" + parentNodeId + " > ul", result.Results[i].Uri, result.Results[i].ClassificationName.Value)
+				addClassificationNode("#" + parentNodeId + " > ul", result.Results[i].Uri, result.Results[i].ClassificationName.Value, result.Results[i].ClassificationCanAttachRecords.Value)
 				}
 			}
 		console.log($("#" + parentNodeId + " > ul > li").length)
+		for(i=0; i<$("#" + parentNodeId + " > ul > li").length; i++)  // for each <li>
+			{
+			var nodeExistsInSearchResults = false;
+			for (x=0; x<result.TotalResults; x++)
+				{
+				if($("#" + parentNodeId + " > ul > li:nth-child(" + (i + 1) + ")").attr("id").substr(19)==result.Results[x].Uri)
+					{
+					nodeExistsInSearchResults = true;
+					}
+				
+				}
+				if(!nodeExistsInSearchResults)
+					{
+					$("#" + parentNodeId + " > ul > li:nth-child(" + (i + 1) + ")").addClass("classification-hidden")
+					}
+				console.log("nodeExistsInSearchResults:" + nodeExistsInSearchResults)
+				$(".classification-hidden").remove() // remove the <li> once the for loop has completed.
+			}
+
 		sortClassificationTree(".classification-name")
 		}, 
 	error: function(result)
@@ -166,6 +173,10 @@ $(document).on("click", ".expanded", function()
 // Functions // 
 function addFolderNodes(parentNodeType, parentNodeId)
 	{
+	if(!$("#" + parentNodeId + " > ul ").length)
+		{
+		$("#" + parentNodeId).append("<ul style='list-style-type:none;'></ul>")
+		}
 	var includedProperties = "RecordTitle, RecordRecordType, RecordTypeContentsRule";
 	$.ajax(
 		{
@@ -255,10 +266,14 @@ function addFolderNodes(parentNodeType, parentNodeId)
 	}
 
 
-function addClassificationNode(rootNode, classificationUri, classificationName)
+function addClassificationNode(rootNode, classificationUri, classificationName, canAttachRecords)
 	{
 	//	console.log("rootNode: " + rootNode)
 	$(rootNode).append("<li id='classification-uri-" + classificationUri + "'><span class='collapsed'></span><span class='folder'></span><span class='classification-name'><a href='#'>" + classificationName + "</a></span></li>")
+	if(canAttachRecords)								
+		{
+		$("#classification-uri-" + classificationUri).addClass("classification-can-attach-records")		
+		}
 	}
 
 function addIntermediateFolderNode(parentNodeId, recordUri, recordTitle)
