@@ -87,6 +87,44 @@ $(document).on("click", ".collapsed", function()
 	$("#" + parentNodeId + " > span.folder").addClass("folder-open")
 	$("#" + parentNodeId + " > span.folder").removeClass("folder")
 
+	addClassiciationNodes(parentNodeId)
+	
+
+	if($("#" + parentNodeId).hasClass("classification-can-attach-records"))
+		{
+		addFolderNodes("classification", parentNodeId)
+		}
+	if($("#" + parentNodeId).hasClass("folder-intermediate"))
+		{
+		console.log("You have clicked onto the caret next to an intermediate folder.")
+		addFolderNodes("record", parentNodeId)
+		}
+	})
+
+// Click on expanded caret
+$(document).on("click", ".expanded", function()
+	{
+	var parentNodeId = $(event.target).parent().attr("id");
+	$("#" + parentNodeId + " > ul > li").addClass("classification-hidden")
+	$("#" + parentNodeId + " > span.expanded").addClass("collapsed")
+	$("#" + parentNodeId + " > span.expanded").removeClass("expanded")
+	$("#" + parentNodeId + " > span.folder-open").addClass("folder")
+	$("#" + parentNodeId + " > span.folder-open").removeClass("folder-open")
+	if($("#" + parentNodeId).hasClass("classification-can-attach-records"))
+		{
+		//$("#" + parentNodeId + " ul").remove() //clear folder when parent is collapsed.
+		}
+	if($("#" + parentNodeId).hasClass("folder-intermediate"))
+		{
+		$("#" + parentNodeId + " ul").remove() //clear folder when parent is collapsed.
+		}
+	})
+
+
+// Functions // 
+
+function addClassiciationNodes(parentNodeId) 
+	{
 	// check for new classifications.
 	var q="parent:" + parentNodeId.substr(19);
 	$.ajax(
@@ -110,7 +148,6 @@ $(document).on("click", ".collapsed", function()
 				addClassificationNode("#" + parentNodeId + " > ul", result.Results[i].Uri, result.Results[i].ClassificationName.Value, result.Results[i].ClassificationCanAttachRecords.Value)
 				}
 			}
-		console.log($("#" + parentNodeId + " > ul > li").length)
 		for(i=0; i<$("#" + parentNodeId + " > ul > li").length; i++)  // for each <li>
 			{
 			var nodeExistsInSearchResults = false;
@@ -137,40 +174,19 @@ $(document).on("click", ".collapsed", function()
 		console.log("Oooops!")
 		}
 	});
-	
+	}
 
-	if($("#" + parentNodeId).hasClass("classification-can-attach-records"))
-		{
-		addFolderNodes("classification", parentNodeId)
-		}
-	if($("#" + parentNodeId).hasClass("folder-intermediate"))
-		{
-		console.log("You have clicked onto the caret next to an intermediate folder.")
-		addFolderNodes("record", parentNodeId)
-		}
-	})
-
-// Click on expanded caret
-$(document).on("click", ".expanded", function()
+function addClassificationNode(rootNode, classificationUri, classificationName, canAttachRecords)
 	{
-	var parentNodeId = $(event.target).parent().attr("id");
-	$("#" + parentNodeId + " > ul > li").addClass("classification-hidden")
-	$("#" + parentNodeId + " > span.expanded").addClass("collapsed")
-	$("#" + parentNodeId + " > span.expanded").removeClass("expanded")
-	$("#" + parentNodeId + " > span.folder-open").addClass("folder")
-	$("#" + parentNodeId + " > span.folder-open").removeClass("folder-open")
-	if($("#" + parentNodeId).hasClass("classification-can-attach-records"))
+	//	console.log("rootNode: " + rootNode)
+	$(rootNode).append("<li id='classification-uri-" + classificationUri + "'><span class='collapsed'></span><span class='folder'></span><span class='classification-name'><a href='#'>" + classificationName + "</a></span></li>")
+	if(canAttachRecords)								
 		{
-		$("#" + parentNodeId + " ul").remove() //clear folder when parent is collapsed.
+		$("#classification-uri-" + classificationUri).addClass("classification-can-attach-records")		
 		}
-	if($("#" + parentNodeId).hasClass("folder-intermediate"))
-		{
-		$("#" + parentNodeId + " ul").remove() //clear folder when parent is collapsed.
-		}
-	})
+	}
 
 
-// Functions // 
 function addFolderNodes(parentNodeType, parentNodeId)
 	{
 	if(!$("#" + parentNodeId + " > ul ").length)
@@ -266,15 +282,7 @@ function addFolderNodes(parentNodeType, parentNodeId)
 	}
 
 
-function addClassificationNode(rootNode, classificationUri, classificationName, canAttachRecords)
-	{
-	//	console.log("rootNode: " + rootNode)
-	$(rootNode).append("<li id='classification-uri-" + classificationUri + "'><span class='collapsed'></span><span class='folder'></span><span class='classification-name'><a href='#'>" + classificationName + "</a></span></li>")
-	if(canAttachRecords)								
-		{
-		$("#classification-uri-" + classificationUri).addClass("classification-can-attach-records")		
-		}
-	}
+
 
 function addIntermediateFolderNode(parentNodeId, recordUri, recordTitle)
 	{
