@@ -1,7 +1,7 @@
 $(document).ready(function()
 	{
 	// populate the #classification-data div
-	var url = url = "/Search?q=all&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords&trimtype=Classification"
+	var url = url = "/Search?q=all&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern&trimtype=Classification"
 	$.ajax(
 		{
 		url: url,
@@ -16,7 +16,7 @@ $(document).ready(function()
 						{
 						if(!$("#classification-uri-" + classifications.Results[i].Uri).length)
 							{
-							addClassificationNode("#classification-treeview > ul", classifications.Results[i].Uri, classifications.Results[i].ClassificationName.Value, classifications.Results[i].ClassificationCanAttachRecords.Value)
+							addClassificationNode("#classification-treeview > ul", classifications.Results[i].Uri, classifications.Results[i].ClassificationName.Value, classifications.Results[i].ClassificationCanAttachRecords.Value, classifications.Results[i].ClassificationChildPattern.Value)
 						}
 					}
 				}		
@@ -87,7 +87,12 @@ $(document).on("click", ".collapsed", function()
 	$("#" + parentNodeId + " > span.folder").addClass("folder-open")
 	$("#" + parentNodeId + " > span.folder").removeClass("folder")
 
-	addClassiciationNodes(parentNodeId)
+	console.log($("#" + parentNodeId).attr("id").substr(0, 19))
+	if($("#" + parentNodeId).hasClass("classification-can-have-children"))
+		{
+		addClassiciationNodes(parentNodeId)		
+		}
+	
 	
 
 	if($("#" + parentNodeId).hasClass("classification-can-attach-records"))
@@ -129,7 +134,7 @@ function addClassiciationNodes(parentNodeId)
 	var q="parent:" + parentNodeId.substr(19);
 	$.ajax(
 	{
-	url: "/Search?q=" + q + "&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords&trimtype=Classification",
+	url: "/Search?q=" + q + "&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern&trimtype=Classification",
 	success: function(result)
 		{
 		if(!$("#" + parentNodeId + " > ul").length)
@@ -142,10 +147,9 @@ function addClassiciationNodes(parentNodeId)
 
 		for(i=0; i<result.TotalResults; i++)  // for each classification returned in the search result
 			{
-				console.log("NUmber of results: ")
 			if(!$("#classification-uri-" + result.Results[i].Uri).length)
 				{
-				addClassificationNode("#" + parentNodeId + " > ul", result.Results[i].Uri, result.Results[i].ClassificationName.Value, result.Results[i].ClassificationCanAttachRecords.Value)
+				addClassificationNode("#" + parentNodeId + " > ul", result.Results[i].Uri, result.Results[i].ClassificationName.Value, result.Results[i].ClassificationCanAttachRecords.Value, result.Results[i].ClassificationChildPattern.Value)
 				}
 			}
 		for(i=0; i<$("#" + parentNodeId + " > ul > li").length; i++)  // for each <li>
@@ -176,7 +180,7 @@ function addClassiciationNodes(parentNodeId)
 	});
 	}
 
-function addClassificationNode(rootNode, classificationUri, classificationName, canAttachRecords)
+function addClassificationNode(rootNode, classificationUri, classificationName, canAttachRecords, classificationChildPattern)
 	{
 	//	console.log("rootNode: " + rootNode)
 	$(rootNode).append("<li id='classification-uri-" + classificationUri + "'><span class='collapsed'></span><span class='folder'></span><span class='classification-name'><a href='#'>" + classificationName + "</a></span></li>")
@@ -184,15 +188,18 @@ function addClassificationNode(rootNode, classificationUri, classificationName, 
 		{
 		$("#classification-uri-" + classificationUri).addClass("classification-can-attach-records")		
 		}
+	console.log(classificationName + ": " + classificationChildPattern)
+	if(classificationChildPattern!="")
+		{
+
+		$("#classification-uri-" + classificationUri).addClass("classification-can-have-children")		
+		}
 	}
 
 
 function addFolderNodes(parentNodeType, parentNodeId)
 	{
-	if(!$("#" + parentNodeId + " > ul ").length)
-		{
-		$("#" + parentNodeId).append("<ul style='list-style-type:none;'></ul>")
-		}
+		
 	var includedProperties = "RecordTitle, RecordRecordType, RecordTypeContentsRule";
 	$.ajax(
 		{
@@ -217,10 +224,20 @@ function addFolderNodes(parentNodeType, parentNodeId)
 				url: url,
 				success: function(result)
 					{
+					if(!$("#" + parentNodeId + " > ul").length)
+						{
+						if(result.TotalResults>0)
+							{
+							$("#" + parentNodeId).append("<ul style='list-style-type:none;'></ul>")
+							}
+						}
 					for(i=0; i<result.TotalResults; i++)
 						{
-						for(x=0; x<recordTypeDefinitions.TotalResults; x++)
+
+						if(!$("#record-uri-" + result.Results[i].Uri).length)
 							{
+							for(x=0; x<recordTypeDefinitions.TotalResults; x++)
+								{
 							if(result.Results[i].RecordRecordType.Uri==recordTypeDefinitions.Results[x].Uri)
 								{
 								var recordUri = result.Results[i].Uri;
@@ -262,8 +279,11 @@ function addFolderNodes(parentNodeType, parentNodeId)
 										}
 									}
 								}
+							}	
 							}
+
 						}
+
 					}, 
 				error: function(result)
 					{
@@ -288,13 +308,13 @@ function addIntermediateFolderNode(parentNodeId, recordUri, recordTitle)
 	{
 	$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + recordUri + "' class='folder-intermediate'><span class='collapsed'></span></span><span class='folder-green'></span><span class='record-title'><a href='#'>" + recordTitle + "</a></span></li>")
 	//$("#" + parentNodeId +" > ul > li").removeClass("classification-hidden")
-	sortClassificationTree(".record-title")
+	//sortClassificationTree(".record-title")
 	}
 
 function addTerminalFolderNode(parentNodeId, recordUri, recordTitle)
 	{
 	$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + recordUri + "' class='folder-terminal'><span style='padding: 12px 20px;'></span><span class='folder-fill'></span><span class='record-title'><a href='#'>" + recordTitle + "</a></span></li>")
-	sortClassificationTree(".record-title")
+	//sortClassificationTree(".record-title")
 	}
 
 		
