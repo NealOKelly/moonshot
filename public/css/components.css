@@ -6,10 +6,8 @@
 	color: green;
 }
 
-
 #classification-treeview ul li ul{
 	padding-inline-start: 24px;
-	
 }
 
 .collapsed{

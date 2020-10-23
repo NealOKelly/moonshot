@@ -1,5 +1,5 @@
-$(document).ready(function(){
-
+$(document).ready(function()
+	{
 	// populate the #classification-data div
 	$.ajax(
 		{
@@ -35,10 +35,7 @@ $(document).ready(function(){
 								}
 							if(!$("#classification-uri-" + classifications.Results[i].Uri).length)
 								{
-
-								
 								addClassificationNode(parentNodeId, classifications.Results[i].Uri, classifications.Results[i].ClassificationName.Value)
-
 								// If records can be attached to the classification then add a class.
 								if(classifications.Results[i].ClassificationCanAttachRecords.Value==true)
 									{
@@ -52,7 +49,6 @@ $(document).ready(function(){
 				}
 			// sort	 this list.
 			sortClassificationTree(".classification-name")
-
 			// hide everything but top-level classification on load.
 			$("#classification-treeview li").each(function(_, li)
 				{
@@ -120,11 +116,11 @@ $(document).on("click", ".collapsed", function()
 	{
 	var parentNodeId = $(event.target).parent().attr("id");
 	//alert(parentNodeId)
-	$("#" + parentNodeId +" > ul > li").removeClass("classification-hidden")
+	$("#" + parentNodeId + " > ul > li").removeClass("classification-hidden")
 	$("#" + parentNodeId + " > span.collapsed").addClass("expanded")
-	$("#" + parentNodeId +" > span.collapsed").removeClass("collapsed")
+	$("#" + parentNodeId + " > span.collapsed").removeClass("collapsed")
 	$("#" + parentNodeId + " > span.folder").addClass("folder-open")
-	$("#" + parentNodeId +" > span.folder").removeClass("folder")
+	$("#" + parentNodeId + " > span.folder").removeClass("folder")
 
 	$("#" + parentNodeId).append("<ul style='list-style-type:none;'></ul>")
 	// for records attached directly to classifications (folders).
@@ -143,11 +139,11 @@ $(document).on("click", ".collapsed", function()
 $(document).on("click", ".expanded", function()
 	{
 	var parentNodeId = $(event.target).parent().attr("id");
-	$("#" + parentNodeId +" > ul > li").addClass("classification-hidden")
+	$("#" + parentNodeId + " > ul > li").addClass("classification-hidden")
 	$("#" + parentNodeId + " > span.expanded").addClass("collapsed")
-	$("#" + parentNodeId +" > span.expanded").removeClass("expanded")
+	$("#" + parentNodeId + " > span.expanded").removeClass("expanded")
 	$("#" + parentNodeId + " > span.folder-open").addClass("folder")
-	$("#" + parentNodeId +" > span.folder-open").removeClass("folder-open")
+	$("#" + parentNodeId + " > span.folder-open").removeClass("folder-open")
 	if($("#" + parentNodeId).hasClass("classification-can-attach-records"))
 		{
 		$("#" + parentNodeId + " ul").remove() //clear folder when parent is collapsed.
@@ -272,10 +268,10 @@ function addTerminalFolderNode(parentNodeId, recordUri, recordTitle)
 		
 function sortClassificationTree(sortBy)
 	{
-	$('ul').each(function(_, ul)
+	$("ul").each(function(_, ul)
 		{
 		// get all the nodes to be sorted
-		var $toSort = $(ul).children('li');
+		var $toSort = $(ul).children("li");
 		$toSort.sort((li1, li2) => $(li1).children(sortBy).text().localeCompare($(li2).children(sortBy).text()));
 		$toSort.each(function() 
 			{
@@ -306,9 +302,9 @@ function getClassificationProperties(classificationUri)
 		success: function(result)
 			{
 			var details = JSON.stringify(result);
-			$("#classificationNameValue").html(result.Results[0].ClassificationName.Value)
-			$("#classificationAccessControlValue").html(result.Results[0].ClassificationAccessControl.Value)
-			$("#classificationCanAttachRecordsValue").html(result.Results[0].ClassificationCanAttachRecords.Value)
+			$("#classificationNameValue").html(details.Results[0].ClassificationName.Value)
+			$("#classificationAccessControlValue").html(details.Results[0].ClassificationAccessControl.Value)
+			$("#classificationCanAttachRecordsValue").html(details.Results[0].ClassificationCanAttachRecords.Value)
 			}, 
 		error: function(result)
 			{
