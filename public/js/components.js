@@ -81,20 +81,18 @@ $(document).on("click", ".collapsed", function()
 	{
 	var parentNodeId = $(event.target).parent().attr("id");
 	//alert(parentNodeId)
-	$("#" + parentNodeId + " > ul > li").removeClass("classification-hidden")
+	$("#" + parentNodeId + " > ul > li").addClass("classification-hidden")
 	$("#" + parentNodeId + " > span.collapsed").addClass("expanded")
 	$("#" + parentNodeId + " > span.collapsed").removeClass("collapsed")
 	$("#" + parentNodeId + " > span.folder").addClass("folder-open")
 	$("#" + parentNodeId + " > span.folder").removeClass("folder")
 
-	console.log($("#" + parentNodeId).attr("id").substr(0, 19))
+	//console.log($("#" + parentNodeId).attr("id").substr(0, 19))
 	if($("#" + parentNodeId).hasClass("classification-can-have-children"))
 		{
 		addClassiciationNodes(parentNodeId)		
 		}
 	
-	
-
 	if($("#" + parentNodeId).hasClass("classification-can-attach-records"))
 		{
 		addFolderNodes("classification", parentNodeId)
@@ -104,6 +102,7 @@ $(document).on("click", ".collapsed", function()
 		console.log("You have clicked onto the caret next to an intermediate folder.")
 		addFolderNodes("record", parentNodeId)
 		}
+	$("#" + parentNodeId + " > ul > li").removeClass("classification-hidden")
 	})
 
 // Click on expanded caret
@@ -231,57 +230,79 @@ function addFolderNodes(parentNodeType, parentNodeId)
 							$("#" + parentNodeId).append("<ul style='list-style-type:none;'></ul>")
 							}
 						}
-					for(i=0; i<result.TotalResults; i++)
+					for(i=0; i<result.TotalResults; i++)  
 						{
-
-						if(!$("#record-uri-" + result.Results[i].Uri).length)
+						if(!$("#record-uri-" + result.Results[i].Uri).length)  // for each search result, check whether the <li> exists and, if not, create it.
 							{
 							for(x=0; x<recordTypeDefinitions.TotalResults; x++)
 								{
-							if(result.Results[i].RecordRecordType.Uri==recordTypeDefinitions.Results[x].Uri)
-								{
-								var recordUri = result.Results[i].Uri;
-								var recordTitle = result.Results[i].RecordTitle.Value;
-								// Do not display any records where the RecordTypeLevel is <4.
-								if(recordTypeDefinitions.Results[x].RecordTypeLevel.Value>="4")
+								if(result.Results[i].RecordRecordType.Uri==recordTypeDefinitions.Results[x].Uri)
 									{
-									console.log(recordTypeDefinitions.Results[x].RecordTypeContentsRule.Value)
-									switch(recordTypeDefinitions.Results[x].RecordTypeContentsRule.Value)
+									var recordUri = result.Results[i].Uri;
+									var recordTitle = result.Results[i].RecordTitle.Value;
+									// Do not display any records where the RecordTypeLevel is <4.
+									if(recordTypeDefinitions.Results[x].RecordTypeLevel.Value>="4")
 										{
-										case "ByLevel":
-											if(recordTypeDefinitions.Results[x].RecordTypeLevel.Value>="5")
-												{
-												addIntermediateFolderNode(parentNodeId, recordUri, recordTitle)
-												}
-											else
-												{
-												if(recordTypeDefinitions.Results[x].RecordTypeLevel.Value<"5")
+										console.log(recordTypeDefinitions.Results[x].RecordTypeContentsRule.Value)
+										switch(recordTypeDefinitions.Results[x].RecordTypeContentsRule.Value)
+											{
+											case "ByLevel":
+												if(recordTypeDefinitions.Results[x].RecordTypeLevel.Value>="5")
 													{
-													addTerminalFolderNode(parentNodeId, recordUri, recordTitle)											
+													addIntermediateFolderNode(parentNodeId, recordUri, recordTitle)
 													}
-												}
-											break;
-										case "ByLevelInclusive":
-											addIntermediateFolderNode(parentNodeId, recordUri, recordTitle)
-											break;
-										case "ByBehavior":
-											addTerminalFolderNode(parentNodeId, recordUri, recordTitle)
-											break;
-										case "ByList":
-											if(recordTypeDefinitions.Results[x].RecordTypeLevel.Value>="4")
-												{
+												else
+													{
+													if(recordTypeDefinitions.Results[x].RecordTypeLevel.Value<"5")
+														{
+														addTerminalFolderNode(parentNodeId, recordUri, recordTitle)											
+														}
+													}
+												break;
+											case "ByLevelInclusive":
 												addIntermediateFolderNode(parentNodeId, recordUri, recordTitle)
-												}
-											break;
-										case "Prevented":
-											// Do not add node to classification tree.
-											break;
+												break;
+											case "ByBehavior":
+												addTerminalFolderNode(parentNodeId, recordUri, recordTitle)
+												break;
+											case "ByList":
+												if(recordTypeDefinitions.Results[x].RecordTypeLevel.Value>="4")
+													{
+													addIntermediateFolderNode(parentNodeId, recordUri, recordTitle)
+													}
+												break;
+											case "Prevented":
+												// Do not add node to classification tree.
+												break;
+											}
 										}
 									}
-								}
-							}	
+								sortClassificationTree(".record-title")
+								}	
 							}
-
+						}
+					// HERE
+					console.log($("#" + parentNodeId + " > ul > li").length)
+					for(i=0; i<$("#" + parentNodeId + " > ul > li").length; i++)  // for each <li>
+						{
+						
+						var nodeExistsInSearchResults = false;
+						for(x=0; x<result.TotalResults; x++)
+							{
+								console.log($("#" + parentNodeId + " > ul > li:nth-child(" + (i + 1) + ")").attr("id").substr(11))
+								console.log(result.Results[x].Uri)
+							if($("#" + parentNodeId + " > ul > li:nth-child(" + (i + 1) + ")").attr("id").substr(11)==result.Results[x].Uri)
+								{
+								nodeExistsInSearchResults = true;
+								}
+							
+							}
+							console.log(nodeExistsInSearchResults)
+							if(!nodeExistsInSearchResults)
+								{
+								$("#" + parentNodeId + " > ul > li:nth-child(" + (i + 1) + ")").addClass("classification-hidden")
+								}
+							$(".classification-hidden").remove() // remove the <li> once the for loop has completed.
 						}
 
 					}, 
@@ -308,13 +329,13 @@ function addIntermediateFolderNode(parentNodeId, recordUri, recordTitle)
 	{
 	$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + recordUri + "' class='folder-intermediate'><span class='collapsed'></span></span><span class='folder-green'></span><span class='record-title'><a href='#'>" + recordTitle + "</a></span></li>")
 	//$("#" + parentNodeId +" > ul > li").removeClass("classification-hidden")
-	//sortClassificationTree(".record-title")
+//	sortClassificationTree(".record-title")
 	}
 
 function addTerminalFolderNode(parentNodeId, recordUri, recordTitle)
 	{
 	$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + recordUri + "' class='folder-terminal'><span style='padding: 12px 20px;'></span><span class='folder-fill'></span><span class='record-title'><a href='#'>" + recordTitle + "</a></span></li>")
-	//sortClassificationTree(".record-title")
+//	sortClassificationTree(".record-title")
 	}
 
 		
