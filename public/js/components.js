@@ -182,7 +182,7 @@ function addClassiciationNodes(parentNodeId)
 function addClassificationNode(rootNode, classificationUri, classificationName, canAttachRecords, classificationChildPattern)
 	{
 	//	console.log("rootNode: " + rootNode)
-	$(rootNode).append("<li id='classification-uri-" + classificationUri + "'><span class='collapsed'></span><span class='folder'></span><span class='classification-name'><a href='#'>" + classificationName + "</a></span></li>")
+	$(rootNode).append("<li id='classification-uri-" + classificationUri + "'><span class='collapsed'></span><span class='folder'></span><span class='classification-name'><a>" + classificationName + "</a></span></li>")
 	if(canAttachRecords)								
 		{
 		$("#classification-uri-" + classificationUri).addClass("classification-can-attach-records")		
@@ -327,14 +327,14 @@ function addFolderNodes(parentNodeType, parentNodeId)
 
 function addIntermediateFolderNode(parentNodeId, recordUri, recordTitle)
 	{
-	$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + recordUri + "' class='folder-intermediate'><span class='collapsed'></span></span><span class='folder-green'></span><span class='record-title'><a href='#'>" + recordTitle + "</a></span></li>")
+	$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + recordUri + "' class='folder-intermediate'><span class='collapsed'></span></span><span class='folder-green'></span><span class='record-title'><a>" + recordTitle + "</a></span></li>")
 	//$("#" + parentNodeId +" > ul > li").removeClass("classification-hidden")
 //	sortClassificationTree(".record-title")
 	}
 
 function addTerminalFolderNode(parentNodeId, recordUri, recordTitle)
 	{
-	$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + recordUri + "' class='folder-terminal'><span style='padding: 12px 20px;'></span><span class='folder-fill'></span><span class='record-title'><a href='#'>" + recordTitle + "</a></span></li>")
+	$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + recordUri + "' class='folder-terminal'><span style='padding: 12px 20px;'></span><span class='folder-fill'></span><span class='record-title'><a>" + recordTitle + "</a></span></li>")
 //	sortClassificationTree(".record-title")
 	}
 
