@@ -10,8 +10,6 @@ $(document).ready(function()
 			var classifications = result;
 			var intClassificationsDisplayed = 0;
 				console.log(classifications)
-			//while (intClassificationsDisplayed < classifications.Results.length)
-			//	{
 				for(var i=0; i<classifications.TotalResults; i++)
 					{
 					if(!classifications.Results[i].hasOwnProperty("ClassificationParentClassification"))
@@ -23,11 +21,9 @@ $(document).ready(function()
 							if(classifications.Results[i].ClassificationCanAttachRecords.Value==true){
 								$("#classification-uri-" + classifications.Results[i].Uri).addClass("classification-can-attach-records")
 							}
-					//	intClassificationsDisplayed++;
 						}
 					}
-					}		
-			//	}
+				}		
 			// sort	 this list.
 			sortClassificationTree(".classification-name")
 			// hide everything but top-level classification on load.
@@ -110,16 +106,24 @@ $(document).on("click", ".collapsed", function()
 	url: "/Search?q=" + q + "&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords&trimtype=Classification",
 	success: function(result)
 		{
-		if(result.TotalResults>0){
-			$("#" + parentNodeId).append("<ul style='list-style-type:none;'></ul>")
-		}
+		if(!$("#" + parentNodeId + " > ul").length)
+			{
+			if(result.TotalResults>0)
+				{
+				$("#" + parentNodeId).append("<ul style='list-style-type:none;'></ul>")
+				}
+			}
+
 		for (i=0; i<result.TotalResults; i++)  // for each classification returned in the search result
 			{
+				console.log("NUmber of results: ")
 			if(!$("#classification-uri-" + result.Results[i].Uri).length)
 				{
 				addClassificationNode("#" + parentNodeId + " > ul", result.Results[i].Uri, result.Results[i].ClassificationName.Value)
 				}
 			}
+		console.log($("#" + parentNodeId + " > ul > li").length)
+		sortClassificationTree(".classification-name")
 		}, 
 	error: function(result)
 		{
