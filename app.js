@@ -35,17 +35,26 @@ app.get('', (req, res) => {
 	res.render('index', { title: 'Moonshot'})
 	})
 
-// get-classifications
-app.get("/get-classifications", (req, res, next) => {
-    console.log("Call to '/get-classifications' received")
+
+// Search
+app.get("/Search", (req, res, next) => {
+    console.log("Call to '/Search' received")
+	console.log(req.query.q)
+	var classificationUri = req.query.q
+	var jsonData = {
+					"TrimType": req.query.trimtype,
+					"q": req.query.q,
+					"Properties": req.query.properties
+			}
 	var config = {
 		  httpsAgent: agent('api-client'),
-		  method: 'get',
-		  url: contentManagerServiceAPIBaseUrl + '/Classification?q=all&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords',
-		  headers: 
-			{ 
+		  method: 'post',
+		  url: contentManagerServiceAPIBaseUrl + '/Search',
+		  headers: { 
 			'Authorization': authorizationHeaderValue, 
-		  	},	
+			'Content-Type': 'application/json', 
+		  },
+		  data : JSON.stringify(jsonData)
 		};
   //console.log(getTimeStamp(), green + "New Content Manager record successfully created.", resetColor)
   console.log("Calling CMServiceAPI.")
@@ -58,6 +67,7 @@ app.get("/get-classifications", (req, res, next) => {
  )
     .catch(err => next(err));
 })
+
 
 // get-classification-details
 app.get("/get-classification-details", (req, res, next) => {
@@ -86,36 +96,7 @@ app.get("/get-classification-details", (req, res, next) => {
     .catch(err => next(err));
 })
 
-// Search
-app.get("/Search", (req, res, next) => {
-    console.log("Call to '/Search' received")
-	var classificationUri = req.query.q
-	var jsonData = {
-					"TrimType": "Record",
-					"q": req.query.q,
-					"Properties": req.query.properties
-			}
-	var config = {
-		  httpsAgent: agent('api-client'),
-		  method: 'post',
-		  url: contentManagerServiceAPIBaseUrl + '/Search',
-		  headers: { 
-			'Authorization': authorizationHeaderValue, 
-			'Content-Type': 'application/json', 
-		  },
-		  data : JSON.stringify(jsonData)
-		};
-  //console.log(getTimeStamp(), green + "New Content Manager record successfully created.", resetColor)
-  console.log("Calling CMServiceAPI.")
-  axios(config)
-    .then( function (response)  {
-	  console.log("Response from CMServiceAPI recieved.")
-	  console.log("Sending response to browser.")
-	  res.status(200).send(response.data)
-  } 
- )
-    .catch(err => next(err));
-})
+
 
 // get-record-type-containment-details
 app.get("/get-record-type-attributes", (req, res, next) => {
@@ -140,6 +121,8 @@ app.get("/get-record-type-attributes", (req, res, next) => {
  )
     .catch(err => next(err));
 })
+
+
 
 // Listen on Port 300
 app.listen(port, () => console.info('App listening on port ' + port))

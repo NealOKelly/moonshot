@@ -1,9 +1,10 @@
 $(document).ready(function()
 	{
 	// populate the #classification-data div
+	var url = url = "/Search?q=all&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords&trimtype=Classification"
 	$.ajax(
 		{
-		url: "/get-classifications",
+		url: url,
 		success: function(result)
 			{
 			var classifications = result;
@@ -168,13 +169,13 @@ function addFolderNodes(parentNodeType, parentNodeId)
 			if(parentNodeType=="classification")
 				{
 				parentNodeUri=parentNodeId.substr(19)
-				var url = "/Search?q=classification:" + parentNodeUri + "&properties=" + includedProperties
+				var url = "/Search?q=classification:" + parentNodeUri + "&properties=" + includedProperties + "&trimtype=Record"
 				}
 			else{
 				if(parentNodeType=="record")
 					{
 					parentNodeUri=parentNodeId.substr(11)
-					var url = "/Search?q=container:" + parentNodeUri + "&properties=" + includedProperties
+					var url = "/Search?q=container:" + parentNodeUri + "&properties=" + includedProperties + "&trimtype=Record"
 					}
 			}
 			$.ajax(
