@@ -1,7 +1,3 @@
-// JavaScript Document
-// nodemon - https://www.npmjs.com/package/nodemon
-// express-ejm-layouts - https://www.npmjs.com/package/express-ejs-layouts
-
 // Dependencies
 const express = require('express') // node.js web server
 const expressLayouts = require('express-ejs-layouts')
@@ -30,14 +26,14 @@ app.use('/img', express.static(__dirname + 'public/img'))
 app.use(expressLayouts)
 app.set('view engine', 'ejs')
 
-//  Routes
+//  ROUTES
 app.get('', (req, res) => {
 	res.render('index', { title: 'Moonshot'})
 	})
 
-
-// Search
-app.get("/Search", (req, res, next) => {
+// ROUTES - /Search
+app.get("/Search", (req, res, next) =>
+	{
     console.log("Call to '/Search' received")
 	console.log(req.query.q)
 	var classificationUri = req.query.q
@@ -51,23 +47,24 @@ app.get("/Search", (req, res, next) => {
 		  httpsAgent: agent('api-client'),
 		  method: 'post',
 		  url: contentManagerServiceAPIBaseUrl + '/Search',
-		  headers: { 
+		  headers:
+			{ 
 			'Authorization': authorizationHeaderValue, 
 			'Content-Type': 'application/json', 
-		  },
-		  data : JSON.stringify(jsonData)
+			},
+		  data: JSON.stringify(jsonData)
 		};
-  //console.log(getTimeStamp(), green + "New Content Manager record successfully created.", resetColor)
-  console.log("Calling CMServiceAPI.")
-  axios(config)
-    .then( function (response)  {
-	  console.log("Response from CMServiceAPI recieved.")
-	  console.log("Sending response to browser.")
-	  res.status(200).send(response.data)
-  } 
- )
-    .catch(err => next(err));
-})
+		//console.log(getTimeStamp(), green + "New Content Manager record successfully created.", resetColor)
+		console.log("Calling CMServiceAPI.")
+		axios(config)
+			.then( function (response)
+			{
+			console.log("Response from CMServiceAPI recieved.")
+			console.log("Sending response to browser.")
+			res.status(200).send(response.data)
+			})
+			.catch(err => next(err));
+	})
 
 
 // get-classification-details
@@ -122,8 +119,6 @@ app.get("/get-record-type-attributes", (req, res, next) => {
  )
     .catch(err => next(err));
 })
-
-
 
 // Listen on Port 300
 app.listen(port, () => console.info('App listening on port ' + port))
