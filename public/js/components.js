@@ -79,34 +79,13 @@ $(document).on("click", ".record-title>a", function()
 $(document).on("click", ".collapsed", function()
 	{
 	var parentNodeId = $(event.target).parent().attr("id");
-	
-		
-	
-	
-	//alert(parentNodeId)
-	//$("#" + parentNodeId + " > ul > li").addClass("classification-hidden")
+
 	$("#" + parentNodeId + " > span.collapsed").addClass("expanded")
 	$("#" + parentNodeId + " > span.collapsed").removeClass("collapsed")
 	$("#" + parentNodeId + " > span.folder").addClass("folder-open")
 	$("#" + parentNodeId + " > span.folder").removeClass("folder")
 
-	// At clicked level
-	if($("#" + parentNodeId).hasClass("classification-can-have-children"))
-		{
-		refreshClassificationNodes(parentNodeId)		
-		}
-	
-	if($("#" + parentNodeId).hasClass("classification-can-attach-records"))
-		{
-		refreshFolderNodes("classification", parentNodeId)
-		}
-	if($("#" + parentNodeId).hasClass("folder-intermediate"))
-		{
-		refreshFolderNodes("record", parentNodeId)
-		}
-	
-	// Recursive
-	$("#" + parentNodeId).find(".expanded").each(function( index )
+	$("#" + parentNodeId).find(".expanded").each(function()
 		{
 		if($(this).parent().hasClass("classification-can-have-children"))
 			{
@@ -121,32 +100,25 @@ $(document).on("click", ".collapsed", function()
 			refreshFolderNodes("record", $(this).parent().attr("id"))
 			}
 		});
-	$("#" + parentNodeId + " > ul > li").removeClass("classification-hidden")
 	})
 
 // Click on expanded caret
 $(document).on("click", ".expanded", function()
 	{
 	var parentNodeId = $(event.target).parent().attr("id");
-	$("#" + parentNodeId + " > ul > li").addClass("classification-hidden")
+	$("#" + parentNodeId + " > ul").addClass("classification-hidden")
 	$("#" + parentNodeId + " > span.expanded").addClass("collapsed")
 	$("#" + parentNodeId + " > span.expanded").removeClass("expanded")
 	$("#" + parentNodeId + " > span.folder-open").addClass("folder")
 	$("#" + parentNodeId + " > span.folder-open").removeClass("folder-open")
-	if($("#" + parentNodeId).hasClass("classification-can-attach-records"))
-		{
-		//$("#" + parentNodeId + " ul").remove() //clear folder when parent is collapsed.
-		}
-	if($("#" + parentNodeId).hasClass("folder-intermediate"))
-		{
-		$("#" + parentNodeId + " ul").remove() //clear folder when parent is collapsed.
-		}
 	})
 
 // Functions // 
 
 function refreshClassificationNodes(parentNodeId) 
 	{
+	$("#" + parentNodeId + " > ul").addClass("classification-hidden") // if already exists, hide.
+		
 	// check for new classifications.
 	var q="parent:" + parentNodeId.substr(19);
 	$.ajax(
@@ -161,7 +133,6 @@ function refreshClassificationNodes(parentNodeId)
 				$("#" + parentNodeId).append("<ul style='list-style-type:none;'></ul>")
 				}
 			}
-
 		for(i=0; i<result.TotalResults; i++)  // for each classification returned in the search result
 			{
 			if(!$("#classification-uri-" + result.Results[i].Uri).length)
@@ -182,11 +153,12 @@ function refreshClassificationNodes(parentNodeId)
 				if(!nodeExistsInSearchResults)
 					{
 					$("#" + parentNodeId + " > ul > li:nth-child(" + (i + 1) + ")").addClass("for-deletion")
-					$("#" + parentNodeId + " > ul > li:nth-child(" + (i + 1) + ")").addClass("classification-hidden")
 					}
 				console.log("nodeExistsInSearchResults:" + nodeExistsInSearchResults)
 				$(".for-deletion").remove() // remove the <li> once the for loop has completed.
 			}
+		$("#" + parentNodeId + " > ul").removeClass("classification-hidden")
+		$("#" + parentNodeId).parents("ul").removeClass("classification-hidden")
 		sortClassificationTree(".classification-name")
 		}, 
 	error: function(result)
@@ -198,7 +170,6 @@ function refreshClassificationNodes(parentNodeId)
 
 function addClassificationNode(rootNode, classificationUri, classificationName, canAttachRecords, classificationChildPattern)
 	{
-	//	console.log("rootNode: " + rootNode)
 	$(rootNode).append("<li id='classification-uri-" + classificationUri + "'><span class='collapsed'></span><span class='folder'></span><span class='classification-name'><a>" + classificationName + "</a></span></li>")
 	if(canAttachRecords)								
 		{
@@ -213,7 +184,8 @@ function addClassificationNode(rootNode, classificationUri, classificationName, 
 
 function refreshFolderNodes(parentNodeType, parentNodeId)
 	{
-	$(parentNodeId + " > ul").addClass("classification-hidden")	
+	$("#" + parentNodeId + " > ul").addClass("classification-hidden") // if already exists, hide.
+	
 	var includedProperties = "RecordTitle, RecordRecordType, RecordTypeContentsRule";
 	$.ajax(
 		{
@@ -242,7 +214,7 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 						{
 						if(result.TotalResults>0)
 							{
-							$("#" + parentNodeId).append("<ul style='list-style-type:none;'></ul>")
+							$("#" + parentNodeId).append("<ul style='list-style-type:none;' class='classification-hidden'></ul>") // create hidden
 							}
 						}
 					for(i=0; i<result.TotalResults; i++)  
@@ -292,15 +264,11 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 											}
 										}
 									}
-								sortClassificationTree(".record-title")
 								}	
 							}
 						}
-					// HERE
-					console.log($("#" + parentNodeId + " > ul > li").length)
 					for(i=0; i<$("#" + parentNodeId + " > ul > li").length; i++)  // for each <li>
 						{
-						
 						var nodeExistsInSearchResults = false;
 						for(x=0; x<result.TotalResults; x++)
 							{
@@ -310,16 +278,17 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 								{
 								nodeExistsInSearchResults = true;
 								}
-							
 							}
 							console.log(nodeExistsInSearchResults)
 							if(!nodeExistsInSearchResults)
 								{
-								$("#" + parentNodeId + " > ul > li:nth-child(" + (i + 1) + ")").addClass("classification-hidden")
-									$("#" + parentNodeId + " > ul > li:nth-child(" + (i + 1) + ")").addClass("for-deletion")
+								$("#" + parentNodeId + " > ul > li:nth-child(" + (i + 1) + ")").addClass("for-deletion")
 								}
 							$(".for-deletion").remove() // remove the <li> once the for loop has completed.
 						}
+						sortClassificationTree(".record-title")
+						$("#" + parentNodeId + " > ul").removeClass("classification-hidden")
+						$("#" + parentNodeId).parents("ul").removeClass("classification-hidden")
 					}, 
 				error: function(result)
 					{
@@ -334,7 +303,6 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 			console.log(result)
 			}
 		});
-	//$(parentNodeId + " > ul").removeClass("classification-hidden")
 	}
 
 function addIntermediateFolderNode(parentNodeId, recordUri, recordTitle)
