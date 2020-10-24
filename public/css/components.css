@@ -104,8 +104,18 @@
 	vertical-align: top;
 	padding-left: 10px;
 }
+
+.classification-name:hover{
+	text-decoration: underline;
+	cursor: pointer;
+}
 .record-title{
 	display: inline-block;
 	vertical-align: top;
 	padding-left: 10px;
+}
+
+.record-title:hover{
+	text-decoration: underline;
+	cursor: pointer;
 }
