@@ -3,7 +3,7 @@
 }
 
 #classification-treeview a{
-	color: green;
+	/*color: green;*/
 }
 
 #classification-treeview ul li ul{
@@ -78,16 +78,6 @@
     height: 24px;
 }
 
-.folder-green{
-  	display: inline-block;
-  	content: "";
-  	background-image: url("../img/icons/folder-green.svg");
-	background-size: cover;
-	background-repeat: no-repeat;
-    width: 24px;
-    height: 24px;
-}
-
 .folder-fill{
 	display: inline-block;
   	content: "";
@@ -98,6 +88,48 @@
     height: 24px;
 }
 
+
+.star{
+	display: inline-block;
+  	content: "";
+  	background-image: url("../img/icons/star.svg");
+	background-size: cover;
+	background-repeat: no-repeat;
+    width: 24px;
+    height: 24px;
+}
+
+.clock-history{
+	display: inline-block;
+  	content: "";
+  	background-image: url("../img/icons/clock-history.svg");
+	background-size: cover;
+	background-repeat: no-repeat;
+    width: 24px;
+    height: 24px;
+}
+
+
+.favourites{
+	display: inline-block;
+	vertical-align: top;
+	padding-left: 10px;
+}
+.favourites:hover{
+	text-decoration: underline;
+	cursor: pointer;
+}
+.all-files{
+	display: inline-block;
+	vertical-align: top;
+	padding-left: 10px;
+}
+
+.recents{
+	display: inline-block;
+	vertical-align: top;
+	padding-left: 10px;
+}
 
 .classification-name{
 	display: inline-block;

@@ -6,20 +6,18 @@ $(document).ready(function()
 		{
 		url: url,
 		success: function(result)
+		{
+		var classifications = result;
+		for(var i=0; i<classifications.TotalResults; i++)  // populate top level classifications.
 			{
-			var classifications = result;
-			var intClassificationsDisplayed = 0;
-				console.log(classifications)
-				for(var i=0; i<classifications.TotalResults; i++)
+			if(!classifications.Results[i].hasOwnProperty("ClassificationParentClassification"))
+				{
+				if(!$("#classification-uri-" + classifications.Results[i].Uri).length)
 					{
-					if(!classifications.Results[i].hasOwnProperty("ClassificationParentClassification"))
-						{
-						if(!$("#classification-uri-" + classifications.Results[i].Uri).length)
-							{
-							addClassificationNode("#classification-treeview > ul", classifications.Results[i].Uri, classifications.Results[i].ClassificationName.Value, classifications.Results[i].ClassificationCanAttachRecords.Value, classifications.Results[i].ClassificationChildPattern.Value)
-						}
+					addClassificationNode("#all-files > ul", classifications.Results[i].Uri, classifications.Results[i].ClassificationName.Value, classifications.Results[i].ClassificationCanAttachRecords.Value, classifications.Results[i].ClassificationChildPattern.Value)
 					}
-				}		
+				}
+			}	
 			// sort	 this list.
 			sortClassificationTree(".classification-name")
 			}, 
@@ -67,6 +65,16 @@ $(document).on("click", ".folder-fill", function()
 	var eventTargetParent = $(event.target).parent();
 	highlightSelectedFolder(eventTargetParent)
 	})
+
+$(document).on("click", ".star", function()
+	{
+	//alert("Clicked.")
+	var eventTargetParent = $(event.target).parent();
+	$("#classification-treeview li").removeClass("classification-node-selected")
+	$("#classification-treeview li").removeClass("folder-node-selected")
+	$("#" + eventTargetParent.attr("id")).addClass("classification-node-selected")
+	})
+
 
 // Click on folder-fill Icon //
 $(document).on("click", ".record-title>a", function()
@@ -154,7 +162,6 @@ function refreshClassificationNodes(parentNodeId)
 					{
 					$("#" + parentNodeId + " > ul > li:nth-child(" + (i + 1) + ")").addClass("for-deletion")
 					}
-				console.log("nodeExistsInSearchResults:" + nodeExistsInSearchResults)
 				$(".for-deletion").remove() // remove the <li> once the for loop has completed.
 			}
 		$("#" + parentNodeId + " > ul").removeClass("classification-hidden")
@@ -175,7 +182,6 @@ function addClassificationNode(rootNode, classificationUri, classificationName, 
 		{
 		$("#classification-uri-" + classificationUri).addClass("classification-can-attach-records")		
 		}
-	console.log(classificationName + ": " + classificationChildPattern)
 	if(classificationChildPattern!="")
 		{
 		$("#classification-uri-" + classificationUri).addClass("classification-can-have-children")		
@@ -230,7 +236,6 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 									// Do not display any records where the RecordTypeLevel is <4.
 									if(recordTypeDefinitions.Results[x].RecordTypeLevel.Value>="4")
 										{
-										console.log(recordTypeDefinitions.Results[x].RecordTypeContentsRule.Value)
 										switch(recordTypeDefinitions.Results[x].RecordTypeContentsRule.Value)
 											{
 											case "ByLevel":
@@ -272,14 +277,11 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 						var nodeExistsInSearchResults = false;
 						for(x=0; x<result.TotalResults; x++)
 							{
-								console.log($("#" + parentNodeId + " > ul > li:nth-child(" + (i + 1) + ")").attr("id").substr(11))
-								console.log(result.Results[x].Uri)
 							if($("#" + parentNodeId + " > ul > li:nth-child(" + (i + 1) + ")").attr("id").substr(11)==result.Results[x].Uri)
 								{
 								nodeExistsInSearchResults = true;
 								}
 							}
-							console.log(nodeExistsInSearchResults)
 							if(!nodeExistsInSearchResults)
 								{
 								$("#" + parentNodeId + " > ul > li:nth-child(" + (i + 1) + ")").addClass("for-deletion")
@@ -307,7 +309,7 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 
 function addIntermediateFolderNode(parentNodeId, recordUri, recordTitle)
 	{
-	$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + recordUri + "' class='folder-intermediate'><span class='collapsed'></span></span><span class='folder-green'></span><span class='record-title'><a>" + recordTitle + "</a></span></li>")
+	$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + recordUri + "' class='folder-intermediate'><span class='collapsed'></span></span><span class='folder'></span><span class='record-title'><a>" + recordTitle + "</a></span></li>")
 	}
 
 function addTerminalFolderNode(parentNodeId, recordUri, recordTitle)

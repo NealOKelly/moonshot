@@ -27,7 +27,7 @@ app.use(expressLayouts)
 app.set('view engine', 'ejs')
 
 //  ROUTES
-app.get('', (req, res) => {
+app.get('/', (req, res) => {
 	res.render('index', { title: 'Moonshot'})
 	})
 

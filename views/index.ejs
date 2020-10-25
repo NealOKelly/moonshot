@@ -1,43 +1,22 @@
-<h1 class="mt-5">Moonshot!</h1>
-<p class="lead">This is the future of GilbyIM!</p>
-
-<p class="lead">Classification Tree:</p>
-<div class="row">
-	<div id="classification-treeview" class="span4" style="color: green;">
-		<ul style="list-style-type:none;">
-		</ul>
+<div class="row" style="margin-top:56px;height:100%;">
+	<div class="col-3" style="background-color:#75b540;color:white;height:100%;overflow:auto;overflow-x:hidden;">
+		<div id="classification-treeview" style="padding:30px;">
+			<ul style="list-style-type:none;">
+				<li id="all-files"><span class='collapsed'></span><span class='folder'></span><span class='all-files'><a>All Files</a></span><ul style="list-style-type:none;"></ul></li>
+				<li id="favourites"><span class='collapsed'></span><span class='star'></span><span class='favourites'><a>Favourites</a></span></li>
+				<li id="recents"><span class='collapsed'></span><span class='clock-history'></span><span class='recents'><a>Recents</a></span></li>
+			</ul>
+		</div>
+	</div>
+	<div class="col-6" style="background-color: #fff;">
+		<div style="height:65%;text-align:center;padding:30px;color:grey;"><p>This will be the records list pane.</p></div>
+		<div style="height:35%;text-align:center;padding:30px;color:grey;"><p>This will be the properties pane.</p></div>
 	</div>
 
-
-
+	<div class="col-3" style="height:100%;padding:30px">
+		<div style="height:100%;overflow:auto;overflow-x:hidden;">
+			<a class="twitter-timeline" href="https://twitter.com/RT_GilbyIM?ref_src=twsrc%5Etfw">Tweets by GilbyIM</a>
+			<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+		</div>
+	</div>
 </div>
-<p class="lead">Details Pane:</p>
-<div id="details-panel" style="color: green;">
-	<table style="width: 100%;">
-	<tr>
-		<td id="classificationNameName" style="width: 25%;">Classification Name</td>
-		<td id="classificationNameValue" style="width: 75%;"></td>
-	</tr>
-	<tr>
-		<td id="classificationAccessControlName" style="width: 25%;">Access Controls</td>
-		<td id="classificationAccessControlValue" style="width: 75%;"></td>
-	</tr>
-	<tr>
-		<td id="classificationCanAttachRecordsName" style="width: 25%;">Can Attach Records?</td>
-		<td id="classificationCanAttachRecordsValue" style="width: 75%;"></td>
-	</tr>
-	</table>
-
-
-</div>
-<p>&nbsp;</p>
-
-<p class="lead">Things to do:</p>
-<ul>
-	<li>Containerization (Docker).</li>
-	<li>Continuous Integration Pipeline.</li>
-	<li>Integration with GilbyIM Single Sign-On.</li>
-	<li>Branding.</li>
-	<li>All the actual functionality.</li>
-</ul>
-<p>&nbsp;</p>
