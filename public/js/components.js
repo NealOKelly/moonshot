@@ -38,34 +38,99 @@ $(document).ready(function()
 $(document).on("click", ".folder", function()
 	{
 	var eventTargetParent = $(event.target).parent();
-	highlightSelectedClassification(eventTargetParent)
-	var classificationUri = eventTargetParent.attr("id").substr(19)
-	getClassificationProperties(classificationUri)
+	highlightSelectedNode(eventTargetParent)
+	if((eventTargetParent).attr("id").substr(0, 19) == "classification-uri-")
+		{
+		drawPropertiesTable("classification")
+		var classificationUri = eventTargetParent.attr("id").substr(19)
+		getClassificationProperties(classificationUri)
+		}
+	else
+		{
+		if((eventTargetParent).attr("id").substr(0, 11) == "record-uri-")
+			{
+			if($(eventTargetParent).hasClass("folder-intermediate"))
+				{
+				drawPropertiesTable("folder-intermediate")
+				getRecordProperties("folder-intermediate", eventTargetParent.attr("id").substr(11))	
+				}
+			}
+		}
 	})
 
 $(document).on("click", ".folder-open", function()
 	{
 	var eventTargetParent = $(event.target).parent();
-	highlightSelectedClassification(eventTargetParent)
-	var classificationUri = eventTargetParent.attr("id").substr(19)
-	getClassificationProperties(classificationUri)
+	highlightSelectedNode(eventTargetParent)
+	if((eventTargetParent).attr("id").substr(0, 19) == "classification-uri-")
+		{
+		drawPropertiesTable("classification")
+		var classificationUri = eventTargetParent.attr("id").substr(19)
+		getClassificationProperties(classificationUri)
+		}
+	else
+		{
+		if((eventTargetParent).attr("id").substr(0, 11) == "record-uri-")
+			{
+			if($(eventTargetParent).hasClass("folder-intermediate"))
+				{
+				drawPropertiesTable("folder-intermediate")
+				getRecordProperties("folder-intermediate", eventTargetParent.attr("id").substr(11))	
+				}
+			}
+		}
 	})
 
 // Click on Classification Name Hyperlink //
 $(document).on("click", ".classification-name>a", function()
 	{
-	var eventTargetParent = $(event.target).parent();
-	highlightSelectedClassification(eventTargetParent.parent())
-	var classificationUri = eventTargetParent.parent().attr("id").substr(19)
-	getClassificationProperties(classificationUri)
+	var eventTargetParent = $(event.target).parent().parent();
+	highlightSelectedNode(eventTargetParent)
+	if((eventTargetParent).attr("id").substr(0, 19) == "classification-uri-")
+		{
+		drawPropertiesTable("classification")
+		var classificationUri = eventTargetParent.attr("id").substr(19)
+		getClassificationProperties(classificationUri)
+		}
+	else
+		{
+		if((eventTargetParent).attr("id").substr(0, 11) == "record-uri-")
+			{
+			if($(eventTargetParent).hasClass("folder-intermediate"))
+				{
+				drawPropertiesTable("folder-intermediate")
+				getRecordProperties("folder-intermediate", eventTargetParent.attr("id").substr(11))	
+				}
+			}
+		}
 	})
 
 // Click on folder-fill Icon //
 $(document).on("click", ".folder-fill", function()
 	{
+	alert("Clicked")
 	var eventTargetParent = $(event.target).parent();
-	highlightSelectedFolder(eventTargetParent)
+	highlightSelectedNode(eventTargetParent)
+	if($(eventTargetParent).hasClass("folder-terminal"))
+		{
+		drawPropertiesTable("folder-terminal")
+		getRecordProperties("folder-terminal", eventTargetParent.attr("id").substr(11))		
+		}
 	})
+$(document).on("click", ".record-title>a", function()
+	{
+	var eventTargetParent = $(event.target).parent().parent();
+	highlightSelectedNode(eventTargetParent)
+	if($(eventTargetParent).hasClass("folder-terminal"))
+		{
+		drawPropertiesTable("folder-terminal")
+		//alert(eventTargetParent.attr("id").substr(11))
+		getRecordProperties("folder-terminal", eventTargetParent.attr("id").substr(11))		
+		}
+	})
+
+
+
 
 $(document).on("click", ".star", function()
 	{
@@ -88,12 +153,8 @@ $(document).on("click", ".recents>a", function()
 	})
 
 
-// Click on folder-fill Icon //
-$(document).on("click", ".record-title>a", function()
-	{
-	var eventTargetParent = $(event.target).parent();
-	highlightSelectedFolder(eventTargetParent.parent())
-	})
+
+
 
 // Click on collpased caret
 $(document).on("click", ".collapsed", function()
@@ -354,31 +415,37 @@ function sortClassificationTree(sortBy)
 		});
 	}
 
-function highlightSelectedClassification(eventTargetParent)
+
+
+function highlightSelectedNode(eventTargetParent)
 	{
-	$("#classification-treeview li").removeClass("classification-node-selected")
-	$("#classification-treeview li").removeClass("folder-node-selected")
-	$("#" + eventTargetParent.attr("id")).addClass("classification-node-selected")
+	$("#classification-treeview li").removeClass("node-selected")
+	$("#classification-treeview li").removeClass("node-selected")
+	$("#" + eventTargetParent.attr("id")).addClass("node-selected")
 	}
 
-function highlightSelectedFolder(eventTargetParent)
+function getRecords(recordUri)
 	{
-	$("#classification-treeview li").removeClass("classification-node-selected")
-	$("#classification-treeview li").removeClass("folder-node-selected")
-	$("#" + eventTargetParent.attr("id")).addClass("folder-node-selected")
+		
 	}
+
+
 
 function getClassificationProperties(classificationUri)
 	{
+	//alert(classificationUri)
+	var url = "/Search?q=" + classificationUri + "&properties=ClassificationName, ClassificationTitle, ClassificationIdNumber, AccessControl&trimtype=Classification"
 	$.ajax(
 		{
-		url: "/get-classification-details?uri=" + classificationUri, 
+		url: url,
 		success: function(result)
 			{
 			var details = JSON.stringify(result);
-			$("#classificationNameValue").html(details.Results[0].ClassificationName.Value)
-			$("#classificationAccessControlValue").html(details.Results[0].ClassificationAccessControl.Value)
-			$("#classificationCanAttachRecordsValue").html(details.Results[0].ClassificationCanAttachRecords.Value)
+			console.log(details)
+			$("#properties-classification-title").html(result.Results[0].ClassificationTitle.Value)
+			$("#properties-classification-number").html(result.Results[0].ClassificationIdNumber.Value)
+			$("#properties-classification-access-control").html(result.Results[0].ClassificationAccessControl.Value)
+
 			}, 
 		error: function(result)
 			{
@@ -387,3 +454,70 @@ function getClassificationProperties(classificationUri)
 			}
 		});
 	}
+
+function getRecordProperties(type, recordUri)
+	{
+	var url = "/Search?q=" + uri + "&properties=RecordTitle, RecordNumber, Classification, RecordContainer, RecordType, DateRegistered, AccessControl, RetentionSchedule&trimtype=Record"
+	$.ajax(
+		{
+		url: url, 
+		success: function(result)
+			{
+			var details = JSON.stringify(result);
+				console.log(details)
+				switch(type)
+					{
+					case "folder-intermediate":
+						$("#properties-record-number").html(result.Results[0].RecordNumber.Value)
+						$("#properties-classification").html(result.Results[0].RecordClassification.ClassificationTitle.Value)
+						$("#properties-record-type").html(result.Results[0].RecordRecordType.RecordTypeName.Value)
+						$("#properties-date-registered").html(result.Results[0].RecordDateRegistered.DateTime)
+						$("#properties-access-control").html(result.Results[0].RecordAccessControl.Value)
+						$("#properties-retention-schedule").html(result.Results[0].RecordRetentionSchedule.Uri)
+							
+						
+
+						break;
+					case "folder-terminal":
+						$("#properties-record-number").html(result.Results[0].RecordNumber.Value)
+						$("#properties-container").html(result.Results[0].RecordContainer.RecordNumber.Value + ": " + result.Results[0].RecordContainer.RecordTitle.Value)
+						$("#properties-record-type").html(result.Results[0].RecordRecordType.RecordTypeName.Value)
+						$("#properties-date-registered").html(result.Results[0].RecordDateRegistered.DateTime)
+						$("#properties-access-control").html(result.Results[0].RecordAccessControl.Value)
+						break;
+					case "document":
+
+						break;
+					}
+			}, 
+		error: function(result)
+			{
+			console.log("Oooops!")
+			console.log(result)
+			}
+		});
+	}
+
+function drawPropertiesTable(type)
+	{
+	switch(type)
+		{
+		case "classification":
+			var tableHTML = '<table class="table table-dark table-sm" style="position:absolute;bottom:0;margin-bottom:0;"><tbody><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Number</td><td id="properties-classification-number" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Classification Title</td><td id="properties-classification-title" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Access Control</td><td id="properties-classification-access-control" style="text-align:left;"></td></tr></tbody></table>'
+			break;
+		case "folder-intermediate":
+			var tableHTML = '<table class="table table-dark table-sm" style="position:absolute;bottom:0;margin-bottom:0;"><tbody><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Record Number</td><td id="properties-record-number" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Classification</td><td id="properties-classification" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Record Type</td><td id="properties-record-type" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Date Registered</td><td id="properties-date-registered" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Access Control</td><td id="properties-access-control" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Retention Schedule</td><td id="properties-retention-schedule" style="text-align:left;"></td></tr><tr><td scope="row" style="width:20%;text-align:left;padding-left:30px;">Date Due for Destruction</td><td id="properties-date-due-for-destruction" style="text-align:left;"></td></tr><tr></tbody></table>'
+			break;
+		case "folder-terminal":
+			var tableHTML = '<table class="table table-dark table-sm" style="position:absolute;bottom:0;margin-bottom:0;"><tbody><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Record Number</td><td id="properties-record-number" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Container</td><td id="properties-container" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Record Type</td><td id="properties-record-type" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Date Registered</td><td id="properties-date-registered" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Access Control</td><td id="properties-access-control" style="text-align:left;"></td></tr></tbody></table>'
+			break;
+		case "document":
+			var tableHTML = '<table class="table table-dark table-sm" style="position:absolute;bottom:0;margin-bottom:0;"><tbody><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Record Number</td><td id="properties-record-number" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Container</td><td id="properties-container" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Record Type</td><td id="properties-record-type" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Date Registered</td><td id="properties-date-registered" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Access Control</td><td id="properties-access-control" style="text-align:left;"></td></tr></tbody></table>'
+			break;
+		}
+	$("#properties-pane > table").remove()
+	$("#properties-pane").append(tableHTML)
+	}
+
+
+

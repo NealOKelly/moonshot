@@ -39,19 +39,19 @@
 	display: none;
 }
 
-.classification-node-selected > span.classification-name {
+.node-selected > span.classification-name {
 	font-weight: bold;
 }
 
-.classification-node-selected > .collapsed {
+.node-selected > .collapsed {
 	background-image: url("../img/icons/caret-right-fill.svg");
 }
 
-.classification-node-selected > .expanded {
+.node-selected > .expanded {
 	background-image: url("../img/icons/caret-down-fill.svg");
 }
 
-.folder-node-selected > span.record-title {
+.node-selected > span.record-title {
 	font-weight: bold;
 }
 
