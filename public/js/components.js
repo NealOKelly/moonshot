@@ -16,6 +16,7 @@ $(document).ready(function()
 					{
 					addClassificationNode("#all-files > ul", classifications.Results[i].Uri, classifications.Results[i].ClassificationName.Value, classifications.Results[i].ClassificationCanAttachRecords.Value, classifications.Results[i].ClassificationChildPattern.Value)
 					}
+					$("#all-files > ul").addClass("classification-hidden")
 				}
 			}	
 			// sort	 this list.
@@ -87,27 +88,35 @@ $(document).on("click", ".record-title>a", function()
 $(document).on("click", ".collapsed", function()
 	{
 	var parentNodeId = $(event.target).parent().attr("id");
-
-	$("#" + parentNodeId + " > span.collapsed").addClass("expanded")
-	$("#" + parentNodeId + " > span.collapsed").removeClass("collapsed")
-	$("#" + parentNodeId + " > span.folder").addClass("folder-open")
-	$("#" + parentNodeId + " > span.folder").removeClass("folder")
-
-	$("#" + parentNodeId).find(".expanded").each(function()
+	
+	if(parentNodeId=="all-files")
 		{
-		if($(this).parent().hasClass("classification-can-have-children"))
+		alert("Clicked on classification-hidden")
+		$("#all-files ul").removeClass("classification-hidden")
+		}
+	else
+		{
+		$("#" + parentNodeId + " > span.collapsed").addClass("expanded")
+		$("#" + parentNodeId + " > span.collapsed").removeClass("collapsed")
+		$("#" + parentNodeId + " > span.folder").addClass("folder-open")
+		$("#" + parentNodeId + " > span.folder").removeClass("folder")
+
+		$("#" + parentNodeId).find(".expanded").each(function()
 			{
-			refreshClassificationNodes($(this).parent().attr("id"))
-			}
-		if($(this).parent().hasClass("classification-can-attach-records"))
-			{
-			refreshFolderNodes("classification", $(this).parent().attr("id"))
-			}
-		if($(this).parent().hasClass("folder-intermediate"))
-			{
-			refreshFolderNodes("record", $(this).parent().attr("id"))
-			}
-		});
+			if($(this).parent().hasClass("classification-can-have-children"))
+				{
+				refreshClassificationNodes($(this).parent().attr("id"))
+				}
+			if($(this).parent().hasClass("classification-can-attach-records"))
+				{
+				refreshFolderNodes("classification", $(this).parent().attr("id"))
+				}
+			if($(this).parent().hasClass("folder-intermediate"))
+				{
+				refreshFolderNodes("record", $(this).parent().attr("id"))
+				}
+			});
+		}
 	})
 
 // Click on expanded caret
