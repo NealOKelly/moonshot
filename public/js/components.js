@@ -69,11 +69,22 @@ $(document).on("click", ".folder-fill", function()
 
 $(document).on("click", ".star", function()
 	{
-	//alert("Clicked.")
-	var eventTargetParent = $(event.target).parent();
-	$("#classification-treeview li").removeClass("classification-node-selected")
-	$("#classification-treeview li").removeClass("folder-node-selected")
-	$("#" + eventTargetParent.attr("id")).addClass("classification-node-selected")
+	alert("Why have you clicked on this?  THis functionality has not been written yet.  Moron.")
+	})
+
+$(document).on("click", ".favourites>a", function()
+	{
+	alert("Are you taking the piss?")
+	})
+
+$(document).on("click", ".clock-history", function()
+	{
+	alert("Have you been sent to vex me?")
+	})
+
+$(document).on("click", ".recents>a", function()
+	{
+	alert("Give me strength!")
 	})
 
 
@@ -91,8 +102,11 @@ $(document).on("click", ".collapsed", function()
 	
 	if(parentNodeId=="all-files")
 		{
-		alert("Clicked on classification-hidden")
 		$("#all-files ul").removeClass("classification-hidden")
+		$("#" + parentNodeId + " > span.collapsed").addClass("expanded")
+		$("#" + parentNodeId + " > span.collapsed").removeClass("collapsed")
+		$("#" + parentNodeId + " > span.folder").addClass("folder-open")
+		$("#" + parentNodeId + " > span.folder").removeClass("folder")
 		}
 	else
 		{

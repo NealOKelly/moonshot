@@ -124,12 +124,20 @@
 	vertical-align: top;
 	padding-left: 10px;
 }
-
+.all-files:hover{
+	text-decoration: underline;
+	cursor: pointer;
+}
 .recents{
 	display: inline-block;
 	vertical-align: top;
 	padding-left: 10px;
 }
+.recents:hover{
+	text-decoration: underline;
+	cursor: pointer;
+}
+
 
 .classification-name{
 	display: inline-block;
