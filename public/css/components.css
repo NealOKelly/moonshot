@@ -55,7 +55,14 @@
 	font-weight: bold;
 }
 
-
+.row-selected {
+	font-weight: bold;
+	color: #75b540;
+}
+.record-row:hover {
+	/*text-decoration: underline;*/
+	cursor: pointer;	
+}
 
 
 .folder{
@@ -108,6 +115,48 @@
     width: 24px;
     height: 24px;
 }
+
+.file-earmark{
+  	display: inline-block;
+  	content: "";
+  	background-image: url("../img/icons/file-earmark.svg");
+	background-size: cover;
+	background-repeat: no-repeat;
+    width: 24px;
+    height: 24px;
+}
+
+.file-earmark-green{
+  	display: inline-block;
+  	content: "";
+  	background-image: url("../img/icons/file-earmark-green.svg");
+	background-size: cover;
+	background-repeat: no-repeat;
+    width: 24px;
+    height: 24px;
+}
+
+
+.download-green{
+  	display: inline-block;
+  	content: "";
+  	background-image: url("../img/icons/download-green.svg");
+	background-size: cover;
+	background-repeat: no-repeat;
+    width: 24px;
+    height: 24px;
+}
+
+.download{
+  	display: inline-block;
+  	content: "";
+  	background-image: url("../img/icons/download.svg");
+	background-size: cover;
+	background-repeat: no-repeat;
+    width: 24px;
+    height: 24px;
+}
+
 
 
 .favourites{
