@@ -4,7 +4,8 @@
   "description": "Bespoke Web Client for Micro Focus Content Manager by Records Transformation Ltd.",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+	"start": "node app.js"
   },
   "author": "Neal O'kelly - CTO, Records Transformation Ltd.",
   "license": "ISC",

@@ -108,24 +108,45 @@ $(document).on("click", ".classification-name>a", function()
 // Click on folder-fill Icon //
 $(document).on("click", ".folder-fill", function()
 	{
-	alert("Clicked")
 	var eventTargetParent = $(event.target).parent();
 	highlightSelectedNode(eventTargetParent)
 	if($(eventTargetParent).hasClass("folder-terminal"))
 		{
 		drawPropertiesTable("folder-terminal")
-		getRecordProperties("folder-terminal", eventTargetParent.attr("id").substr(11))		
+		getRecordProperties("folder-terminal", eventTargetParent.attr("id").substr(11))
+		getRecords(eventTargetParent.attr("id").substr(11))
 		}
 	})
+
 $(document).on("click", ".record-title>a", function()
 	{
 	var eventTargetParent = $(event.target).parent().parent();
 	highlightSelectedNode(eventTargetParent)
-	if($(eventTargetParent).hasClass("folder-terminal"))
+	if((eventTargetParent).attr("id").substr(0, 19) == "classification-uri-")
 		{
-		drawPropertiesTable("folder-terminal")
-		//alert(eventTargetParent.attr("id").substr(11))
-		getRecordProperties("folder-terminal", eventTargetParent.attr("id").substr(11))		
+		drawPropertiesTable("classification")
+		var classificationUri = eventTargetParent.attr("id").substr(19)
+		getClassificationProperties(classificationUri)
+		}
+	else
+		{
+		if((eventTargetParent).attr("id").substr(0, 11) == "record-uri-")
+			{
+			if($(eventTargetParent).hasClass("folder-intermediate"))
+				{
+				drawPropertiesTable("folder-intermediate")
+				getRecordProperties("folder-intermediate", eventTargetParent.attr("id").substr(11))	
+				}
+			else
+				{
+				if($(eventTargetParent).hasClass("folder-terminal"))
+					{
+					drawPropertiesTable("folder-terminal")
+					getRecordProperties("folder-terminal", eventTargetParent.attr("id").substr(11))
+					getRecords(eventTargetParent.attr("id").substr(11))
+					}
+				}
+			}
 		}
 	})
 
@@ -152,8 +173,27 @@ $(document).on("click", ".recents>a", function()
 	alert("Give me strength!")
 	})
 
-
-
+$(document).on("click", ".record-row", function()
+	{
+	//font-weight: bold;
+	var eventTargetParent = $(event.target).parent();
+	$(".record-row").removeClass("row-selected")
+	$("#classification-treeview li").removeClass("node-selected")
+	$(event.target).parent().addClass("row-selected")
+	//alert(eventTargetParent.attr("id"))
+	$("#records-list-pane tr > td:nth-child(1) > span").removeClass("file-earmark-green")
+	$("#records-list-pane tr > td:nth-child(1) > span").addClass("file-earmark")
+	$("#records-list-pane tr > td:nth-child(5) > span").removeClass("download-green")
+	$("#records-list-pane tr > td:nth-child(5) > span").addClass("download")
+	$("#" + eventTargetParent.attr("id") + " > td:nth-child(1) > span").removeClass("file-earmark")
+	$("#" + eventTargetParent.attr("id") + " > td:nth-child(1) > span").addClass("file-earmark-green")
+	$("#" + eventTargetParent.attr("id") + " > td:nth-child(5) > span").removeClass("download")
+	$("#" + eventTargetParent.attr("id") + " > td:nth-child(5) > span").addClass("download-green")
+	drawPropertiesTable("document")
+	getRecordProperties("document", eventTargetParent.attr("id").substr(11))
+	//$(event.target).parent().addClass("row-selected")
+	
+	})
 
 
 // Click on collpased caret
@@ -419,22 +459,14 @@ function sortClassificationTree(sortBy)
 
 function highlightSelectedNode(eventTargetParent)
 	{
-	$("#classification-treeview li").removeClass("node-selected")
+	$(".record-row").removeClass("row-selected")
 	$("#classification-treeview li").removeClass("node-selected")
 	$("#" + eventTargetParent.attr("id")).addClass("node-selected")
 	}
 
 function getRecords(recordUri)
 	{
-		
-	}
-
-
-
-function getClassificationProperties(classificationUri)
-	{
-	//alert(classificationUri)
-	var url = "/Search?q=" + classificationUri + "&properties=ClassificationName, ClassificationTitle, ClassificationIdNumber, AccessControl&trimtype=Classification"
+	var url = "/Search?q=container:" + recordUri + "&properties=RecordTitle, RecordNumber, DateRegistered&trimtype=Record"
 	$.ajax(
 		{
 		url: url,
@@ -442,6 +474,50 @@ function getClassificationProperties(classificationUri)
 			{
 			var details = JSON.stringify(result);
 			console.log(details)
+			//alert(result.TotalResults)
+			if(result.TotalResults=="0")
+				{
+				$("#records-list-pane").html("The selected folder does not contain any records.")		
+				}
+			else
+				{
+				var tableHTML = '<table class="table table-sm"><th>Type</th><th>Record Number</th><th style="text-align:left;">Title</th><th>Date Registered</th><th>Download</th>'
+				for(i=0; i<result.TotalResults; i++)
+					{
+					tableHTML = tableHTML + '<tr id="record-uri-' + result.Results[i].Uri + '" class="record-row">'
+					tableHTML = tableHTML + '<td><span class="file-earmark"></span></td>'
+					tableHTML = tableHTML + '<td>' + result.Results[i].RecordNumber.Value + '</td>'
+					tableHTML = tableHTML + '<td style="text-align:left;">' + result.Results[i].RecordTitle.Value + '</td>'
+					tableHTML = tableHTML + '<td>' + result.Results[i].RecordDateRegistered.DateTime.substr(8, 2) + '/' + result.Results[i].RecordDateRegistered.DateTime.substr(5, 2) + '/' + result.Results[i].RecordDateRegistered.DateTime.substr(0, 4) + '</td>'
+					tableHTML = tableHTML + '<td><span class="download"></span></td></tr>'
+					}
+					tableHTML = tableHTML + '</table'>
+
+				$("#records-list-pane").html(tableHTML)
+				}
+			
+
+			}, 
+		error: function(result)
+			{
+			console.log("Oooops!")
+			console.log(result)
+			}
+		});		
+	}
+
+
+
+function getClassificationProperties(classificationUri)
+	{
+	var url = "/Search?q=" + classificationUri + "&properties=ClassificationName, ClassificationTitle, ClassificationIdNumber, AccessControl&trimtype=Classification"
+	$.ajax(
+		{
+		url: url,
+		success: function(result)
+			{
+			var details = JSON.stringify(result);
+			//console.log(details)
 			$("#properties-classification-title").html(result.Results[0].ClassificationTitle.Value)
 			$("#properties-classification-number").html(result.Results[0].ClassificationIdNumber.Value)
 			$("#properties-classification-access-control").html(result.Results[0].ClassificationAccessControl.Value)
@@ -457,14 +533,14 @@ function getClassificationProperties(classificationUri)
 
 function getRecordProperties(type, recordUri)
 	{
-	var url = "/Search?q=" + uri + "&properties=RecordTitle, RecordNumber, Classification, RecordContainer, RecordType, DateRegistered, AccessControl, RetentionSchedule&trimtype=Record"
+	var url = "/Search?q=" + recordUri + "&properties=RecordTitle, RecordNumber, Classification, RecordContainer, RecordType, DateRegistered, AccessControl, RetentionSchedule&trimtype=Record"
 	$.ajax(
 		{
 		url: url, 
 		success: function(result)
 			{
 			var details = JSON.stringify(result);
-				console.log(details)
+				//console.log(details)
 				switch(type)
 					{
 					case "folder-intermediate":
@@ -486,6 +562,11 @@ function getRecordProperties(type, recordUri)
 						$("#properties-access-control").html(result.Results[0].RecordAccessControl.Value)
 						break;
 					case "document":
+						$("#properties-record-number").html(result.Results[0].RecordNumber.Value)
+						$("#properties-container").html(result.Results[0].RecordContainer.RecordNumber.Value + ": " + result.Results[0].RecordContainer.RecordTitle.Value)
+						$("#properties-record-type").html(result.Results[0].RecordRecordType.RecordTypeName.Value)
+						$("#properties-date-registered").html(result.Results[0].RecordDateRegistered.DateTime)
+						$("#properties-access-control").html(result.Results[0].RecordAccessControl.Value)
 
 						break;
 					}
@@ -518,6 +599,3 @@ function drawPropertiesTable(type)
 	$("#properties-pane > table").remove()
 	$("#properties-pane").append(tableHTML)
 	}
-
-
-
