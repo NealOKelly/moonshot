@@ -2,6 +2,8 @@
 const express = require('express') // node.js web server
 const expressLayouts = require('express-ejs-layouts')
 const axios = require('axios');
+const https = require("https")
+const fs = require("fs")
 //const dateFormat = require('dateformat');
 
 // Included Files
@@ -10,7 +12,7 @@ const agent = require('./modules/https-auth/agent');
 
 // Constants
 const app = express()
-const port= 3000
+const port= 80
 const contentManagerUsername = process.env['CONTENT_MANAGER_USERNAME'];
 const contentManagerPassword = process.env['CONTENT_MANAGER_PASSWORD'];
 const authorizationHeaderValue = "Basic " + Buffer.from(contentManagerUsername + ":" + contentManagerPassword).toString('base64');
@@ -120,5 +122,17 @@ app.get("/get-record-type-attributes", (req, res, next) => {
     .catch(err => next(err));
 })
 
+https.createServer
+	({
+		key: fs.readFileSync("server-key.pem"),
+		cert: fs.readFileSync("server-cert.pem")
+	
+	
+	}, app)
+	.listen(443, function() {
+			console.log("Listening on 443")
+			})
+
+
 // Listen on Port 300
-app.listen(port, () => console.info('App listening on port ' + port))
+//app.listen(port, () => console.info('App listening on port ' + port))
