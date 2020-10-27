@@ -122,17 +122,17 @@ app.get("/get-record-type-attributes", (req, res, next) => {
     .catch(err => next(err));
 })
 
-https.createServer
-	({
-		key: fs.readFileSync("server-key.pem"),
-		cert: fs.readFileSync("server-cert.pem")
+//https.createServer
+	//({
+		//key: fs.readFileSync("server-key.pem"),
+		//cert: fs.readFileSync("server-cert.pem")
 	
 	
-	}, app)
-	.listen(443, function() {
-			console.log("Listening on 443")
-			})
+	//}, app)
+	//.listen(443, function() {
+		//	console.log("Listening on 443")
+			//})
 
 
 // Listen on Port 300
-//app.listen(port, () => console.info('App listening on port ' + port))
+app.listen(port, () => console.info('App listening on port ' + port))
