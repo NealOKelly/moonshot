@@ -5,3 +5,6 @@ _notes/
 /bower_components/
 /node_modules/
 /ajax-example.js
+/server-certs/
+/https-auth/api-client-cert.pem
+/https-auth/spi-client-key.pem

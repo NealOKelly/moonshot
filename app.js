@@ -12,7 +12,7 @@ const agent = require('./modules/https-auth/agent');
 
 // Constants
 const app = express()
-const port= 80
+const port = 80
 const contentManagerUsername = process.env['CONTENT_MANAGER_USERNAME'];
 const contentManagerPassword = process.env['CONTENT_MANAGER_PASSWORD'];
 const authorizationHeaderValue = "Basic " + Buffer.from(contentManagerUsername + ":" + contentManagerPassword).toString('base64');
@@ -122,17 +122,14 @@ app.get("/get-record-type-attributes", (req, res, next) => {
     .catch(err => next(err));
 })
 
-//https.createServer
-	//({
-		//key: fs.readFileSync("server-key.pem"),
-		//cert: fs.readFileSync("server-cert.pem")
+https.createServer
+	({
+		key: fs.readFileSync("./server-certs/STAR_gilbyim_com_pem.key"),
+		ca: fs.readFileSync("./server-certs/STAR_gilbyim_com.ca-bundle"),
+		cert: fs.readFileSync("./server-certs/STAR_gilbyim_com.crt")
 	
 	
-	//}, app)
-	//.listen(443, function() {
-		//	console.log("Listening on 443")
-			//})
-
-
-// Listen on Port 300
-app.listen(port, () => console.info('App listening on port ' + port))
+	}, app)
+	.listen(443, function() {
+			console.log("Listening on 443")
+			})
