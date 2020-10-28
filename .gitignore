@@ -8,3 +8,5 @@ _notes/
 /server-certs/
 /https-auth/api-client-cert.pem
 /https-auth/spi-client-key.pem
+/modules/https-auth/api-client-cert.pem
+/modules/https-auth/api-client-key.pem

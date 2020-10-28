@@ -4,22 +4,25 @@
   "description": "Bespoke Web Client for Micro Focus Content Manager by Records Transformation Ltd.",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-	"start": "node app.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Neal O'kelly - CTO, Records Transformation Ltd.",
+  "author": "Neal O'Kelly",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.20.0",
+    "axios": "^0.21.0",
     "bootstrap-icons": "^1.0.0",
+    "cookie-parser": "^1.4.5",
     "dotenv": "^8.2.0",
     "ejs": "^3.1.5",
     "express": "^4.17.1",
     "express-ejs-layouts": "^2.5.0",
+    "express-session": "^1.17.1",
     "https": "^1.0.0",
+    "method-override": "^3.0.0",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.6",
+    "passport": "^0.4.1",
+    "passport-wsfed-saml2": "^3.0.17",
     "path": "^0.12.7"
-  },
-  "devDependencies": {
-    "nodemon": "^2.0.5"
   }
 }
