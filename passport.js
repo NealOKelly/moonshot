@@ -71,7 +71,6 @@ passport.use(new SamlStrategy(
 				return done(null, profile);
 				}
 			return done(null, user);
-			return done(null, profile)
 			})
 		});
 	}
