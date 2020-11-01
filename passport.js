@@ -3,6 +3,12 @@ var fs = require('fs'),
 	passport = require('passport'),
 	SamlStrategy = require('passport-saml').Strategy;
 
+// Constants
+require('dotenv').config();
+const entryPoint = process.env['PASSPORT_SAML_ENTRYPOINT'];
+const issuer = process.env['PASSPORT_SAML_ISSUER'];
+const callbackUrl = process.env['PASSPORT_SAML_CALLBACKURL'];
+
 // Users object
 var users = [
 		{ id: 1, givenName: 'Neal', email: 'neal.okelly100@gmail.com' },
@@ -20,10 +26,10 @@ function findByEmail(email, fn)
 			return fn(null, user);
 			}
 		}
-		return fn(null, null);
+	return fn(null, null);
 	}
 
-// Passport session setup
+//  Passport session setup
 //   To support persistent login sessions, Passport needs to be able to
 //   serialize users into and deserialize users out of the session.  Typically,
 //   this will be as simple as storing the user ID when serializing, and finding
@@ -41,39 +47,37 @@ passport.deserializeUser(function(user, done)
 // Passport strategy
 passport.use(new SamlStrategy(
 	{
-	entryPoint: 'https://authenticate.gilbyim.com/adfs/ls/',
-	issuer: 'https://beta.gilbyim.com/', // This is the Relying Party Trust identifier.
-	callbackUrl: 'https://beta.gilbyim.com/login/callback',
-    authnContext: 'http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password',
+	entryPoint: entryPoint,
+	issuer: issuer, // This is the Relying Party Trust identifier.
+	callbackUrl: callbackUrl,
     acceptedClockSkewMs: -1,
     identifierFormat: null,
-    signatureAlgorithm: 'sha256',
 	},
 	function(profile, done)
 	{
 	console.log("Auth with", profile);
-    if (!profile.email)
+    if(!profile.email)
 		{
 		return done(new Error("No email found"), null);
 		}
 		process.nextTick(function()
-		{
-		findByEmail(profile.email, function(err, user)
 			{
-			if(err)
+			findByEmail(profile.email, function(err, user)
 				{
-				return done(err);
-				}
-			if(!user)
-				{
-				// "Auto-registration"
-				users.push(profile);
-				return done(null, profile);
-				}
-			return done(null, user);
-			})
-		});
-	}
-));
+				if(err)
+					{
+					return done(err);
+					}
+				if(!user)
+					{
+					// "Auto-registration"
+					users.push(profile);
+					return done(null, profile);
+					}
+				return done(null, user);
+				})
+			});
+		}
+	));
 
 module.exports = passport;
