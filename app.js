@@ -19,15 +19,13 @@ const contentManagerPassword = process.env['CONTENT_MANAGER_PASSWORD'];
 const authorizationHeaderValue = "Basic " + Buffer.from(contentManagerUsername + ":" + contentManagerPassword).toString('base64');
 const contentManagerServiceAPIBaseUrl = process.env['CONTENT_MANAGER_API_BASE_URL'];
 
-
+const idpLogoutURL = process.env['PASSPORT_SAML_LOGOUTURL'];
 
 // Static Files
 app.use(express.static('public'))
 app.use('/css', express.static(__dirname + 'public/css'))
 app.use('/js', express.static(__dirname + 'public/js'))
 app.use('/img', express.static(__dirname + 'public/img'))
-
-
 
 // Express configuration
 var router = express.Router();
@@ -56,11 +54,6 @@ app.get('/', ensureAuthenticated, function(req, res)
 	res.render('index', { user: req.user, title: "Moonshot" });
 	});
 
-app.get('/account', ensureAuthenticated, function(req, res)
-	{
-	res.send("This is the account page.");
-	});
-
 app.get('/login',
   passport.authenticate('saml', { failureRedirect: '/', failureFlash: true }),
   function(req, res)
@@ -81,12 +74,12 @@ app.post('/login/callback',
 app.get('/logout', function(req, res)
 	{
 	req.logout();
-	res.redirect('https://authenticate.gilbyim.com/adfs/ls/?wa=wsignout1.0');
+	res.redirect(idpLogoutURL);
 	});
 
 
 // ROUTES - /Search
-app.get("/Search", (req, res, next) =>
+app.get("/Search", ensureAuthenticated, (req, res, next) =>
 	{
     console.log("Call to '/Search' received")
 	console.log(req.query.q)
@@ -112,17 +105,17 @@ app.get("/Search", (req, res, next) =>
 		console.log("Calling CMServiceAPI.")
 		axios(config)
 			.then( function (response)
-			{
-			console.log("Response from CMServiceAPI recieved.")
-			console.log("Sending response to browser.")
-			res.status(200).send(response.data)
-			})
-			.catch(err => next(err));
+				{
+				console.log("Response from CMServiceAPI recieved.")
+				console.log("Sending response to browser.")
+				res.status(200).send(response.data)
+				})
+				.catch(err => next(err));
 	})
 
 
 // get-classification-details
-app.get("/get-classification-details", (req, res, next) => {
+app.get("/get-classification-details", ensureAuthenticated, (req, res, next) => {
     console.log("Call to '/get-classification-details' received")
 	var classificationUri = req.query.uri
 		
@@ -149,7 +142,7 @@ app.get("/get-classification-details", (req, res, next) => {
 })
 
 // get-record-type-containment-details
-app.get("/get-record-type-attributes", (req, res, next) => {
+app.get("/get-record-type-attributes", ensureAuthenticated, (req, res, next) => {
     console.log("Call to '/get-record-type-attributes' received")
 	var recordTypeUri = req.query.uri;
 	var config = {
@@ -182,7 +175,7 @@ https.createServer(
 	cert: fs.readFileSync("./server-certs/STAR_gilbyim_com.crt")
 	}, app).listen(443, function()
 		{
-		console.log("Listening on 443")
+		console.log("Listening on 443.")
 		})
 
 // Functions
