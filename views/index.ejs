@@ -1,7 +1,7 @@
 <% if (!user) { %>
 <h2>Welcome! Please <a href="/login">log in.</a></h2>
 <% } else { %>
-<h2>Hello, <%= user.givenName %>.</h2>
+<h2>Hello, <%= user.email %>.</h2>
 <p>Options</p>
 <ul>
 	<li><a href="/account">Account</a></li>
