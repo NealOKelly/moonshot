@@ -10,3 +10,4 @@ _notes/
 /https-auth/spi-client-key.pem
 /modules/https-auth/api-client-cert.pem
 /modules/https-auth/api-client-key.pem
+.env
