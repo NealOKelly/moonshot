@@ -81,7 +81,7 @@ app.post('/login/callback',
 app.get('/logout', function(req, res)
 	{
 	req.logout();
-	res.redirect('/');
+	res.redirect('https://authenticate.gilbyim.com/adfs/ls/?wa=wsignout1.0');
 	});
 
 
