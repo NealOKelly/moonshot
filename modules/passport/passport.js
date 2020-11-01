@@ -9,24 +9,10 @@ const entryPoint = process.env['PASSPORT_SAML_ENTRYPOINT'];
 const issuer = process.env['PASSPORT_SAML_ISSUER'];
 const callbackUrl = process.env['PASSPORT_SAML_CALLBACKURL'];
 
-// Users object
-var users = [
-		{ id: 1, givenName: 'Neal', email: 'neal.okelly100@gmail.com' },
-		{ id: 2, givenName: 'foo', email: 'foo@gmail.com' }
-	];
-
-// Not sure what this does
-function findByEmail(email, fn)
+// Random function that somehow creates the user object through magic.
+function getUser(profile, fn)
 	{
-	for(var i=0; i<users.length; i++)
-		{
-		var user = users[i];
-		if(user.email===email)
-			{
-			return fn(null, user);
-			}
-		}
-	return fn(null, null);
+	return fn(null, profile);
 	}
 
 //  Passport session setup
@@ -54,25 +40,15 @@ passport.use(new SamlStrategy(
     identifierFormat: null,
 	},
 	function(profile, done)
-	{
-	console.log("Auth with", profile);
-    if(!profile.email)
 		{
-		return done(new Error("No email found"), null);
-		}
+		console.log("Auth with", profile);
 		process.nextTick(function()
 			{
-			findByEmail(profile.email, function(err, user)
+			getUser(profile, function(err, user)  // It really bothers me that I don't understand what this is doing.
 				{
 				if(err)
 					{
 					return done(err);
-					}
-				if(!user)
-					{
-					// "Auto-registration"
-					users.push(profile);
-					return done(null, profile);
 					}
 				return done(null, user);
 				})
