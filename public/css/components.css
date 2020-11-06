@@ -119,7 +119,8 @@
 .file-earmark{
   	display: inline-block;
   	content: "";
-  	background-image: url("../img/icons/file-earmark.svg");
+  	background-image: url("../img/icons/shamrock.svg");
+	/*background-image: url("../img/icons/file-earmark.svg");*/
 	background-size: cover;
 	background-repeat: no-repeat;
     width: 24px;
