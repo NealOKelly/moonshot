@@ -3,23 +3,14 @@ var passport = require('passport'),
 	expressLayouts = require('express-ejs-layouts'),
 	express = require('express'),
 	https = require('https'),
-	fs = require('fs'),
 	bodyParser = require('body-parser'),
 	morgan = require('morgan'),
 	cookieParser = require('cookie-parser'),
-	methodOverride = require('method-override'),
-	session = require('express-session'),
-	axios = require('axios'),
-	cors = require('cors');
+	session = require('express-session');
 
 var app = express();
 require('./modules/passport/passport.js');
-const agent = require('./modules/https-auth/agent');
-const contentManagerUsername = process.env['CONTENT_MANAGER_USERNAME'];
-const contentManagerPassword = process.env['CONTENT_MANAGER_PASSWORD'];
-const authorizationHeaderValue = "Basic " + Buffer.from(contentManagerUsername + ":" + contentManagerPassword).toString('base64');
 const contentManagerServiceAPIBaseUrl = process.env['CONTENT_MANAGER_API_BASE_URL'];
-
 const idpLogoutURL = process.env['PASSPORT_SAML_LOGOUTURL'];
 
 // Static Files
@@ -32,13 +23,13 @@ app.use('/img', express.static(__dirname + 'public/img'))
 var router = express.Router();
 app.set('view engine', 'ejs');
 app.use(expressLayouts);
-app.use(morgan('combined'));
+//app.use(morgan('combined'));
+// morgan provides rich logging on https requests to the console.
 app.use(cookieParser());
 app.use(bodyParser.urlencoded(
 	{
 	extended: true
 	}));
-app.use(methodOverride());
 app.use(session(
 	{
 	secret: 'keyboard cat',
@@ -48,7 +39,6 @@ app.use(session(
 app.use(passport.initialize());
 app.use(passport.session());
 app.use('', router);
-//app.use(cors());
 
 // Routes
 app.get('/', ensureAuthenticated, function(req, res)
@@ -98,7 +88,6 @@ app.listen(3000, () => {
 // Functions
 function ensureAuthenticated(req, res, next)
 	{
-	console.log("isAuthenticated:" + req.isAuthenticated())
 	if(req.isAuthenticated())
 		{
 		return next();

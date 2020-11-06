@@ -9,10 +9,8 @@
   "author": "Neal O'Kelly",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.21.0",
     "body-parser": "^1.19.0",
     "bootstrap-icons": "^1.0.0",
-    "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.5",
     "dotenv": "^8.2.0",
     "ejs": "^3.1.5",
@@ -20,16 +18,9 @@
     "express-ejs-layouts": "^2.5.0",
     "express-session": "^1.17.1",
     "https": "^1.0.0",
-    "libsaml": "^1.0.0",
-    "method-override": "^3.0.0",
     "morgan": "^1.10.0",
     "nodemon": "^2.0.6",
     "passport": "^0.4.1",
-    "passport-saml": "^1.5.0",
-    "passport-wsfed-saml2": "^3.0.17",
-    "path": "^0.12.7",
-    "routes": "^2.1.0",
-    "saml-encoder-decoder-js": "^1.0.1",
-    "xml2json": "^0.12.0"
+    "passport-saml": "^1.5.0"
   }
 }
