@@ -1,36 +1,44 @@
+var hasPreAuthenticated = false;
+var apiBaseUrl = "https://api.gilbyim.com"
 $(document).ready(function()
 	{
-	// populate the #classification-data div
-	var url = url = "/Search?q=all&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern&trimtype=Classification"
-	$.ajax(
+	preauthenticateApi().then(function()
 		{
-		url: url,
-		success: function(result)
-		{
-		var classifications = result;
-		for(var i=0; i<classifications.TotalResults; i++)  // populate top level classifications.
+  	   	// populate the #classification-data div
+		var url = apiBaseUrl + "/Search?q=all&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern&trimtype=Classification&pageSize=1000000"
+		$.ajax(
 			{
-			if(!classifications.Results[i].hasOwnProperty("ClassificationParentClassification"))
+			url: url,
+			type: "POST",
+			xhrFields: { withCredentials: true},
+			contentType: 'application/json', 
+			success: function(result)
+			{
+			var classifications = result;
+			for(var i=0; i<classifications.TotalResults; i++)  // populate top level classifications.
 				{
-				if(!$("#classification-uri-" + classifications.Results[i].Uri).length)
+				if(!classifications.Results[i].hasOwnProperty("ClassificationParentClassification"))
 					{
-					addClassificationNode("#all-files > ul", classifications.Results[i].Uri, classifications.Results[i].ClassificationName.Value, classifications.Results[i].ClassificationCanAttachRecords.Value, classifications.Results[i].ClassificationChildPattern.Value)
+					if(!$("#classification-uri-" + classifications.Results[i].Uri).length)
+						{
+						addClassificationNode("#all-files > ul", classifications.Results[i].Uri, classifications.Results[i].ClassificationName.Value, classifications.Results[i].ClassificationCanAttachRecords.Value, classifications.Results[i].ClassificationChildPattern.Value)
+						}
+						$("#all-files > ul").addClass("classification-hidden")
 					}
-					$("#all-files > ul").addClass("classification-hidden")
+				}	
+				// sort	 this list.
+				sortClassificationTree(".classification-name")
+				}, 
+			error: function(result)
+				{
+				console.log("Oooops!")
 				}
-			}	
-			// sort	 this list.
-			sortClassificationTree(".classification-name")
-			}, 
-		error: function(result)
-			{
-			console.log("Oooops!")
-			console.log(result)
-			}
-		});
-	})
+			});
+		})
+	});
 
-//////// Handle Events  /////////
+
+//////// Handle User-Initiated Events  /////////
 
 ///// Classiciation Control Events /////
 
@@ -246,58 +254,90 @@ $(document).on("click", ".expanded", function()
 	})
 
 // Functions // 
+function preauthenticateApi()
+	{
+	// Session cookies need to be estabilished before making any AJAX calls to the API server.  This is because the first HTTP200 response
+	// (i.e what is returned by the ajax call) is actually a page served by ADFS server that uses JavaScript to POST the SAML assertion 
+	// to the API server.  As a workaround, we load a resource from the API server into an IFRAME instead.
+
+	return $.Deferred(function(d)
+	{
+	if(hasPreAuthenticated)
+		{
+		d.resolve();
+		return;
+		}
+		var iFrame = $("<iframe></iframe>");
+		iFrame.hide();
+		iFrame.appendTo("body");
+		iFrame.attr('src', "https://api.gilbyim.com/help/index");
+		iFrame.on('load', function () 
+			{
+			hasPreAuthenticated = true;
+			//iFrame.remove();
+			d.resolve();
+			});
+		});
+	};
 
 function refreshClassificationNodes(parentNodeId) 
 	{
 	$("#" + parentNodeId + " > ul").addClass("classification-hidden") // if already exists, hide.
 		
 	// check for new classifications.
-	var q="parent:" + parentNodeId.substr(19);
-	$.ajax(
-	{
-	url: "/Search?q=" + q + "&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern&trimtype=Classification",
-	success: function(result)
+	preauthenticateApi().then(function()
 		{
-		if(!$("#" + parentNodeId + " > ul").length)
+		var q="parent:" + parentNodeId.substr(19);
+		$.ajax(
 			{
-			if(result.TotalResults>0)
+			url: apiBaseUrl + "/Search?q=" + q + "&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern&trimtype=Classification",
+			type: "POST",
+			contentType: 'application/json',
+			xhrFields: { withCredentials: true},
+			success: function(result)
 				{
-				$("#" + parentNodeId).append("<ul style='list-style-type:none;'></ul>")
-				}
-			}
-		for(i=0; i<result.TotalResults; i++)  // for each classification returned in the search result
-			{
-			if(!$("#classification-uri-" + result.Results[i].Uri).length)
-				{
-				addClassificationNode("#" + parentNodeId + " > ul", result.Results[i].Uri, result.Results[i].ClassificationName.Value, result.Results[i].ClassificationCanAttachRecords.Value, result.Results[i].ClassificationChildPattern.Value)
-				}
-			}
-		for(i=0; i<$("#" + parentNodeId + " > ul > li").length; i++)  // for each <li>
-			{
-			var nodeExistsInSearchResults = false;
-			for (x=0; x<result.TotalResults; x++)
-				{
-				if($("#" + parentNodeId + " > ul > li:nth-child(" + (i + 1) + ")").attr("id").substr(19)==result.Results[x].Uri)
+				if(!$("#" + parentNodeId + " > ul").length)
 					{
-					nodeExistsInSearchResults = true;
+					if(result.TotalResults>0)
+						{
+						$("#" + parentNodeId).append("<ul style='list-style-type:none;'></ul>")
+						}
 					}
-				}
-				if(!nodeExistsInSearchResults)
+				for(i=0; i<result.TotalResults; i++)  // for each classification returned in the search result
 					{
-					$("#" + parentNodeId + " > ul > li:nth-child(" + (i + 1) + ")").addClass("for-deletion")
+					if(!$("#classification-uri-" + result.Results[i].Uri).length)
+						{
+						addClassificationNode("#" + parentNodeId + " > ul", result.Results[i].Uri, result.Results[i].ClassificationName.Value, result.Results[i].ClassificationCanAttachRecords.Value, result.Results[i].ClassificationChildPattern.Value)
+						}
 					}
-				$(".for-deletion").remove() // remove the <li> once the for loop has completed.
-			}
-		$("#" + parentNodeId + " > ul").removeClass("classification-hidden")
-		$("#" + parentNodeId).parents("ul").removeClass("classification-hidden")
-		sortClassificationTree(".classification-name")
-		}, 
-	error: function(result)
-		{
-		console.log("Oooops!")
-		}
-	});
+				for(i=0; i<$("#" + parentNodeId + " > ul > li").length; i++)  // for each <li>
+					{
+					var nodeExistsInSearchResults = false;
+					for (x=0; x<result.TotalResults; x++)
+						{
+						if($("#" + parentNodeId + " > ul > li:nth-child(" + (i + 1) + ")").attr("id").substr(19)==result.Results[x].Uri)
+							{
+							nodeExistsInSearchResults = true;
+							}
+						}
+						if(!nodeExistsInSearchResults)
+							{
+							$("#" + parentNodeId + " > ul > li:nth-child(" + (i + 1) + ")").addClass("for-deletion")
+							}
+						$(".for-deletion").remove() // remove the <li> once the for loop has completed.
+					}
+				$("#" + parentNodeId + " > ul").removeClass("classification-hidden")
+				$("#" + parentNodeId).parents("ul").removeClass("classification-hidden")
+				sortClassificationTree(".classification-name")
+				}, 
+			error: function(result)
+				{
+				console.log("Oooops!")
+				}
+			});		
+		});
 	}
+
 
 function addClassificationNode(rootNode, classificationUri, classificationName, canAttachRecords, classificationChildPattern)
 	{
@@ -319,25 +359,31 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 	var includedProperties = "RecordTitle, RecordRecordType, RecordTypeContentsRule";
 	$.ajax(
 		{
-		url: "/get-record-type-attributes",
+		url: apiBaseUrl + "/RecordType?q=all&properties=RecordTypeLevel, RecordTypeContentsRule, RecordTypeName",
+		type: "GET",
+		contentType: 'application/json',
+		xhrFields: { withCredentials: true},
 		success: function(result)
 			{
 			var recordTypeDefinitions = result;
 			if(parentNodeType=="classification")
 				{
 				parentNodeUri=parentNodeId.substr(19)
-				var url = "/Search?q=classification:" + parentNodeUri + "&properties=" + includedProperties + "&trimtype=Record"
+				var url = apiBaseUrl + "/Search?q=classification:" + parentNodeUri + "&properties=" + includedProperties + "&trimtype=Record"
 				}
 			else{
 				if(parentNodeType=="record")
 					{
 					parentNodeUri=parentNodeId.substr(11)
-					var url = "/Search?q=container:" + parentNodeUri + "&properties=" + includedProperties + "&trimtype=Record"
+					var url = apiBaseUrl + "/Search?q=container:" + parentNodeUri + "&properties=" + includedProperties + "&trimtype=Record"
 					}
 				}
 			$.ajax(
 				{
 				url: url,
+				type: "POST",
+				contentType: 'application/json',
+				xhrFields: { withCredentials: true},
 				success: function(result)
 					{
 					if(!$("#" + parentNodeId + " > ul").length)
@@ -419,14 +465,12 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 				error: function(result)
 					{
 					console.log("Oooops!")
-					console.log(result)
 					}
 				});	
 			}, 
 		error: function(result)
 			{
 			console.log("Oooops!")
-			console.log(result)
 			}
 		});
 	}
@@ -466,15 +510,16 @@ function highlightSelectedNode(eventTargetParent)
 
 function getRecords(recordUri)
 	{
-	var url = "/Search?q=container:" + recordUri + "&properties=RecordTitle, RecordNumber, DateRegistered&trimtype=Record"
+	var url = apiBaseUrl + "/Search?q=container:" + recordUri + "&properties=RecordTitle, RecordNumber, DateRegistered&trimtype=Record"
 	$.ajax(
 		{
 		url: url,
+		type: "POST",
+		contentType: 'application/json',
+		xhrFields: { withCredentials: true},
 		success: function(result)
 			{
 			var details = JSON.stringify(result);
-			console.log(details)
-			//alert(result.TotalResults)
 			if(result.TotalResults=="0")
 				{
 				$("#records-list-pane").html("The selected folder does not contain any records.")		
@@ -501,7 +546,6 @@ function getRecords(recordUri)
 		error: function(result)
 			{
 			console.log("Oooops!")
-			console.log(result)
 			}
 		});		
 	}
@@ -510,14 +554,16 @@ function getRecords(recordUri)
 
 function getClassificationProperties(classificationUri)
 	{
-	var url = "/Search?q=" + classificationUri + "&properties=ClassificationName, ClassificationTitle, ClassificationIdNumber, AccessControl&trimtype=Classification"
+	var url = apiBaseUrl + "/Search?q=" + classificationUri + "&properties=ClassificationName, ClassificationTitle, ClassificationIdNumber, AccessControl&trimtype=Classification"
 	$.ajax(
 		{
 		url: url,
+		type: "POST",
+		xhrFields: { withCredentials: true},
+		contentType: 'application/json',
 		success: function(result)
 			{
 			var details = JSON.stringify(result);
-			//console.log(details)
 			$("#properties-classification-title").html(result.Results[0].ClassificationTitle.Value)
 			$("#properties-classification-number").html(result.Results[0].ClassificationIdNumber.Value)
 			$("#properties-classification-access-control").html(result.Results[0].ClassificationAccessControl.Value)
@@ -526,21 +572,22 @@ function getClassificationProperties(classificationUri)
 		error: function(result)
 			{
 			console.log("Oooops!")
-			console.log(result)
 			}
 		});
 	}
 
 function getRecordProperties(type, recordUri)
 	{
-	var url = "/Search?q=" + recordUri + "&properties=RecordTitle, RecordNumber, Classification, RecordContainer, RecordType, DateRegistered, AccessControl, RetentionSchedule&trimtype=Record"
+	var url = apiBaseUrl + "/Search?q=" + recordUri + "&properties=RecordTitle, RecordNumber, Classification, RecordContainer, RecordType, DateRegistered, AccessControl, RetentionSchedule&trimtype=Record"
 	$.ajax(
 		{
 		url: url, 
+		type: "POST",
+		contentType: 'application/json',
+		xhrFields: { withCredentials: true},
 		success: function(result)
 			{
 			var details = JSON.stringify(result);
-				//console.log(details)
 				switch(type)
 					{
 					case "folder-intermediate":
@@ -550,9 +597,6 @@ function getRecordProperties(type, recordUri)
 						$("#properties-date-registered").html(result.Results[0].RecordDateRegistered.DateTime)
 						$("#properties-access-control").html(result.Results[0].RecordAccessControl.Value)
 						$("#properties-retention-schedule").html(result.Results[0].RecordRetentionSchedule.Uri)
-							
-						
-
 						break;
 					case "folder-terminal":
 						$("#properties-record-number").html(result.Results[0].RecordNumber.Value)
@@ -574,7 +618,6 @@ function getRecordProperties(type, recordUri)
 		error: function(result)
 			{
 			console.log("Oooops!")
-			console.log(result)
 			}
 		});
 	}

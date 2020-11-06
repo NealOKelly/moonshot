@@ -9,7 +9,8 @@ var passport = require('passport'),
 	cookieParser = require('cookie-parser'),
 	methodOverride = require('method-override'),
 	session = require('express-session'),
-	axios = require('axios');
+	axios = require('axios'),
+	cors = require('cors');
 
 var app = express();
 require('./modules/passport/passport.js');
@@ -47,6 +48,7 @@ app.use(session(
 app.use(passport.initialize());
 app.use(passport.session());
 app.use('', router);
+//app.use(cors());
 
 // Routes
 app.get('/', ensureAuthenticated, function(req, res)
@@ -77,106 +79,21 @@ app.get('/logout', function(req, res)
 	res.redirect(idpLogoutURL);
 	});
 
-
-// ROUTES - /Search
-app.get("/Search", ensureAuthenticated, (req, res, next) =>
-	{
-    console.log("Call to '/Search' received")
-	console.log(req.query.q)
-	var classificationUri = req.query.q
-	var jsonData = {
-					"TrimType": req.query.trimtype,
-					"q": req.query.q,
-					"properties": req.query.properties,
-					"pageSize": 1000000,
-					} 
-	var config = {
-		  httpsAgent: agent('api-client'),
-		  method: 'post',
-		  url: contentManagerServiceAPIBaseUrl + '/Search',
-		  headers:
-			{ 
-			'Authorization': authorizationHeaderValue, 
-			'Content-Type': 'application/json', 
-			},
-		  data: JSON.stringify(jsonData)
-		};
-		//console.log(getTimeStamp(), green + "New Content Manager record successfully created.", resetColor)
-		console.log("Calling CMServiceAPI.")
-		axios(config)
-			.then( function (response)
-				{
-				console.log("Response from CMServiceAPI recieved.")
-				console.log("Sending response to browser.")
-				res.status(200).send(response.data)
-				})
-				.catch(err => next(err));
-	})
-
-
-// get-classification-details
-app.get("/get-classification-details", ensureAuthenticated, (req, res, next) => {
-    console.log("Call to '/get-classification-details' received")
-	var classificationUri = req.query.uri
-		
-	var config = {
-		  httpsAgent: agent('api-client'),
-		  method: 'get',
-		  url: contentManagerServiceAPIBaseUrl + '/Classification/' + classificationUri + '/?properties=ClassificationName, ClassificationParentClassification, ClassificationAccessControl, ClassificationRetentionSchedule, ClassificationCanAttachRecords',
-		  headers: { 
-			'Authorization': authorizationHeaderValue, 
-			//'Content-Type': 'application/json', 
-		  },
-		  //data : JSON.stringify(jsonData)
-		};
-  //console.log(getTimeStamp(), green + "New Content Manager record successfully created.", resetColor)
-  console.log("Calling CMServiceAPI.")
-  axios(config)
-    .then( function (response)  {
-	  console.log("Response from CMServiceAPI recieved.")
-	  console.log("Sending response to browser.")
-	  res.status(200).send(response.data)
-  } 
- )
-    .catch(err => next(err));
+app.listen(3000, () => {
+  console.log('Example app listening at http://localhost:3000')
 })
-
-// get-record-type-containment-details
-app.get("/get-record-type-attributes", ensureAuthenticated, (req, res, next) => {
-    console.log("Call to '/get-record-type-attributes' received")
-	var recordTypeUri = req.query.uri;
-	var config = {
-		  httpsAgent: agent('api-client'),
-		  method: 'get',
-		  url: contentManagerServiceAPIBaseUrl + '/RecordType?q=all&properties=RecordTypeLevel, RecordTypeContentsRule, RecordTypeName',
-		  headers: { 
-			'Authorization': authorizationHeaderValue, 
-		  },
-		};
-  //console.log(getTimeStamp(), green + "New Content Manager record successfully created.", resetColor)
-  console.log("Calling CMServiceAPI.")
-  axios(config)
-    .then( function (response)  {
-	  console.log("Response from CMServiceAPI recieved.")
-	  console.log("Sending response to browser.")
-	  res.status(200).send(response.data)
-  } 
- )
-    .catch(err => next(err));
-})
-
 
 
 // Create HTTPS listener
-https.createServer(
-	{
-	key: fs.readFileSync("./server-certs/STAR_gilbyim_com_pem.key"),
-	ca: fs.readFileSync("./server-certs/STAR_gilbyim_com.ca-bundle"),
-	cert: fs.readFileSync("./server-certs/STAR_gilbyim_com.crt")
-	}, app).listen(443, function()
-		{
-		console.log("Listening on 443.")
-		})
+///https.createServer(
+//	{
+//	key: fs.readFileSync("./server-certs/STAR_gilbyim_com_pem.key"),
+//	ca: fs.readFileSync("./server-certs/STAR_gilbyim_com.ca-bundle"),
+//	cert: fs.readFileSync("./server-certs/STAR_gilbyim_com.crt")
+//	}, app).listen(443, function()
+//		{
+//		console.log("Listening on 443.")
+//		})
 
 // Functions
 function ensureAuthenticated(req, res, next)
