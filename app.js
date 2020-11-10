@@ -10,7 +10,7 @@ var passport = require('passport'),
 	fs = require('fs');
 
 var app = express();
-require('./modules/passport/passport.js');
+require('dotenv').config();
 const contentManagerServiceAPIBaseUrl = process.env['CONTENT_MANAGER_API_BASE_URL'];
 const idpLogoutURL = process.env['PASSPORT_SAML_LOGOUTURL'];
 
@@ -41,6 +41,9 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use('', router);
 
+require('./modules/passport/passport.js');
+
+
 // Routes
 app.get('/', ensureAuthenticated, function(req, res)
 	{
@@ -63,6 +66,19 @@ app.post('/login/callback',
 			res.redirect('/');
 			}
 		);
+
+app.get('/authentication-status', function(req, res, next)
+	{
+	console.log(req.isAuthenticated())
+	if(req.isAuthenticated())
+		{
+		res.send("true")
+		}
+	else
+		{
+		res.send("false")
+		}
+});
 
 app.get('/logout', function(req, res)
 	{
