@@ -1,5 +1,9 @@
 var hasPreAuthenticated = false;
-var apiBaseUrl = "https://beta.gilbyim.com/CMServiceAPI"
+
+console.log("apiPath: " + apiPath)
+console.log("baseUrl: " + baseUrl)
+
+	
 
 	function preauthenticateApi()
 	{
@@ -19,7 +23,7 @@ var apiBaseUrl = "https://beta.gilbyim.com/CMServiceAPI"
 		var iFrame = $("<iframe id='cat' sandbox='allow-scripts allow-forms allow-same-origin'></iframe>");
 		iFrame.hide();
 		iFrame.appendTo("body");
-		iFrame.attr('src', "https://beta.gilbyim.com/CMServiceAPI/help/index");
+		iFrame.attr('src', baseUrl + "/" + apiPath + "/help/index");
 				console.log("Before Onloadd:" + $("#cat").contents().find("title").html())			
 		iFrame.on('load', function () 
 			{
@@ -45,7 +49,7 @@ preauthenticateApi().then(function()
 		{
 		console.log("Calling API.")
   	   	// populate the #classification-data div
-		var url = apiBaseUrl + "/Search?q=all&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern&trimtype=Classification&pageSize=1000000"
+		var url = baseUrl + "/" + apiPath + "/Search?q=all&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern&trimtype=Classification&pageSize=1000000"
 		$.ajax(
 			{
 			url: url,
@@ -308,7 +312,7 @@ $(document).on("click", "#reauthenticate-button", function()
 $(document).on("click", "#logout", function()
 	{
 	removeAPISessionCookies();
-	$(location).attr("href","https://beta.gilbyim.com/logout");
+	$(location).attr("href", baseUrl + "/logout");
 	})
 
 $(window).on("beforeunload", function()
@@ -331,7 +335,7 @@ function refreshClassificationNodes(parentNodeId)
 		var q="parent:" + parentNodeId.substr(19);
 		$.ajax(
 			{
-			url: apiBaseUrl + "/Search?q=" + q + "&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern&trimtype=Classification",
+			url: baseUrl + "/" + apiPath + "/Search?q=" + q + "&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern&trimtype=Classification",
 			type: "POST",
 			contentType: 'application/json',
 			xhrFields: { withCredentials: true},
@@ -400,7 +404,7 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 	var includedProperties = "RecordTitle, RecordRecordType, RecordTypeContentsRule";
 	$.ajax(
 		{
-		url: apiBaseUrl + "/RecordType?q=all&properties=RecordTypeLevel, RecordTypeContentsRule, RecordTypeName",
+		url: baseUrl + "/" + apiPath + "/RecordType?q=all&properties=RecordTypeLevel, RecordTypeContentsRule, RecordTypeName",
 		type: "GET",
 		contentType: 'application/json',
 		xhrFields: { withCredentials: true},
@@ -410,13 +414,13 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 			if(parentNodeType=="classification")
 				{
 				parentNodeUri=parentNodeId.substr(19)
-				var url = apiBaseUrl + "/Search?q=classification:" + parentNodeUri + "&properties=" + includedProperties + "&trimtype=Record"
+				var url = baseUrl + "/" + apiPath + "/Search?q=classification:" + parentNodeUri + "&properties=" + includedProperties + "&trimtype=Record"
 				}
 			else{
 				if(parentNodeType=="record")
 					{
 					parentNodeUri=parentNodeId.substr(11)
-					var url = apiBaseUrl + "/Search?q=container:" + parentNodeUri + "&properties=" + includedProperties + "&trimtype=Record"
+					var url = baseUrl + "/" + apiPath + "/Search?q=container:" + parentNodeUri + "&properties=" + includedProperties + "&trimtype=Record"
 					}
 				}
 			$.ajax(
@@ -551,7 +555,7 @@ function highlightSelectedNode(eventTargetParent)
 
 function getRecords(recordUri)
 	{
-	var url = apiBaseUrl + "/Search?q=container:" + recordUri + "&properties=RecordTitle, RecordNumber, DateRegistered&trimtype=Record"
+	var url = baseUrl + "/" + apiPath + "/Search?q=container:" + recordUri + "&properties=RecordTitle, RecordNumber, DateRegistered&trimtype=Record"
 	$.ajax(
 		{
 		url: url,
@@ -595,7 +599,7 @@ function getRecords(recordUri)
 
 function getClassificationProperties(classificationUri)
 	{
-	var url = apiBaseUrl + "/Search?q=" + classificationUri + "&properties=ClassificationName, ClassificationTitle, ClassificationIdNumber, AccessControl&trimtype=Classification"
+	var url = baseUrl + "/" + apiPath + "/Search?q=" + classificationUri + "&properties=ClassificationName, ClassificationTitle, ClassificationIdNumber, AccessControl&trimtype=Classification"
 	$.ajax(
 		{
 		url: url,
@@ -619,7 +623,7 @@ function getClassificationProperties(classificationUri)
 
 function getRecordProperties(type, recordUri)
 	{
-	var url = apiBaseUrl + "/Search?q=" + recordUri + "&properties=RecordTitle, RecordNumber, Classification, RecordContainer, RecordType, DateRegistered, AccessControl, RetentionSchedule&trimtype=Record"
+	var url = baseUrl + "/" + apiPath + "/Search?q=" + recordUri + "&properties=RecordTitle, RecordNumber, Classification, RecordContainer, RecordType, DateRegistered, AccessControl, RetentionSchedule&trimtype=Record"
 	$.ajax(
 		{
 		url: url, 

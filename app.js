@@ -11,7 +11,8 @@ var passport = require('passport'),
 
 var app = express();
 require('dotenv').config();
-const contentManagerServiceAPIBaseUrl = process.env['CONTENT_MANAGER_API_BASE_URL'];
+const applicationBaseUrl = process.env['APPLICATION_BASE_URL']
+const contentManagerServiceAPIPath = process.env['CONTENT_MANAGER_SERVICE_API_PATH'];
 const idpLogoutURL = process.env['PASSPORT_SAML_LOGOUTURL'];
 
 // Static Files
@@ -47,7 +48,7 @@ require('./modules/passport/passport.js');
 // Routes
 app.get('/', ensureAuthenticated, function(req, res)
 	{
-	res.render('index', { user: req.user, title: "Moonshot" });
+	res.render('index', { user: req.user, title: "Moonshot", baseUrl: applicationBaseUrl, apiPath: contentManagerServiceAPIPath });
 	});
 
 app.get('/login',
