@@ -25,6 +25,27 @@ code {
 .navbar-dark{
 	background-color: #000033 !important;
 }
+
+.btn-primary {
+	background-color: #75b540;
+	border-color: #75b540;
+}
+
+.btn-primary:active {
+	background-color: #75b540;
+	border-color: #75b540;
+}
+
+.btn-primary:focus {
+	background-color: #75b540;
+	border-color: #75b540;
+}
+
+.btn-primary:visited {
+	background-color: #75b540;
+	border-color: #75b540;
+}
+
 .btn-outline-success {
     color: #75b540;
     background-color: transparent;

@@ -293,6 +293,17 @@ $(document).on("click", ".expanded", function()
 	$("#" + parentNodeId + " > span.folder-open").removeClass("folder-open")
 	})
 
+// Temporary link for testing session expiry modal.
+$(document).on("click", "#my-link", function()
+	{
+	$('#session-expired').modal('show')
+	})
+
+$(document).on("click", "#reauthenticate-button", function()
+	{
+	$(location).attr("href","https://www.bbc.co.uk");
+	})
+
 // Click logout link
 $(document).on("click", "#logout", function()
 	{
@@ -302,8 +313,7 @@ $(document).on("click", "#logout", function()
 
 $(window).on("beforeunload", function()
 	{
-//	alert("UNloading")
-    //removeAPISessionCookies();
+    removeAPISessionCookies();  // belt and braces
 	})
 
 
