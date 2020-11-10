@@ -73,11 +73,11 @@ app.get('/authentication-status', function(req, res, next)
 	console.log(req.isAuthenticated())
 	if(req.isAuthenticated())
 		{
-		res.send("true")
+		res.send(true)
 		}
 	else
 		{
-		res.send("false")
+		res.send(false)
 		}
 });
 
