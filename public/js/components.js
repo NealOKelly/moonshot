@@ -304,7 +304,8 @@ $(document).on("click", "#my-link", function()
 
 $(document).on("click", "#reauthenticate-button", function()
 	{
-	$(location).attr("href","/login");
+	removeAPISessionCookies();
+	$(location).attr("href","/logout");
 	})
 
 // Click logout link
