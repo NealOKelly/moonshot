@@ -6,7 +6,8 @@ var passport = require('passport'),
 	bodyParser = require('body-parser'),
 	morgan = require('morgan'),
 	cookieParser = require('cookie-parser'),
-	session = require('express-session');
+	session = require('express-session'),
+	fs = require('fs');
 
 var app = express();
 require('./modules/passport/passport.js');
@@ -75,7 +76,7 @@ app.listen(3000, () => {
 
 
 // Create HTTPS listener
-///https.createServer(
+//https.createServer(
 //	{
 //	key: fs.readFileSync("./server-certs/STAR_gilbyim_com_pem.key"),
 //	ca: fs.readFileSync("./server-certs/STAR_gilbyim_com.ca-bundle"),
