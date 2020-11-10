@@ -1,9 +1,49 @@
 var hasPreAuthenticated = false;
-var apiBaseUrl = "https://api.gilbyim.com"
+var apiBaseUrl = "https://beta.gilbyim.com/CMServiceAPI"
+
+	function preauthenticateApi()
+	{
+		console.log("Calling preAuthenticate.")
+	// Session cookies need to be estabilished before making any AJAX calls to the API server.  This is because the first HTTP200 response
+	// (i.e what is returned by the ajax call) is actually a page served by ADFS server that uses JavaScript to POST the SAML assertion 
+	// to the API server.  As a workaround, we load a resource from the API server into an IFRAME instead.
+
+	return $.Deferred(function(d)
+	{
+	if(hasPreAuthenticated)
+		{
+		console.log("Already pre-authenticated, skipping");
+		d.resolve();
+		return;
+		}
+		var iFrame = $("<iframe id='cat' sandbox='allow-scripts allow-forms allow-same-origin'></iframe>");
+		iFrame.hide();
+		iFrame.appendTo("body");
+		iFrame.attr('src', "https://beta.gilbyim.com/CMServiceAPI/help/index");
+				console.log("Before Onloadd:" + $("#cat").contents().find("title").html())			
+		iFrame.on('load', function () 
+			{
+			console.log("After Onloadd:" + $("#cat").contents().find("title").html())			
+			if($("#cat").contents().find("title").html()=="Content Manager - ServiceAPI Help Index")
+				{
+				hasPreAuthenticated = true;
+				//iFrame.remove();
+				d.resolve();					
+				}
+			});
+		});
+	};
+
+
 $(document).ready(function()
 	{
-	preauthenticateApi().then(function()
+
+
+	
+	
+preauthenticateApi().then(function()
 		{
+		console.log("Calling API.")
   	   	// populate the #classification-data div
 		var url = apiBaseUrl + "/Search?q=all&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern&trimtype=Classification&pageSize=1000000"
 		$.ajax(
@@ -253,32 +293,23 @@ $(document).on("click", ".expanded", function()
 	$("#" + parentNodeId + " > span.folder-open").removeClass("folder-open")
 	})
 
-// Functions // 
-function preauthenticateApi()
+// Click logout link
+$(document).on("click", "#logout", function()
 	{
-	// Session cookies need to be estabilished before making any AJAX calls to the API server.  This is because the first HTTP200 response
-	// (i.e what is returned by the ajax call) is actually a page served by ADFS server that uses JavaScript to POST the SAML assertion 
-	// to the API server.  As a workaround, we load a resource from the API server into an IFRAME instead.
+	removeAPISessionCookies();
+	$(location).attr("href","https://beta.gilbyim.com/logout");
+	})
 
-	return $.Deferred(function(d)
+$(window).on("beforeunload", function()
 	{
-	if(hasPreAuthenticated)
-		{
-		d.resolve();
-		return;
-		}
-		var iFrame = $("<iframe></iframe>");
-		iFrame.hide();
-		iFrame.appendTo("body");
-		iFrame.attr('src', "https://api.gilbyim.com/help/index");
-		iFrame.on('load', function () 
-			{
-			hasPreAuthenticated = true;
-			//iFrame.remove();
-			d.resolve();
-			});
-		});
-	};
+//	alert("UNloading")
+    //removeAPISessionCookies();
+	})
+
+
+
+// Functions // 
+
 
 function refreshClassificationNodes(parentNodeId) 
 	{
@@ -641,4 +672,18 @@ function drawPropertiesTable(type)
 		}
 	$("#properties-pane > table").remove()
 	$("#properties-pane").append(tableHTML)
+	}
+
+function removeAppSessionCookies()
+	{
+	//$.cookie("FedAuth", null, { expires: -1, path: "/CMServiceAPI/"} )
+	//$.cookie("FedAuth", null, { expires: -1, path: "/CMServiceAPI/"} )
+	//alert("Hellow Wotlf")
+	}
+
+
+function removeAPISessionCookies()
+	{
+	$.cookie("FedAuth", null, { expires: -1, path: "/CMServiceAPI/"} )
+	$.cookie("FedAuth", null, { expires: -1, path: "/CMServiceAPI/"} )
 	}
