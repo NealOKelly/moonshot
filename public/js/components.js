@@ -1,43 +1,10 @@
 var hasPreAuthenticated = false;
 var isAuthenticated = false;
 
-	function preauthenticateApi()
-	{
-	// Session cookies need to be estabilished before making any AJAX calls to the API server.  This is because the first HTTP200 response
-	// (i.e what is returned by the ajax call) is actually a page served by ADFS server that uses JavaScript to POST the SAML assertion 
-	// to the API server.  As a workaround, we load a resource from the API server into an IFRAME instead.
-
-	return $.Deferred(function(d)
-	{
-	if(hasPreAuthenticated)
-		{
-		d.resolve();
-		return;
-		}
-		var iFrame = $("<iframe id='authentication-frame' sandbox='allow-scripts allow-forms allow-same-origin'></iframe>");
-		iFrame.hide();
-		iFrame.appendTo("body");
-		iFrame.attr('src', baseUrl + "/" + apiPath + "/help/index");
-				console.log("Before Onloadd:" + $("#cat").contents().find("title").html())			
-		iFrame.on('load', function () 
-			{
-			console.log("After Onloadd:" + $("#cat").contents().find("title").html())			
-			if($("#authentication-frame").contents().find("title").html()=="Content Manager - ServiceAPI Help Index")
-				{
-				hasPreAuthenticated = true;
-				iFrame.remove();
-				d.resolve();					
-				}
-			});
-		});
-	};
-
-
 $(document).ready(function()
 	{
 	preauthenticateApi().then(function()
 		{
-		console.log("Calling API.")
   	   	// populate the #classification-data div
 		var url = baseUrl + "/" + apiPath + "/Search?q=all&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern&trimtype=Classification&pageSize=1000000"
 		$.ajax(
@@ -100,6 +67,7 @@ $(document).on("click", ".folder", function()
 		}
 	})
 
+
 $(document).on("click", ".folder-open", function()
 	{
 	var eventTargetParent = $(event.target).parent();
@@ -122,6 +90,7 @@ $(document).on("click", ".folder-open", function()
 			}
 		}
 	})
+
 
 // Click on Classification Name Hyperlink //
 $(document).on("click", ".classification-name>a", function()
@@ -147,6 +116,7 @@ $(document).on("click", ".classification-name>a", function()
 		}
 	})
 
+
 // Click on folder-fill Icon //
 $(document).on("click", ".folder-fill", function()
 	{
@@ -159,6 +129,7 @@ $(document).on("click", ".folder-fill", function()
 		getRecords(eventTargetParent.attr("id").substr(11))
 		}
 	})
+
 
 $(document).on("click", ".record-title>a", function()
 	{
@@ -198,20 +169,24 @@ $(document).on("click", ".star", function()
 	alert("Why have you clicked on this?  THis functionality has not been written yet.  Moron.")
 	})
 
+
 $(document).on("click", ".favourites>a", function()
 	{
 	alert("Are you taking the piss?")
 	})
+
 
 $(document).on("click", ".clock-history", function()
 	{
 	alert("Have you been sent to vex me?")
 	})
 
+
 $(document).on("click", ".recents>a", function()
 	{
 	alert("Give me strength!")
 	})
+
 
 $(document).on("click", ".record-row", function()
 	{
@@ -274,6 +249,7 @@ $(document).on("click", ".collapsed", function()
 		}
 	})
 
+
 // Click on expanded caret
 $(document).on("click", ".expanded", function()
 	{
@@ -288,19 +264,55 @@ $(document).on("click", ".expanded", function()
 // Temporary link for testing session expiry modal.
 $(document).on("click", "#my-link", function()
 	{
-	getAuthenticationStatus().then(function () 
+	//alert("clicked")
+	downloadDocument().then(function () 
 		{
-		if(isAuthenticated)
-			{
-			// Do something...
-			}
-		else
-			{
-			$('#session-expired').modal('show')
-			}
+		console.log("Do something...")
 		});
 	})
-		
+
+function downloadDocument()
+	{
+	//alert("Attempting download.")
+	var deferredObject = $.Deferred();
+	$.ajax(
+		{
+		url: "https://beta.gilbyim.com/CMServiceAPI/Record/1579/File/Document",
+		xhrFields: { responseType: 'arraybuffer'},
+		success: function(result)
+			{
+			console.log("Document downloaded.")
+			console.log(result)
+			//var blob = new Blob(result, {type: "octet/stream"}),
+            var url = window.URL.createObjectURL(new File([result], "download.pdf", {type: "application/pdf"}));
+			var anchorElem = document.createElement("a");
+			anchorElem.style = "display: none";
+			anchorElem.href = url;
+			anchorElem.download = "download.pdf";
+			document.body.appendChild(anchorElem);
+			anchorElem.click();
+
+			document.body.removeChild(anchorElem);
+
+				
+				
+				
+			deferredObject.resolve();		
+			}, 
+		error: function(result)
+			{
+			deferredObject.resolve();		
+			console.log("Oooops!")
+			}
+		});
+		return deferredObject.promise();
+	}
+
+
+
+
+
+
 
 $(document).on("click", "#reauthenticate-button", function()
 	{
@@ -322,14 +334,43 @@ $(window).on("beforeunload", function()
 
 
 // Functions // 
-function getAuthenticationStatus() {
+function preauthenticateApi()
+	{
+	// Session cookies need to be estabilished before making any AJAX calls to the API server.  This is because the first HTTP200 response
+	// (i.e what is returned by the ajax call) is actually a page served by ADFS server that uses JavaScript to POST the SAML assertion 
+	// to the API server.  As a workaround, we load a resource from the API server into an IFRAME instead.
+
+	return $.Deferred(function(d)
+	{
+	if(hasPreAuthenticated)
+		{
+		d.resolve();
+		return;
+		}
+		var iFrame = $("<iframe id='authentication-frame' sandbox='allow-scripts allow-forms allow-same-origin'></iframe>");
+		iFrame.hide();
+		iFrame.appendTo("body");
+		iFrame.attr('src', baseUrl + "/" + apiPath + "/help/index");
+		iFrame.on('load', function () 
+			{
+			if($("#authentication-frame").contents().find("title").html()=="Content Manager - ServiceAPI Help Index")
+				{
+				hasPreAuthenticated = true;
+				iFrame.remove();
+				d.resolve();					
+				}
+			});
+		});
+	};
+
+function getAuthenticationStatus()
+	{
 	var deferredObject = $.Deferred();
 	$.ajax(
 		{
 		url: "/authentication-status",
 		success: function(result)
 			{
-			console.log(result)
 			if(result==true)
 				{
 				isAuthenticated=true;
@@ -347,9 +388,7 @@ function getAuthenticationStatus() {
 			}
 		});
 		return deferredObject.promise();
-}
-
-
+	}
 
 function refreshClassificationNodes(parentNodeId) 
 	{
@@ -419,7 +458,6 @@ function refreshClassificationNodes(parentNodeId)
 		});
 	}
 
-
 function addClassificationNode(rootNode, classificationUri, classificationName, canAttachRecords, classificationChildPattern)
 	{
 	$(rootNode).append("<li id='classification-uri-" + classificationUri + "'><span class='collapsed'></span><span class='folder'></span><span class='classification-name'><a>" + classificationName + "</a></span></li>")
@@ -432,7 +470,6 @@ function addClassificationNode(rootNode, classificationUri, classificationName, 
 		$("#classification-uri-" + classificationUri).addClass("classification-can-have-children")		
 		}
 	}
-
 
 function refreshFolderNodes(parentNodeType, parentNodeId)
 	{
@@ -567,18 +604,15 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 		});
 	}
 
-
 function addIntermediateFolderNode(parentNodeId, recordUri, recordTitle)
 	{
 	$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + recordUri + "' class='folder-intermediate'><span class='collapsed'></span></span><span class='folder'></span><span class='record-title'><a>" + recordTitle + "</a></span></li>")
 	}
 
-
 function addTerminalFolderNode(parentNodeId, recordUri, recordTitle)
 	{
 	$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + recordUri + "' class='folder-terminal'><span style='padding: 12px 20px;'></span><span class='folder-fill'></span><span class='record-title'><a>" + recordTitle + "</a></span></li>")
 	}
-
 
 function sortClassificationTree(sortBy)
 	{
@@ -594,7 +628,6 @@ function sortClassificationTree(sortBy)
 		});
 	}
 
-
 function highlightSelectedNode(eventTargetParent)
 	{
 	$(".record-row").removeClass("row-selected")
@@ -602,14 +635,13 @@ function highlightSelectedNode(eventTargetParent)
 	$("#" + eventTargetParent.attr("id")).addClass("node-selected")
 	}
 
-
 function getRecords(recordUri)
 	{
 	getAuthenticationStatus().then(function () 
 		{
 		if(isAuthenticated)
 			{
-			var url = baseUrl + "/" + apiPath + "/Search?q=container:" + recordUri + "&properties=RecordTitle, RecordNumber, DateRegistered&trimtype=Record"
+			var url = baseUrl + "/" + apiPath + "/Search?q=container:" + recordUri + "&properties=RecordTitle, RecordNumber, DateRegistered, RecordFileType&trimtype=Record"
 			$.ajax(
 				{
 				url: url,
@@ -618,6 +650,7 @@ function getRecords(recordUri)
 				xhrFields: { withCredentials: true},
 				success: function(result)
 					{
+					console.log(result)
 					var details = JSON.stringify(result);
 					if(result.TotalResults=="0")
 						{
@@ -653,7 +686,6 @@ function getRecords(recordUri)
 		});
 	}
 
-
 function getClassificationProperties(classificationUri)
 	{
 	var url = baseUrl + "/" + apiPath + "/Search?q=" + classificationUri + "&properties=ClassificationName, ClassificationTitle, ClassificationIdNumber, AccessControl&trimtype=Classification"
@@ -677,7 +709,6 @@ function getClassificationProperties(classificationUri)
 			}
 		});
 	}
-
 
 function getRecordProperties(type, recordUri)
 	{
@@ -734,7 +765,6 @@ function getRecordProperties(type, recordUri)
 		});
 	}
 
-
 function drawPropertiesTable(type)
 	{
 	switch(type)
@@ -756,14 +786,12 @@ function drawPropertiesTable(type)
 	$("#properties-pane").append(tableHTML)
 	}
 
-
 function removeAppSessionCookies()
 	{
 	//$.cookie("FedAuth", null, { expires: -1, path: "/CMServiceAPI/"} )
 	//$.cookie("FedAuth", null, { expires: -1, path: "/CMServiceAPI/"} )
 	//alert("Hellow Wotlf")
 	}
-
 
 function removeAPISessionCookies()
 	{
