@@ -14,7 +14,7 @@
   	display: inline-block;
 	text-align: center;
   	content: "";
-  	background-image: url("../img/icons/caret-right.svg");
+  	background-image: url("../img/bs-icons/caret-right.svg");
 	background-size: cover;
   	background-repeat: no-repeat;
 	width: 24px;
@@ -27,7 +27,7 @@
   display: inline-block;
 	text-align: center;
   content: "";
-  background-image: url("../img/icons/caret-down.svg");
+  background-image: url("../img/bs-icons/caret-down.svg");
 	 background-size: cover;
   background-repeat: no-repeat;
 	width: 24px;
@@ -44,11 +44,11 @@
 }
 
 .node-selected > .collapsed {
-	background-image: url("../img/icons/caret-right-fill.svg");
+	background-image: url("../img/bs-icons/caret-right-fill.svg");
 }
 
 .node-selected > .expanded {
-	background-image: url("../img/icons/caret-down-fill.svg");
+	background-image: url("../img/bs-icons/caret-down-fill.svg");
 }
 
 .node-selected > span.record-title {
@@ -68,7 +68,7 @@
 .folder{
   	display: inline-block;
   	content: "";
-  	background-image: url("../img/icons/folder.svg");
+  	background-image: url("../img/bs-icons/folder.svg");
 	background-size: cover;
 	background-repeat: no-repeat;
     width: 24px;
@@ -78,7 +78,7 @@
 .folder-open{
 	display: inline-block;
   	content: "";
-  	background-image: url("../img/icons/folder2-open.svg");
+  	background-image: url("../img/bs-icons/folder2-open.svg");
 	background-size: cover;
 	background-repeat: no-repeat;
     width: 24px;
@@ -88,7 +88,7 @@
 .folder-fill{
 	display: inline-block;
   	content: "";
-  	background-image: url("../img/icons/folder-fill.svg");
+  	background-image: url("../img/bs-icons/folder-fill.svg");
 	background-size: cover;
 	background-repeat: no-repeat;
     width: 24px;
@@ -99,7 +99,7 @@
 .star{
 	display: inline-block;
   	content: "";
-  	background-image: url("../img/icons/star.svg");
+  	background-image: url("../img/bs-icons/star.svg");
 	background-size: cover;
 	background-repeat: no-repeat;
     width: 24px;
@@ -109,7 +109,7 @@
 .clock-history{
 	display: inline-block;
   	content: "";
-  	background-image: url("../img/icons/clock-history.svg");
+  	background-image: url("../img/bs-icons/clock-history.svg");
 	background-size: cover;
 	background-repeat: no-repeat;
     width: 24px;
@@ -117,20 +117,22 @@
 }
 
 .file-earmark{
-  	display: inline-block;
+  	/*display: inline-block;
   	content: "";
-  	background-image: url("../img/icons/shamrock.svg");
-	/*background-image: url("../img/icons/file-earmark.svg");*/
-	background-size: cover;
+  	background-image: url("../img/bs-icons/shamrock.svg");
+	background-image: url("../img/icons/file-earmark.svg");*/
+	background-image: url("../img/fiv-icons/pdf.svg");
+	font-size: .25em;
+	/*background-size: cover;
 	background-repeat: no-repeat;
     width: 24px;
-    height: 24px;
+    height: 24px;*/
 }
 
 .file-earmark-green{
   	display: inline-block;
   	content: "";
-  	background-image: url("../img/icons/file-earmark-green.svg");
+  	background-image: url("../img/bs-icons/file-earmark-green.svg");
 	background-size: cover;
 	background-repeat: no-repeat;
     width: 24px;
@@ -141,7 +143,7 @@
 .download-green{
   	display: inline-block;
   	content: "";
-  	background-image: url("../img/icons/download-green.svg");
+  	background-image: url("../img/bs-icons/download-green.svg");
 	background-size: cover;
 	background-repeat: no-repeat;
     width: 24px;
@@ -151,7 +153,7 @@
 .download{
   	display: inline-block;
   	content: "";
-  	background-image: url("../img/icons/download.svg");
+  	background-image: url("../img/bs-icons/download.svg");
 	background-size: cover;
 	background-repeat: no-repeat;
     width: 24px;

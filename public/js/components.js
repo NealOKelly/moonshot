@@ -188,27 +188,7 @@ $(document).on("click", ".recents>a", function()
 	})
 
 
-$(document).on("click", ".record-row", function()
-	{
-	//font-weight: bold;
-	var eventTargetParent = $(event.target).parent();
-	$(".record-row").removeClass("row-selected")
-	$("#classification-treeview li").removeClass("node-selected")
-	$(event.target).parent().addClass("row-selected")
-	//alert(eventTargetParent.attr("id"))
-	$("#records-list-pane tr > td:nth-child(1) > span").removeClass("file-earmark-green")
-	$("#records-list-pane tr > td:nth-child(1) > span").addClass("file-earmark")
-	$("#records-list-pane tr > td:nth-child(5) > span").removeClass("download-green")
-	$("#records-list-pane tr > td:nth-child(5) > span").addClass("download")
-	$("#" + eventTargetParent.attr("id") + " > td:nth-child(1) > span").removeClass("file-earmark")
-	$("#" + eventTargetParent.attr("id") + " > td:nth-child(1) > span").addClass("file-earmark-green")
-	$("#" + eventTargetParent.attr("id") + " > td:nth-child(5) > span").removeClass("download")
-	$("#" + eventTargetParent.attr("id") + " > td:nth-child(5) > span").addClass("download-green")
-	drawPropertiesTable("document")
-	getRecordProperties("document", eventTargetParent.attr("id").substr(11))
-	//$(event.target).parent().addClass("row-selected")
-	
-	})
+
 
 
 // Click on collpased caret
@@ -262,57 +242,54 @@ $(document).on("click", ".expanded", function()
 	})
 
 // Temporary link for testing session expiry modal.
-$(document).on("click", "#my-link", function()
+$(document).on("click", ".download", function()
 	{
-	//alert("clicked")
-	downloadDocument().then(function () 
-		{
-		console.log("Do something...")
-		});
+	var recordUri = $(event.target).parent().parent().attr("id").substr(11)
+	var recordTitle = $(event.target).parent().parent().data("recordTitle")
+	var recordMimeType = $(event.target).parent().parent().data("recordMimeType")
+	var recordExtension = $(event.target).parent().parent().data("recordExtension")
+	
+	
+	
+	//var recordTitle = "document"
+	downloadDocument(recordUri, recordTitle, recordExtension, recordMimeType)
 	})
 
-function downloadDocument()
+function downloadDocument(recordUri, recordTitle, recordExtension, recordMimeType)
 	{
-	//alert("Attempting download.")
-	var deferredObject = $.Deferred();
-	$.ajax(
+	getAuthenticationStatus().then(function () 
 		{
-		url: "https://beta.gilbyim.com/CMServiceAPI/Record/1579/File/Document",
-		xhrFields: { responseType: 'arraybuffer'},
-		success: function(result)
+		if(isAuthenticated)
 			{
-			console.log("Document downloaded.")
-			console.log(result)
-			//var blob = new Blob(result, {type: "octet/stream"}),
-            var url = window.URL.createObjectURL(new File([result], "download.pdf", {type: "application/pdf"}));
-			var anchorElem = document.createElement("a");
-			anchorElem.style = "display: none";
-			anchorElem.href = url;
-			anchorElem.download = "download.pdf";
-			document.body.appendChild(anchorElem);
-			anchorElem.click();
-
-			document.body.removeChild(anchorElem);
-
-				
-				
-				
-			deferredObject.resolve();		
-			}, 
-		error: function(result)
+			var url = baseUrl + "/" + apiPath + "/Record/" + recordUri + "/File/Document"
+			$.ajax(
+				{
+				url: url,
+				xhrFields: { responseType: 'arraybuffer'},
+				success: function(result)
+					{
+					var url = window.URL.createObjectURL(new File([result], "download." + recordExtension, {type: recordMimeType}));
+					var anchorElem = document.createElement("a");
+					anchorElem.style = "display: none";
+					anchorElem.href = url;
+					anchorElem.download = recordTitle + "." + recordExtension.toLowerCase();
+					document.body.appendChild(anchorElem);
+					anchorElem.click();
+					document.body.removeChild(anchorElem);
+					window.URL.revokeObjectURL(url)
+					}, 
+				error: function(result)
+					{
+					console.log("Oooops!")
+					}
+				});
+			}
+		else
 			{
-			deferredObject.resolve();		
-			console.log("Oooops!")
+			$("#session-expired").modal("show")
 			}
 		});
-		return deferredObject.promise();
 	}
-
-
-
-
-
-
 
 $(document).on("click", "#reauthenticate-button", function()
 	{
@@ -641,7 +618,7 @@ function getRecords(recordUri)
 		{
 		if(isAuthenticated)
 			{
-			var url = baseUrl + "/" + apiPath + "/Search?q=container:" + recordUri + "&properties=RecordTitle, RecordNumber, DateRegistered, RecordFileType&trimtype=Record"
+			var url = baseUrl + "/" + apiPath + "/Search?q=container:" + recordUri + "&properties=RecordTitle, RecordNumber, DateRegistered, RecordMimeType, RecordExtension&trimtype=Record"
 			$.ajax(
 				{
 				url: url,
@@ -661,14 +638,15 @@ function getRecords(recordUri)
 						var tableHTML = '<table class="table table-sm"><th>Type</th><th>Record Number</th><th style="text-align:left;">Title</th><th>Date Registered</th><th>Download</th>'
 						for(i=0; i<result.TotalResults; i++)
 							{
-							tableHTML = tableHTML + '<tr id="record-uri-' + result.Results[i].Uri + '" class="record-row">'
-							tableHTML = tableHTML + '<td><span class="file-earmark"></span></td>'
+							tableHTML = tableHTML + '<tr id="record-uri-' + result.Results[i].Uri + '" class="record-row" data-record-title="' + result.Results[i].RecordTitle.Value + '" data-record-extension="' + result.Results[i].RecordExtension.Value + '" data-record-mime-type="' + result.Results[i].RecordMimeType.Value + '">'
+							//tableHTML = tableHTML + '<td><span class="file-earmark"></span></td>'
+							tableHTML = tableHTML + '<td>' + result.Results[i].RecordExtension.Value + '</td>'
 							tableHTML = tableHTML + '<td>' + result.Results[i].RecordNumber.Value + '</td>'
 							tableHTML = tableHTML + '<td style="text-align:left;">' + result.Results[i].RecordTitle.Value + '</td>'
 							tableHTML = tableHTML + '<td>' + result.Results[i].RecordDateRegistered.DateTime.substr(8, 2) + '/' + result.Results[i].RecordDateRegistered.DateTime.substr(5, 2) + '/' + result.Results[i].RecordDateRegistered.DateTime.substr(0, 4) + '</td>'
 							tableHTML = tableHTML + '<td><span class="download"></span></td></tr>'
 							}
-							tableHTML = tableHTML + '</table'>
+						tableHTML = tableHTML + '</table'>
 
 						$("#records-list-pane").html(tableHTML)
 						}

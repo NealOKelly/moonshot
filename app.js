@@ -13,7 +13,7 @@ var app = express();
 require('dotenv').config();
 const applicationBaseUrl = process.env['APPLICATION_BASE_URL']
 const contentManagerServiceAPIPath = process.env['CONTENT_MANAGER_SERVICE_API_PATH'];
-const idpLogoutURL = process.env['PASSPORT_SAML_LOGOUTURL'];
+const idpLogoutURL = process.env['PASSPORT_SAML_LOGOUT_URL'];
 
 // Static Files
 app.use(express.static('public'))
