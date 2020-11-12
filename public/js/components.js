@@ -248,10 +248,6 @@ $(document).on("click", ".download", function()
 	var recordTitle = $(event.target).parent().parent().data("recordTitle")
 	var recordMimeType = $(event.target).parent().parent().data("recordMimeType")
 	var recordExtension = $(event.target).parent().parent().data("recordExtension")
-	
-	
-	
-	//var recordTitle = "document"
 	downloadDocument(recordUri, recordTitle, recordExtension, recordMimeType)
 	})
 

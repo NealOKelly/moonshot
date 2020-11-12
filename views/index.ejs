@@ -1,7 +1,7 @@
 <div class="row" style="margin-top:56px;height:100%;">
-	<div class="col-3" style="background-color:#75b540;color:white;height:100%;overflow:auto;overflow-x:hidden;">
+	<div class="col-3" style="background-color:#75b540;color:white;height:100%;overflow:auto;white-space:nowrap;">
 		<div id="classification-treeview" style="padding-top:30px;">
-			<ul style="list-style-type:none;margin-left:-10px;">
+			<ul style="list-style-type:none;margin-left:-10px;display:inline-block;">
 				<li id="all-files"><span class='collapsed'></span><span class='folder'></span><span class='all-files'><a>All Files</a></span><ul style="list-style-type:none;"></ul></li>
 				<li id="favourites"><span class='collapsed'></span><span class='star'></span><span class='favourites'><a>Favourites</a></span></li>
 				<li id="recents"><span class='collapsed'></span><span class='clock-history'></span><span class='recents'><a>Recents</a></span></li>
@@ -14,10 +14,32 @@
 		<div id="properties-pane" style="text-align:center;overflow:auto;overflow-x:hidden;">
 		</div>
 	</div>
-	<div class="col-3" style="height:100%;padding:30px">
-		<div style="height:100%;overflow:auto;overflow-x:hidden;">
+	<div class="col-3" style="height:100%;padding:30px;background-color:#dedede;">
+		<div style="height:100%;overflow:auto;">
+			<form>
+				<div class="form-group">
+    				<label for="exampleInputEmail1">Record title</label>
+    				<input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" value="test-document.pdf">
+    				<!--<small id="emailHelp" class="form-text text-muted">This is currently pre-populated.</small>-->
+  				</div>
+				<div class="form-group">
+    				<label for="exampleInputEmail1">Container</label>
+    				<input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" value="20/118">
+    				<!--<small id="emailHelp" class="form-text text-muted">This is currently pre-populated.</small>-->
+  				</div>
+				<div class="input-group mb-3">
+					<input type="text" class="form-control" placeholder="Select document to upload" aria-label="Recipient's username" aria-describedby="button-addon2">
+					<div class="input-group-append">
+					<button class="btn btn-outline-secondary" type="button" id="button-addon2">Browse</button>
+					</div>
+				</div>
+				<button type="submit" class="btn btn-primary">Upload</button>
+			</form>
+		</div>
+	</div>
+		<!--<div style="height:100%;overflow:auto;overflow-x:hidden;">
 			<a class="twitter-timeline" href="https://twitter.com/RT_GilbyIM?ref_src=twsrc%5Etfw">Tweets by GilbyIM</a>
 			<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-		</div>
+		</div>-->
 	</div>
 </div>

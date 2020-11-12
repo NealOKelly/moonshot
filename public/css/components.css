@@ -195,6 +195,7 @@
 	display: inline-block;
 	vertical-align: top;
 	padding-left: 10px;
+	padding-right:30px;
 }
 
 .classification-name:hover{
@@ -205,6 +206,7 @@
 	display: inline-block;
 	vertical-align: top;
 	padding-left: 10px;
+	padding-right:30px;
 }
 
 .record-title:hover{
