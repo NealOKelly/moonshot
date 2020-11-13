@@ -45,15 +45,26 @@ $(document).ready(function()
 // Read File //
 $(document).on("click", "#my-link", function()
 	{
-    //on change event  
-    formdata = new FormData();
+    formData = new FormData();
     if($("#default_file").prop('files').length > 0)
 		{
 		file = $("#default_file").prop('files')[0];
-		formdata.append("upload", file);
+		formData.append("upload", file);
 		}
-		uploadFile(formdata)
+		var fileName = uuidv4();
+		console.log(fileName);
+		uploadFile(fileName, formData)
 	})
+
+function uuidv4() {
+  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+  );
+}
+
+
+
+
 
 
 ///// Classiciation Control Events /////
@@ -788,13 +799,13 @@ function removeAPISessionCookies()
 	$.cookie("FedAuth", null, { expires: -1, path: "/CMServiceAPI/"} )
 	}
 
-function uploadFile(formdata)
+function uploadFile(fileName, formData)
 	{
 	jQuery.ajax(
 		{
-		url: "https://api.gilbyim.com/WebDAV/Uploads/filename27.pdf",
+		url: "https://api.gilbyim.com/WebDAV/Uploads/" + fileName + ".pdf",
 		type: "PUT",
-		data: formdata,
+		data: formData,
 		processData: false,
 		contentType: false,
 		headers: { Authorization : "Basic bmVhbC5va2VsbHlAZ2lsYnlpbS5jb206Q3JhNTYwNTYh" },
