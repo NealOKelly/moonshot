@@ -16,25 +16,15 @@
 	</div>
 	<div class="col-3" style="height:100%;padding:30px;background-color:#dedede;">
 		<div style="height:100%;overflow:auto;">
-			<form>
-				<div class="form-group">
-    				<label for="exampleInputEmail1">Record title</label>
-    				<input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" value="test-document.pdf">
-    				<!--<small id="emailHelp" class="form-text text-muted">This is currently pre-populated.</small>-->
-  				</div>
-				<div class="form-group">
-    				<label for="exampleInputEmail1">Container</label>
-    				<input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" value="20/118">
-    				<!--<small id="emailHelp" class="form-text text-muted">This is currently pre-populated.</small>-->
-  				</div>
-				<div class="input-group mb-3">
-					<input type="text" class="form-control" placeholder="Select document to upload" aria-label="Recipient's username" aria-describedby="button-addon2">
-					<div class="input-group-append">
-					<button class="btn btn-outline-secondary" type="button" id="button-addon2">Browse</button>
-					</div>
-				</div>
-				<button type="submit" class="btn btn-primary">Upload</button>
-			</form>
+
+	<iframe id="WebDAV-frame" src="/four-oh-four"></iframe>
+			
+<form>
+	<input id="default_file" type="file" name="upload" />
+	<button type="submit" class="btn btn-primary">Upload</button>
+</form>
+
+
 		</div>
 	</div>
 		<!--<div style="height:100%;overflow:auto;overflow-x:hidden;">

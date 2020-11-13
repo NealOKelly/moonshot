@@ -41,6 +41,21 @@ $(document).ready(function()
 
 //////// Handle User-Initiated Events  /////////
 
+
+// Read File //
+$(document).on("click", "#my-link", function()
+	{
+    //on change event  
+    formdata = new FormData();
+    if($("#default_file").prop('files').length > 0)
+		{
+		file = $("#default_file").prop('files')[0];
+		formdata.append("upload", file);
+		}
+		uploadFile(formdata)
+	})
+
+
 ///// Classiciation Control Events /////
 
 // Click on folder Icon //
@@ -771,4 +786,25 @@ function removeAPISessionCookies()
 	{
 	$.cookie("FedAuth", null, { expires: -1, path: "/CMServiceAPI/"} )
 	$.cookie("FedAuth", null, { expires: -1, path: "/CMServiceAPI/"} )
+	}
+
+function uploadFile(formdata)
+	{
+	jQuery.ajax(
+		{
+		url: "https://api.gilbyim.com/WebDAV/Uploads/filename27.pdf",
+		type: "PUT",
+		data: formdata,
+		processData: false,
+		contentType: false,
+		headers: { Authorization : "Basic bmVhbC5va2VsbHlAZ2lsYnlpbS5jb206Q3JhNTYwNTYh" },
+		success: function (result) 
+			{
+			console.log("Success")
+			},
+		error: function(result) 
+			{
+			console.log("Error")
+			}
+		});
 	}
