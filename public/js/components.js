@@ -49,11 +49,11 @@ $(document).on("click", "#my-link", function()
     if($("#upload-form-file").prop('files').length > 0)
 		{
 		file = $("#upload-form-file").prop('files')[0];
-		formData.append("file", file);
+		//formData.append("file", file);
 		var fileName = uuidv4();
 		console.log(fileName);
 		var extension = "pdf";
-		uploadFile(fileName, extension, formData, file).then(function()
+		uploadFile(fileName, extension, file).then(function()
 			{
 			var recordTitle = $("#upload-form-record-title").val()
 			var recordType = $("#upload-form-record-type").val()
@@ -763,7 +763,7 @@ function getRecordProperties(type, recordUri)
 							$("#properties-container").html(result.Results[0].RecordContainer.RecordNumber.Value + ": " + result.Results[0].RecordContainer.RecordTitle.Value)
 							$("#properties-record-type").html(result.Results[0].RecordRecordType.RecordTypeName.Value)
 							$("#properties-date-registered").html(result.Results[0].RecordDateRegistered.DateTime)
-							$("#properties-access-control").html(result.Results[0].RecordAccessControl.Value)
+							//$("#properties-access-control").html(result.Results[0].RecordAccessControl.Value)
 							
 							// Upload form.
 							clearUploadForm()
@@ -826,7 +826,7 @@ function removeAPISessionCookies()
 	$.cookie("FedAuth", null, { expires: -1, path: "/CMServiceAPI/"} )
 	}
 
-function uploadFile(fileName, extension, formData, file)
+function uploadFile(fileName, extension, file)
 	{
 	var deferredObject = $.Deferred();
 	jQuery.ajax(
