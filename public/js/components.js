@@ -48,8 +48,8 @@ $(document).on("click", "#my-link", function()
     formData = new FormData();
     if($("#upload-form-file").prop('files').length > 0)
 		{
+		$("#upload-status").modal("show")
 		file = $("#upload-form-file").prop('files')[0];
-		//formData.append("file", file);
 		var fileName = uuidv4();
 		console.log(fileName);
 		var extension = getFileExtension($("#upload-form-file").val().substr(12))
@@ -67,7 +67,11 @@ $(document).on("click", "#my-link", function()
 
 
 
+$(document).on("click", "#upload-status-ok-button", function()
+	{
+    $("#upload-status").modal("hide")
 
+	})
 
 
 
@@ -144,7 +148,7 @@ $(document).on("click", ".classification-name>a", function()
 				}
 			}
 		}
-		$("#upload-form").addClass("upload-form-hidden")
+		$("#upload-form-container").addClass("upload-form-hidden")
 		clearUploadForm()
 	})
 
@@ -161,7 +165,7 @@ $(document).on("click", ".folder-fill", function()
 		getRecords(eventTargetParent.attr("id").substr(11))
 		}
 	clearUploadForm()
-	$("#upload-form").removeClass("upload-form-hidden")
+	$("#upload-form-container").removeClass("upload-form-hidden")
 	})
 
 
@@ -174,7 +178,7 @@ $(document).on("click", ".record-title>a", function()
 		drawPropertiesTable("classification")
 		var classificationUri = eventTargetParent.attr("id").substr(19)
 		getClassificationProperties(classificationUri)
-		$("#upload-form").addClass("upload-form-hidden")
+		$("#upload-form-container").addClass("upload-form-hidden")
 		clearUploadForm()
 		}
 	else
@@ -185,7 +189,7 @@ $(document).on("click", ".record-title>a", function()
 				{
 				drawPropertiesTable("folder-intermediate")
 				getRecordProperties("folder-intermediate", eventTargetParent.attr("id").substr(11))	
-				$("#upload-form").addClass("upload-form-hidden")
+				$("#upload-form-container").addClass("upload-form-hidden")
 				clearUploadForm()
 				}
 			else
@@ -195,7 +199,7 @@ $(document).on("click", ".record-title>a", function()
 					drawPropertiesTable("folder-terminal")
 					getRecordProperties("folder-terminal", eventTargetParent.attr("id").substr(11))
 					getRecords(eventTargetParent.attr("id").substr(11))
-					$("#upload-form").removeClass("upload-form-hidden")
+					$("#upload-form-container").removeClass("upload-form-hidden")
 					}
 				}
 			}
@@ -887,7 +891,7 @@ function createRecord(recordTitle, recordType, recordContainerUri, fileName)
 		deferredObject.promise()
 	}
 
-function attachFileToRecord(recordUri, fileName)
+function attachFileToRecord(recordUri, fileName, recordContainerUri)
 	{
 	console.log("recordUri: " + recordUri)
 	console.log("fileName: " + fileName)
@@ -907,8 +911,11 @@ function attachFileToRecord(recordUri, fileName)
 			{
 			console.log("file attached to record.")
 			console.log(result)
-			clearUploadForm()
-
+			// this is similar to clear upload form except that it excludes the container.  Maybe write this better at some point.
+			$("#upload-form-record-title").val("")
+			$("#upload-form-file").val("")
+			$("#upload-form-file-label").html("Choose file...")
+			getRecords(recordContainerUri)
 			}, 
 		error: function(result)
 			{
@@ -920,9 +927,6 @@ function attachFileToRecord(recordUri, fileName)
 
 function clearUploadForm()
 	{
-	$("#upload-form-record-title").val("")
-	$("#upload-form-file").val("")
-	$("#upload-form-file-label").html("Choose file...")
 	$("#upload-form-record-container").val("")
 	}
 
