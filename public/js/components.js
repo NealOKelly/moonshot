@@ -52,13 +52,14 @@ $(document).on("click", "#my-link", function()
 		formData.append("file", file);
 		var fileName = uuidv4();
 		console.log(fileName);
-		uploadFile(fileName, formData).then(function()
+		var extension = "pdf";
+		uploadFile(fileName, extension, formData).then(function()
 			{
 			var recordTitle = $("#upload-form-record-title").val()
 			var recordType = $("#upload-form-record-type").val()
 			var recordContainerUri = $("#upload-form-record-container").data("recordUri")
 			
-			createRecord(recordTitle, recordType, recordContainerUri)
+			alert(createRecord(recordTitle, recordType, recordContainerUri, fileName + "." + extension))
 			})
 		}
 	})
@@ -825,12 +826,12 @@ function removeAPISessionCookies()
 	$.cookie("FedAuth", null, { expires: -1, path: "/CMServiceAPI/"} )
 	}
 
-function uploadFile(fileName, formData)
+function uploadFile(fileName, extension, formData)
 	{
 	var deferredObject = $.Deferred();
 	jQuery.ajax(
 		{
-		url: "https://api.gilbyim.com/WebDAV/Uploads/" + fileName + ".pdf",
+		url: "https://api.gilbyim.com/WebDAV/Uploads/" + fileName + "." + extension,
 		type: "PUT",
 		data: formData,
 		processData: false,
@@ -851,16 +852,16 @@ function uploadFile(fileName, formData)
 	return deferredObject.promise();
 	}
 
-function createRecord(recordTitle, recordType, recordContainerUri)
+function createRecord(recordTitle, recordType, recordContainerUri, fileName)
 	{
-	console.log("RecordTile:" + recordTitle)
+	var deferredObject = $.Deferred();
 	var url = baseUrl + "/" + apiPath + "/Record"
 	var data = {
 				"RecordTitle" : recordTitle,
 				"RecordRecordType" : recordType,
 				"RecordContainer" : recordContainerUri
 				}
-	
+
 	$.ajax(
 		{
 		url: url,
@@ -871,6 +872,10 @@ function createRecord(recordTitle, recordType, recordContainerUri)
 		success: function(result)
 			{
 			console.log("Record succesfully created.")
+				//console.log(i)
+			attachFileToRecord(result.Results[0].Uri, fileName)
+			//deferredObject.resolve(result.Results[0].Uri)
+			//deferredObject.resolveWith(context, ["Can rocks!"])
 
 			}, 
 		error: function(result)
@@ -878,7 +883,38 @@ function createRecord(recordTitle, recordType, recordContainerUri)
 			console.log("Oooops!")
 			}
 		});
-		
+		deferredObject.promise()
+	}
+
+function attachFileToRecord(recordUri, fileName)
+	{
+	console.log("recordUri: " + recordUri)
+	console.log("fileName: " + fileName)
+	var data = {
+				"Uri": recordUri,
+				"RecordFilePath": fileName
+				}
+	var url = baseUrl + "/" + apiPath + "/Record"
+	$.ajax(
+		{
+		url: url,
+		data: JSON.stringify(data),
+		type: "POST",
+		contentType: 'application/json',
+		xhrFields: { withCredentials: true},
+		success: function(result)
+			{
+			console.log("file attached to record.")
+			console.log(result)
+			clearUploadForm()
+
+			}, 
+		error: function(result)
+			{
+			console.log("Oooops!")
+			console.log(result)
+			}
+		});
 	}
 
 function clearUploadForm()
@@ -888,7 +924,6 @@ function clearUploadForm()
 	$("#upload-form-file-label").html("Choose file...")
 	$("#upload-form-record-container").val("")
 	}
-
 
 function uuidv4()
 	{
