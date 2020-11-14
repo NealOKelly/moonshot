@@ -59,11 +59,7 @@ $(document).on("click", "#my-link", function()
 		}
 	})
 
-function uuidv4() {
-  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-  );
-}
+
 
 
 
@@ -258,6 +254,15 @@ $(document).on("click", ".collapsed", function()
 		}
 	})
 
+// File input
+$(document).on("change", "#upload-form-file", function()
+	{
+	var fileName = $("#upload-form-file").val().substr(12)
+	$("#upload-form-file-label").html(fileName)
+	var extension = getFileExtension($("#upload-form-file").val().substr(12))
+	var recordTitle = fileName.substr(0, fileName.length - (extension.length + 1))
+	$("#upload-form-record-title").val(recordTitle)
+	})
 
 // Click on expanded caret
 $(document).on("click", ".expanded", function()
@@ -826,4 +831,15 @@ function uploadFile(fileName, formData)
 			}
 		});
 	return deferredObject.promise();
+	}
+
+function uuidv4()
+	{
+	return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+	}
+
+function getFileExtension(fileName)
+	{
+	return fileName.slice((fileName.lastIndexOf(".") - 1 >>> 0) + 2);
 	}
