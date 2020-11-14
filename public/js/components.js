@@ -43,7 +43,7 @@ $(document).ready(function()
 
 
 // Read File //
-$(document).on("click", "#my-link", function()
+$(document).on("click", "#upload-button", function()
 	{
     formData = new FormData();
     if($("#upload-form-file").prop('files').length > 0)
@@ -58,7 +58,6 @@ $(document).on("click", "#my-link", function()
 			var recordTitle = $("#upload-form-record-title").val()
 			var recordType = $("#upload-form-record-type").val()
 			var recordContainerUri = $("#upload-form-record-container").data("recordUri")
-			
 			createRecord(recordTitle, recordType, recordContainerUri, fileName + "." + extension)
 			})
 		}
@@ -878,7 +877,7 @@ function createRecord(recordTitle, recordType, recordContainerUri, fileName)
 			{
 			console.log("Record succesfully created.")
 				//console.log(i)
-			attachFileToRecord(result.Results[0].Uri, fileName)
+			attachFileToRecord(result.Results[0].Uri, fileName, recordContainerUri)
 			//deferredObject.resolve(result.Results[0].Uri)
 			//deferredObject.resolveWith(context, ["Can rocks!"])
 
