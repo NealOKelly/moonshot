@@ -144,7 +144,7 @@ $(document).on("click", ".classification-name>a", function()
 			}
 		}
 		$("#upload-form").addClass("upload-form-hidden")
-		$("#upload-form-record-container").val("")
+		clearUploadForm()
 	})
 
 
@@ -159,6 +159,7 @@ $(document).on("click", ".folder-fill", function()
 		getRecordProperties("folder-terminal", eventTargetParent.attr("id").substr(11))
 		getRecords(eventTargetParent.attr("id").substr(11))
 		}
+	clearUploadForm()
 	$("#upload-form").removeClass("upload-form-hidden")
 	})
 
@@ -173,7 +174,7 @@ $(document).on("click", ".record-title>a", function()
 		var classificationUri = eventTargetParent.attr("id").substr(19)
 		getClassificationProperties(classificationUri)
 		$("#upload-form").addClass("upload-form-hidden")
-		$("#upload-form-record-container").val("")
+		clearUploadForm()
 		}
 	else
 		{
@@ -184,7 +185,7 @@ $(document).on("click", ".record-title>a", function()
 				drawPropertiesTable("folder-intermediate")
 				getRecordProperties("folder-intermediate", eventTargetParent.attr("id").substr(11))	
 				$("#upload-form").addClass("upload-form-hidden")
-				$("#upload-form-record-container").val("")
+				clearUploadForm()
 				}
 			else
 				{
@@ -764,6 +765,7 @@ function getRecordProperties(type, recordUri)
 							$("#properties-access-control").html(result.Results[0].RecordAccessControl.Value)
 							
 							// Upload form.
+							clearUploadForm()
 							$("#upload-form-record-container").val(result.Results[0].RecordContainer.RecordNumber.Value + ": " + result.Results[0].RecordContainer.RecordTitle.Value)
 							$("#upload-form-record-container").data("recordUri", result.Results[0].Uri)
 							break;
@@ -878,6 +880,15 @@ function createRecord(recordTitle, recordType, recordContainerUri)
 		});
 		
 	}
+
+function clearUploadForm()
+	{
+	$("#upload-form-record-title").val("")
+	$("#upload-form-file").val("")
+	$("#upload-form-file-label").html("Choose file...")
+	$("#upload-form-record-container").val("")
+	}
+
 
 function uuidv4()
 	{
