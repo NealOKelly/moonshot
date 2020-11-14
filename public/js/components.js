@@ -55,7 +55,10 @@ $(document).on("click", "#my-link", function()
 		uploadFile(fileName, formData).then(function()
 			{
 			var recordTitle = $("#upload-form-record-title").val()
-			createRecord(recordTitle)
+			var recordType = $("#upload-form-record-type").val()
+			var recordContainerUri = $("#upload-form-record-container").data("recordUri")
+			
+			createRecord(recordTitle, recordType, recordContainerUri)
 			})
 		}
 	})
@@ -420,7 +423,7 @@ function refreshClassificationNodes(parentNodeId)
 				var q="parent:" + parentNodeId.substr(19);
 				$.ajax(
 					{
-					url: baseUrl + "/" + apiPath + "/Search?q=" + q + "&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern&trimtype=Classification",
+					url: baseUrl + "/" + apiPath + "/Search?q=" + q + "&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern&trimtype=Classification&pageSize=1000000",
 					type: "POST",
 					contentType: 'application/json',
 					xhrFields: { withCredentials: true},
@@ -498,7 +501,7 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 			var includedProperties = "RecordTitle, RecordRecordType, RecordTypeContentsRule, RecordContainer";
 			$.ajax(
 				{
-				url: baseUrl + "/" + apiPath + "/RecordType?q=all&properties=RecordTypeLevel, RecordTypeContentsRule, RecordTypeName",
+				url: baseUrl + "/" + apiPath + "/RecordType?q=all&properties=RecordTypeLevel, RecordTypeContentsRule, RecordTypeName&pageSize=1000000",
 				type: "GET",
 				contentType: 'application/json',
 				xhrFields: { withCredentials: true},
@@ -657,7 +660,7 @@ function getRecords(recordUri)
 		{
 		if(isAuthenticated)
 			{
-			var url = baseUrl + "/" + apiPath + "/Search?q=container:" + recordUri + "&properties=RecordTitle, RecordNumber, DateRegistered, RecordMimeType, RecordExtension&trimtype=Record"
+			var url = baseUrl + "/" + apiPath + "/Search?q=container:" + recordUri + "&properties=RecordTitle, RecordNumber, DateRegistered, RecordMimeType, RecordExtension&trimtype=Record&pageSize=1000000"
 			$.ajax(
 				{
 				url: url,
@@ -762,7 +765,7 @@ function getRecordProperties(type, recordUri)
 							
 							// Upload form.
 							$("#upload-form-record-container").val(result.Results[0].RecordContainer.RecordNumber.Value + ": " + result.Results[0].RecordContainer.RecordTitle.Value)
-							$("#upload-form-record-container").data("recordUri", result.Results[0].RecordContainer.Uri)
+							$("#upload-form-record-container").data("recordUri", result.Results[0].Uri)
 							break;
 						case "document":
 							$("#properties-record-number").html(result.Results[0].RecordNumber.Value)
@@ -846,15 +849,16 @@ function uploadFile(fileName, formData)
 	return deferredObject.promise();
 	}
 
-function createRecord(recordTitle)
+function createRecord(recordTitle, recordType, recordContainerUri)
 	{
 	console.log("RecordTile:" + recordTitle)
 	var url = baseUrl + "/" + apiPath + "/Record"
 	var data = {
-				"RecordTitle":"Integration Demo",
-				"RecordRecordType":"Document",
-				"RecordContainer": 1517
+				"RecordTitle" : recordTitle,
+				"RecordRecordType" : recordType,
+				"RecordContainer" : recordContainerUri
 				}
+	
 	$.ajax(
 		{
 		url: url,
