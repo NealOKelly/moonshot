@@ -140,6 +140,7 @@ $(document).on("click", ".classification-name>a", function()
 			}
 		}
 		$("#upload-form").addClass("upload-form-hidden")
+		$("#upload-form-record-container").val("")
 	})
 
 
@@ -168,6 +169,7 @@ $(document).on("click", ".record-title>a", function()
 		var classificationUri = eventTargetParent.attr("id").substr(19)
 		getClassificationProperties(classificationUri)
 		$("#upload-form").addClass("upload-form-hidden")
+		$("#upload-form-record-container").val("")
 		}
 	else
 		{
@@ -178,6 +180,7 @@ $(document).on("click", ".record-title>a", function()
 				drawPropertiesTable("folder-intermediate")
 				getRecordProperties("folder-intermediate", eventTargetParent.attr("id").substr(11))	
 				$("#upload-form").addClass("upload-form-hidden")
+				$("#upload-form-record-container").val("")
 				}
 			else
 				{
@@ -491,7 +494,7 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 			{
 			$("#" + parentNodeId + " > ul").addClass("classification-hidden") // if already exists, hide.
 	
-			var includedProperties = "RecordTitle, RecordRecordType, RecordTypeContentsRule";
+			var includedProperties = "RecordTitle, RecordRecordType, RecordTypeContentsRule, RecordContainer";
 			$.ajax(
 				{
 				url: baseUrl + "/" + apiPath + "/RecordType?q=all&properties=RecordTypeLevel, RecordTypeContentsRule, RecordTypeName",
@@ -552,7 +555,7 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 															{
 															if(recordTypeDefinitions.Results[x].RecordTypeLevel.Value<"5")
 																{
-																addTerminalFolderNode(parentNodeId, recordUri, recordTitle)											
+																addTerminalFolderNode(parentNodeId, recordUri, recordTitle);		
 																}
 															}
 														break;
@@ -755,6 +758,10 @@ function getRecordProperties(type, recordUri)
 							$("#properties-record-type").html(result.Results[0].RecordRecordType.RecordTypeName.Value)
 							$("#properties-date-registered").html(result.Results[0].RecordDateRegistered.DateTime)
 							$("#properties-access-control").html(result.Results[0].RecordAccessControl.Value)
+							
+							// Upload form.
+							$("#upload-form-record-container").val(result.Results[0].RecordContainer.RecordNumber.Value + ": " + result.Results[0].RecordContainer.RecordTitle.Value)
+							$("#upload-form-record-container").data("recordUri", result.Results[0].RecordContainer.Uri)
 							break;
 						case "document":
 							$("#properties-record-number").html(result.Results[0].RecordNumber.Value)
