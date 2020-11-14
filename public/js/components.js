@@ -139,6 +139,7 @@ $(document).on("click", ".classification-name>a", function()
 				}
 			}
 		}
+		$("#upload-form").addClass("upload-form-hidden")
 	})
 
 
@@ -153,6 +154,7 @@ $(document).on("click", ".folder-fill", function()
 		getRecordProperties("folder-terminal", eventTargetParent.attr("id").substr(11))
 		getRecords(eventTargetParent.attr("id").substr(11))
 		}
+	$("#upload-form").removeClass("upload-form-hidden")
 	})
 
 
@@ -165,6 +167,7 @@ $(document).on("click", ".record-title>a", function()
 		drawPropertiesTable("classification")
 		var classificationUri = eventTargetParent.attr("id").substr(19)
 		getClassificationProperties(classificationUri)
+		$("#upload-form").addClass("upload-form-hidden")
 		}
 	else
 		{
@@ -174,6 +177,7 @@ $(document).on("click", ".record-title>a", function()
 				{
 				drawPropertiesTable("folder-intermediate")
 				getRecordProperties("folder-intermediate", eventTargetParent.attr("id").substr(11))	
+				$("#upload-form").addClass("upload-form-hidden")
 				}
 			else
 				{
@@ -182,6 +186,7 @@ $(document).on("click", ".record-title>a", function()
 					drawPropertiesTable("folder-terminal")
 					getRecordProperties("folder-terminal", eventTargetParent.attr("id").substr(11))
 					getRecords(eventTargetParent.attr("id").substr(11))
+					$("#upload-form").removeClass("upload-form-hidden")
 					}
 				}
 			}

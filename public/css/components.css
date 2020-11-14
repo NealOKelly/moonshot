@@ -213,3 +213,11 @@
 	text-decoration: underline;
 	cursor: pointer;
 }
+
+.upload-form-hidden{
+	display: none;
+}
+
+.upload-form-visible{
+	
+}
