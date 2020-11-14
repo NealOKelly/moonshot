@@ -53,13 +53,13 @@ $(document).on("click", "#my-link", function()
 		var fileName = uuidv4();
 		console.log(fileName);
 		var extension = "pdf";
-		uploadFile(fileName, extension, formData).then(function()
+		uploadFile(fileName, extension, formData, file).then(function()
 			{
 			var recordTitle = $("#upload-form-record-title").val()
 			var recordType = $("#upload-form-record-type").val()
 			var recordContainerUri = $("#upload-form-record-container").data("recordUri")
 			
-			alert(createRecord(recordTitle, recordType, recordContainerUri, fileName + "." + extension))
+			createRecord(recordTitle, recordType, recordContainerUri, fileName + "." + extension)
 			})
 		}
 	})
@@ -826,16 +826,17 @@ function removeAPISessionCookies()
 	$.cookie("FedAuth", null, { expires: -1, path: "/CMServiceAPI/"} )
 	}
 
-function uploadFile(fileName, extension, formData)
+function uploadFile(fileName, extension, formData, file)
 	{
 	var deferredObject = $.Deferred();
 	jQuery.ajax(
 		{
 		url: "https://api.gilbyim.com/WebDAV/Uploads/" + fileName + "." + extension,
 		type: "PUT",
-		data: formData,
+		data: file,
 		processData: false,
-		contentType: false,
+		//contentType: false,
+		contentType: "multipart/form-data",
 		headers: { Authorization : "Basic bmVhbC5va2VsbHlAZ2lsYnlpbS5jb206Q3JhNTYwNTYh" },
 		success: function (result) 
 			{
