@@ -52,7 +52,7 @@ $(document).on("click", "#my-link", function()
 		//formData.append("file", file);
 		var fileName = uuidv4();
 		console.log(fileName);
-		var extension = "pdf";
+		var extension = getFileExtension($("#upload-form-file").val().substr(12))
 		uploadFile(fileName, extension, file).then(function()
 			{
 			var recordTitle = $("#upload-form-record-title").val()
