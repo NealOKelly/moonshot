@@ -46,14 +46,17 @@ $(document).ready(function()
 $(document).on("click", "#my-link", function()
 	{
     formData = new FormData();
-    if($("#default_file").prop('files').length > 0)
+    if($("#upload-form-file").prop('files').length > 0)
 		{
-		file = $("#default_file").prop('files')[0];
-		formData.append("upload", file);
-		}
+		file = $("#upload-form-file").prop('files')[0];
+		formData.append("file", file);
 		var fileName = uuidv4();
 		console.log(fileName);
-		uploadFile(fileName, formData)
+		uploadFile(fileName, formData).then(function()
+			{
+			console.log("Thiis should happen afterwards.")
+			})
+		}
 	})
 
 function uuidv4() {
@@ -801,6 +804,7 @@ function removeAPISessionCookies()
 
 function uploadFile(fileName, formData)
 	{
+	var deferredObject = $.Deferred();
 	jQuery.ajax(
 		{
 		url: "https://api.gilbyim.com/WebDAV/Uploads/" + fileName + ".pdf",
@@ -811,11 +815,15 @@ function uploadFile(fileName, formData)
 		headers: { Authorization : "Basic bmVhbC5va2VsbHlAZ2lsYnlpbS5jb206Q3JhNTYwNTYh" },
 		success: function (result) 
 			{
+			console.log("This should happen first.")
+			deferredObject.resolve();
 			console.log("Success")
 			},
 		error: function(result) 
 			{
 			console.log("Error")
+			deferredObject.resolve();
 			}
 		});
+	return deferredObject.promise();
 	}
