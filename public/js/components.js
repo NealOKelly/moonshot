@@ -54,7 +54,8 @@ $(document).on("click", "#my-link", function()
 		console.log(fileName);
 		uploadFile(fileName, formData).then(function()
 			{
-			console.log("Thiis should happen afterwards.")
+			var recordTitle = $("#upload-form-record-title").val()
+			createRecord(recordTitle)
 			})
 		}
 	})
@@ -843,6 +844,35 @@ function uploadFile(fileName, formData)
 			}
 		});
 	return deferredObject.promise();
+	}
+
+function createRecord(recordTitle)
+	{
+	console.log("RecordTile:" + recordTitle)
+	var url = baseUrl + "/" + apiPath + "/Record"
+	var data = {
+				"RecordTitle":"Integration Demo",
+				"RecordRecordType":"Document",
+				"RecordContainer": 1517
+				}
+	$.ajax(
+		{
+		url: url,
+		data: JSON.stringify(data),
+		type: "POST",
+		contentType: 'application/json',
+		xhrFields: { withCredentials: true},
+		success: function(result)
+			{
+			console.log("Record succesfully created.")
+
+			}, 
+		error: function(result)
+			{
+			console.log("Oooops!")
+			}
+		});
+		
 	}
 
 function uuidv4()
