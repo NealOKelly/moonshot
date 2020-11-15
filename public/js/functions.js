@@ -295,11 +295,11 @@ function sortClassificationTree(sortBy)
 		});
 	}
 
-function highlightSelectedNode(eventTargetParent)
+function highlightSelectedNode(node)
 	{
 	$(".record-row").removeClass("row-selected")
 	$("#classification-treeview li").removeClass("node-selected")
-	$("#" + eventTargetParent.attr("id")).addClass("node-selected")
+	$("#" + node.attr("id")).addClass("node-selected")
 	}
 
 function getRecords(recordUri)

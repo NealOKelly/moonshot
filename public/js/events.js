@@ -42,7 +42,7 @@ $(document).ready(function()
 //////// Handle User-Initiated Events  /////////
 
 
-// Read File //
+//Upload
 $(document).on("click", "#upload-button", function()
 	{
 	getAuthenticationStatus().then(function () 
@@ -70,12 +70,6 @@ $(document).on("click", "#upload-button", function()
 			$("#session-expired").modal("show")
 			}
 		});
-	
-	
-	
-	
-	
-
 	})
 
 
@@ -88,10 +82,40 @@ $(document).on("click", "#upload-status-ok-button", function()
 	})
 
 
+$(document).on("click", ".record-row", function()
+	{
+	if ($(event.target).hasClass("download"))
+		{
+		var node = $(event.target).parent().parent();		
+		}
+	else
+		{
+		var node = $(event.target).parent()
+		}
+	$(".record-row").removeClass("row-selected")
+	$("#classification-treeview li").removeClass("node-selected")
+	$(node).addClass("row-selected")
+	$("#records-list-pane tr > td:nth-child(1) > span").removeClass("file-earmark-green")
+	$("#records-list-pane tr > td:nth-child(1) > span").addClass("file-earmark")
+	$("#records-list-pane tr > td:nth-child(5) > span").removeClass("download-green")
+	$("#records-list-pane tr > td:nth-child(5) > span").addClass("download")
+	$("#" + node.attr("id") + " > td:nth-child(1) > span").removeClass("file-earmark")
+	$("#" + node.attr("id") + " > td:nth-child(1) > span").addClass("file-earmark-green")
+	$("#" + node.attr("id") + " > td:nth-child(5) > span").removeClass("download")
+	$("#" + node.attr("id") + " > td:nth-child(5) > span").addClass("download-green")
+	drawPropertiesTable("document")
+	getRecordProperties("document", node.attr("id").substr(11))
+	})
+
+
+
+
 
 ///// Classiciation Control Events /////
 function classificationTreeNodeSelected(node)
 	{
+	alert("This")
+	$("#records-list-pane").css("display", "none")
 	highlightSelectedNode(node)
 	if((node).attr("id").substr(0, 19) == "classification-uri-")
 		{
@@ -138,6 +162,7 @@ $(document).on("click", ".classification-name>a", function()
 // Click on folder-fill Icon //
 $(document).on("click", ".folder-fill", function()
 	{
+	$("#records-list-pane").css("display", "initial")
 	var node = $(event.target).parent();
 	highlightSelectedNode(node)
 	if($(node).hasClass("folder-terminal"))
@@ -169,6 +194,7 @@ $(document).on("click", ".record-title>a", function()
 			{
 			if($(node).hasClass("folder-intermediate"))
 				{
+				$("#records-list-pane").css("display", "none")
 				drawPropertiesTable("folder-intermediate")
 				getRecordProperties("folder-intermediate", node.attr("id").substr(11))	
 				$("#upload-form-container").addClass("upload-form-hidden")
@@ -178,6 +204,7 @@ $(document).on("click", ".record-title>a", function()
 				{
 				if($(node).hasClass("folder-terminal"))
 					{
+					$("#records-list-pane").css("display", "initial")
 					drawPropertiesTable("folder-terminal")
 					getRecordProperties("folder-terminal", node.attr("id").substr(11))
 					getRecords(node.attr("id").substr(11))
