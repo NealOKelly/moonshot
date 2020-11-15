@@ -335,7 +335,7 @@ function getRecords(recordUri)
 							var recordNumber = result.Results[i].RecordNumber.Value;
 							var dateRegistered = result.Results[i].RecordDateRegistered;
 							tableHTML = tableHTML + '<tr id="record-uri-' + uri + '" class="record-row" data-record-title="' + title + '" data-record-extension="' + extension + '" data-record-mime-type="' + mimeType + '">'
-							tableHTML = tableHTML + '<td><span class="file-earmark fiv-viv fiv-icon-' + extension.toLowerCase() + '" arial-label="' + extension.toUpperCase() + ' Icon"></span></td>'
+							tableHTML = tableHTML + '<td><span class="fiv-viv fiv-icon-blank fiv-icon-' + extension.toLowerCase() + '" arial-label="' + extension.toUpperCase() + ' Icon"></span></td>'
 							tableHTML = tableHTML + '<td>' + recordNumber + '</td>'
 							tableHTML = tableHTML + '<td style="text-align:left;">' + title + '</td>'
 							tableHTML = tableHTML + '<td>' + dateRegistered.DateTime.substr(8, 2) + '/' + dateRegistered.DateTime.substr(5, 2) + '/' + dateRegistered.DateTime.substr(0, 4) + '</td>'

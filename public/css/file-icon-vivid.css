@@ -32,12 +32,6 @@
   content: '\00a0';
 }
 
-/*  Testing */
-.fiv-viv.fiv-icon-pdf {
-  background-image: url("../img/file-icon-vectors/vivid/pdf.svg");
-}
-/*  Testing */
-
 .fiv-viv.fiv-icon-3g2 {
   background-image: url("../img/file-icon-vectors/vivid/3g2.svg");
 }
@@ -957,11 +951,11 @@
 .fiv-viv.fiv-icon-pdb {
   background-image: url("../img/file-icon-vectors/vivid/pdb.svg");
 }
-/*
+
 .fiv-viv.fiv-icon-pdf {
   background-image: url("../img/file-icon-vectors/vivid/pdf.svg");
 }
-*/
+
 .fiv-viv.fiv-icon-pem {
   background-image: url("../img/file-icon-vectors/vivid/pem.svg");
 }
