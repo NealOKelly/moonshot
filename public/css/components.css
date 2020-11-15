@@ -117,28 +117,14 @@
 }
 
 .file-earmark{
-  	/*display: inline-block;
-  	content: "";
-  	background-image: url("../img/bs-icons/shamrock.svg");
-	background-image: url("../img/icons/file-earmark.svg");*/
-	background-image: url("../img/fiv-icons/pdf.svg");
-	font-size: .25em;
-	/*background-size: cover;
-	background-repeat: no-repeat;
-    width: 24px;
-    height: 24px;*/
-}
-
-.file-earmark-green{
   	display: inline-block;
   	content: "";
-  	background-image: url("../img/bs-icons/file-earmark-green.svg");
+	background-image: url("../img/bs-icons/file-earmark.svg");*/
 	background-size: cover;
 	background-repeat: no-repeat;
     width: 24px;
     height: 24px;
 }
-
 
 .download-green{
   	display: inline-block;
@@ -220,4 +206,9 @@
 
 .upload-form-visible{
 	
+}
+
+/* File icon vectors - override standard size. */
+.fiv-viv{
+	font-size: 24px;
 }
