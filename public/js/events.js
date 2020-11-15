@@ -180,37 +180,24 @@ $(document).on("click", ".record-title>a", function()
 	{
 	var node = $(event.target).parent().parent();
 	highlightSelectedNode(node)
-	if((node).attr("id").substr(0, 19) == "classification-uri-")
+
+	if($(node).hasClass("folder-intermediate"))
 		{
-		drawPropertiesTable("classification")
-		var classificationUri = node.attr("id").substr(19)
-		getClassificationProperties(classificationUri)
+		$("#records-list-pane").css("display", "none")
+		drawPropertiesTable("folder-intermediate")
+		getRecordProperties("folder-intermediate", node.attr("id").substr(11))	
 		$("#upload-form-container").addClass("upload-form-hidden")
 		clearUploadForm()
 		}
 	else
 		{
-		if((node).attr("id").substr(0, 11) == "record-uri-")
+		if($(node).hasClass("folder-terminal"))
 			{
-			if($(node).hasClass("folder-intermediate"))
-				{
-				$("#records-list-pane").css("display", "none")
-				drawPropertiesTable("folder-intermediate")
-				getRecordProperties("folder-intermediate", node.attr("id").substr(11))	
-				$("#upload-form-container").addClass("upload-form-hidden")
-				clearUploadForm()
-				}
-			else
-				{
-				if($(node).hasClass("folder-terminal"))
-					{
-					$("#records-list-pane").css("display", "initial")
-					drawPropertiesTable("folder-terminal")
-					getRecordProperties("folder-terminal", node.attr("id").substr(11))
-					getRecords(node.attr("id").substr(11))
-					$("#upload-form-container").removeClass("upload-form-hidden")
-					}
-				}
+			$("#records-list-pane").css("display", "initial")
+			drawPropertiesTable("folder-terminal")
+			getRecordProperties("folder-terminal", node.attr("id").substr(11))
+			getRecords(node.attr("id").substr(11))
+			$("#upload-form-container").removeClass("upload-form-hidden")
 			}
 		}
 	})
