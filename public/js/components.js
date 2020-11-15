@@ -45,22 +45,37 @@ $(document).ready(function()
 // Read File //
 $(document).on("click", "#upload-button", function()
 	{
-    formData = new FormData();
-    if($("#upload-form-file").prop('files').length > 0)
+	getAuthenticationStatus().then(function () 
 		{
-		$("#upload-status").modal("show")
-		file = $("#upload-form-file").prop('files')[0];
-		var fileName = uuidv4();
-		console.log(fileName);
-		var extension = getFileExtension($("#upload-form-file").val().substr(12))
-		uploadFile(fileName, extension, file).then(function()
+		if(isAuthenticated)
 			{
-			var recordTitle = $("#upload-form-record-title").val()
-			var recordType = $("#upload-form-record-type").val()
-			var recordContainerUri = $("#upload-form-record-container").data("recordUri")
-			createRecord(recordTitle, recordType, recordContainerUri, fileName + "." + extension)
-			})
-		}
+			if($("#upload-form-file").prop('files').length > 0)
+				{
+				$("#upload-status").modal("show")
+				file = $("#upload-form-file").prop('files')[0];
+				var fileName = uuidv4();
+				console.log(fileName);
+				var extension = getFileExtension($("#upload-form-file").val().substr(12))
+				uploadFile(fileName, extension, file).then(function()
+					{
+					var recordTitle = $("#upload-form-record-title").val()
+					var recordType = $("#upload-form-record-type").val()
+					var recordContainerUri = $("#upload-form-record-container").data("recordUri")
+					createRecord(recordTitle, recordType, recordContainerUri, fileName + "." + extension)
+					})
+				}
+			}
+		else
+			{
+			$("#session-expired").modal("show")
+			}
+		});
+	
+	
+	
+	
+	
+
 	})
 
 
