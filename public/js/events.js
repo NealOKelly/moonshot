@@ -84,7 +84,7 @@ $(document).on("click", "#upload-status-ok-button", function()
 
 $(document).on("click", ".record-row", function()
 	{
-	if ($(event.target).hasClass("download"))
+	if ($(event.target).hasClass("download") || $(event.target).hasClass("fiv-viv"))
 		{
 		var node = $(event.target).parent().parent();		
 		}
