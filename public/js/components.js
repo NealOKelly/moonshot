@@ -69,7 +69,7 @@ $(document).on("click", "#upload-button", function()
 $(document).on("click", "#upload-status-ok-button", function()
 	{
     $("#upload-status").modal("hide")
-
+	$("#upload-progress-bar").css("width", "0%")
 	})
 
 
@@ -846,6 +846,7 @@ function uploadFile(fileName, extension, file)
 			console.log("This should happen first.")
 			deferredObject.resolve();
 			console.log("Success")
+			$("#upload-progress-bar").css("width", "33%")
 			},
 		error: function(result) 
 			{
@@ -876,6 +877,7 @@ function createRecord(recordTitle, recordType, recordContainerUri, fileName)
 		success: function(result)
 			{
 			console.log("Record succesfully created.")
+			$("#upload-progress-bar").css("width", "67%")	
 				//console.log(i)
 			attachFileToRecord(result.Results[0].Uri, fileName, recordContainerUri)
 			//deferredObject.resolve(result.Results[0].Uri)
@@ -896,7 +898,8 @@ function attachFileToRecord(recordUri, fileName, recordContainerUri)
 	console.log("fileName: " + fileName)
 	var data = {
 				"Uri": recordUri,
-				"RecordFilePath": fileName
+				"RecordFilePath": fileName,
+				"RecordFinalizeOnSave" : "true"
 				}
 	var url = baseUrl + "/" + apiPath + "/Record"
 	$.ajax(
@@ -915,6 +918,8 @@ function attachFileToRecord(recordUri, fileName, recordContainerUri)
 			$("#upload-form-file").val("")
 			$("#upload-form-file-label").html("Choose file...")
 			getRecords(recordContainerUri)
+			$("#upload-progress-bar").css("width", "100%")
+			$("#upload-status-caption").html("Upload completed successfully.")
 			}, 
 		error: function(result)
 			{

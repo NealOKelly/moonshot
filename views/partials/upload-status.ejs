@@ -1,16 +1,19 @@
 <!-- Modal for upload progress -->
 <div class="modal fade" id="upload-status" data-backdrop="static" tabindex="-1" aria-labelledby="session-expired" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="session-expired-label">Upload Status</h5>
-      </div>
-      <div class="modal-body">
-        <p>Your file has been uploaded successfully.</p>
-      </div>
-      <div class="modal-footer">
-        <button id="upload-status-ok-button" type="button" class="btn btn-primary">OK</button>
-      </div>
-    </div>
-  </div>
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="session-expired-label">Upload Status</h5>
+			</div>
+			<div class="modal-body">
+				<p id="upload-status-caption">Uploading...</p>
+				<div class="progress">
+					<div id="upload-progress-bar" class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 0%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button id="upload-status-ok-button" type="button" class="btn btn-primary">OK</button>
+			</div>
+		</div>
+	</div>
 </div>
