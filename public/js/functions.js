@@ -325,7 +325,7 @@ function getRecords(recordUri)
 						}
 					else
 						{
-						var tableHTML = '<table class="table table-sm"><th>Type</th><th>Record Number</th><th style="text-align:left;">Title</th><th>Date Registered</th><th>Download</th>'
+						var tableHTML = '<table class="table table-sm"><th style="background-color:#dedede;">Type</th><th style="background-color:#dedede;">Record Number</th><th style="background-color:#dedede;text-align:left;">Title</th><th style="background-color:#dedede;">Date Registered</th><th style="background-color:#dedede;">Download</th>'
 						for(i=0; i<result.TotalResults; i++)
 							{
 							var uri = result.Results[i].Uri;
@@ -339,7 +339,7 @@ function getRecords(recordUri)
 							tableHTML = tableHTML + '<td>' + recordNumber + '</td>'
 							tableHTML = tableHTML + '<td style="text-align:left;">' + title + '</td>'
 							tableHTML = tableHTML + '<td>' + dateRegistered.DateTime.substr(8, 2) + '/' + dateRegistered.DateTime.substr(5, 2) + '/' + dateRegistered.DateTime.substr(0, 4) + '</td>'
-							tableHTML = tableHTML + '<td><span class="download"></span></td></tr>'
+							tableHTML = tableHTML + '<td><span class="download-grey"></span></td></tr>'
 							}
 						tableHTML = tableHTML + '</table'>
 

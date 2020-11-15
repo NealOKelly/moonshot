@@ -57,8 +57,16 @@
 
 .row-selected {
 	font-weight: bold;
+	/*color: #75b540;*/
+}
+
+.row-selected-green {
+	font-weight: bold;
 	color: #75b540;
 }
+
+
+
 .record-row:hover {
 	/*text-decoration: underline;*/
 	/*cursor: pointer;	*/
@@ -66,10 +74,6 @@
 
 .record-row>td{
 	cursor: default;
-}
-
-.download{
-	cursor: pointer;
 }
 
 .folder{
@@ -123,14 +127,15 @@
     height: 24px;
 }
 
-.file-earmark{
+.download{
   	display: inline-block;
   	content: "";
-	background-image: url("../img/bootstrap-icons/file-earmark.svg");*/
+  	background-image: url("../img/bootstrap-icons/download.svg");
 	background-size: cover;
 	background-repeat: no-repeat;
     width: 24px;
     height: 24px;
+	cursor: pointer;
 }
 
 .download-green{
@@ -141,18 +146,32 @@
 	background-repeat: no-repeat;
     width: 24px;
     height: 24px;
+	cursor: pointer;
 }
 
-.download{
+.download-grey{
   	display: inline-block;
   	content: "";
-  	background-image: url("../img/bootstrap-icons/download.svg");
+  	background-image: url("../img/bootstrap-icons/download-grey.svg");
 	background-size: cover;
 	background-repeat: no-repeat;
     width: 24px;
     height: 24px;
+	cursor: default;
 }
 
+
+.download-white{
+  	display: inline-block;
+  	content: "";
+	background-color: #75b540;
+  	background-image: url("../img/bootstrap-icons/download-white.svg");
+	background-size: cover;
+	background-repeat: no-repeat;
+    width: 24px;
+    height: 24px;
+	cursor: pointer;
+}
 
 
 .favourites{
@@ -211,9 +230,6 @@
 	display: none;
 }
 
-.upload-form-visible{
-	
-}
 
 /* File icon vectors - override standard size. */
 .fiv-viv{

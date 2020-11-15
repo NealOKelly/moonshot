@@ -84,27 +84,63 @@ $(document).on("click", "#upload-status-ok-button", function()
 
 $(document).on("click", ".record-row", function()
 	{
-	if ($(event.target).hasClass("download") || $(event.target).hasClass("fiv-viv"))
+	if($(event.target).prop("nodeName")=="TD")
 		{
-		var node = $(event.target).parent().parent();		
+		//alert("It's a TD, so we know the parent is the row.")
+		var row = $(event.target).parent()
+		//alert(row.attr("id"))
+		$("#classification-treeview li").removeClass("node-selected")
+		$(".record-row").removeClass("row-selected")
+		$(".record-row > td:nth-child(5) > span").addClass("download-grey")
+		row.addClass("row-selected")
+		$(".record-row > td:nth-child(5) > span").removeClass("download")
+		$("#" + row.attr("id") + " > td:nth-child(5) > span").removeClass("download-grey")
+		$("#" + row.attr("id") + " > td:nth-child(5) > span").addClass("download")
+		
 		}
 	else
 		{
-		var node = $(event.target).parent()
+		if($(event.target).prop("nodeName")=="SPAN")
+			{
+			if($(event.target).hasClass("download"))
+				{
+				//alert("It's the download icon so we do something special.")
+				var row = $(event.target).parent().parent()	
+				row.addClass("row-selected-green")
+				$("#" + row.attr("id") + " > td:nth-child(5) > span").addClass("download-green")
+				setTimeout(function()
+					{
+					row.removeClass("row-selected-green")
+					$("#" + row.attr("id") + " > td:nth-child(5) > span").addClass("download")
+					$("#" + row.attr("id") + " > td:nth-child(5) > span").removeClass("download-green")
+					},
+					1000);
+				var recordUri = $(event.target).parent().parent().attr("id").substr(11)
+				var recordTitle = $(event.target).parent().parent().data("recordTitle")
+				var recordMimeType = $(event.target).parent().parent().data("recordMimeType")
+				var recordExtension = $(event.target).parent().parent().data("recordExtension")
+				downloadDocument(recordUri, recordTitle, recordExtension, recordMimeType)
+				}
+			else
+				{
+				var row = $(event.target).parent().parent()
+				// They just clicked on the icon.
+				$("#classification-treeview li").removeClass("node-selected")
+				$(".record-row").removeClass("row-selected")
+				$(".record-row > td:nth-child(5) > span").addClass("download-grey")
+				row.addClass("row-selected")
+				$(".record-row > td:nth-child(5) > span").removeClass("download")
+				$("#" + row.attr("id") + " > td:nth-child(5) > span").removeClass("download-grey")
+				$("#" + row.attr("id") + " > td:nth-child(5) > span").addClass("download")
+				}
+			}
+		// we do nothing.
+			
+		// now check the class.
+
 		}
-	$(".record-row").removeClass("row-selected")
-	$("#classification-treeview li").removeClass("node-selected")
-	$(node).addClass("row-selected")
-	//$("#records-list-pane tr > td:nth-child(1) > span").removeClass("file-earmark-green")
-	//$("#records-list-pane tr > td:nth-child(1) > span").addClass("file-earmark")
-	$("#records-list-pane tr > td:nth-child(5) > span").removeClass("download-green")
-	$("#records-list-pane tr > td:nth-child(5) > span").addClass("download")
-	//$("#" + node.attr("id") + " > td:nth-child(1) > span").removeClass("file-earmark")
-	//$("#" + node.attr("id") + " > td:nth-child(1) > span").addClass("file-earmark-green")
-	$("#" + node.attr("id") + " > td:nth-child(5) > span").removeClass("download")
-	$("#" + node.attr("id") + " > td:nth-child(5) > span").addClass("download-green")
-	drawPropertiesTable("document")
-	getRecordProperties("document", node.attr("id").substr(11))
+	
+
 	})
 
 
@@ -262,15 +298,7 @@ $(document).on("click", ".expanded", function()
 	$("#" + parentNodeId + " > span.folder-open").removeClass("folder-open")
 	})
 
-// Temporary link for testing session expiry modal.
-$(document).on("click", ".download", function()
-	{
-	var recordUri = $(event.target).parent().parent().attr("id").substr(11)
-	var recordTitle = $(event.target).parent().parent().data("recordTitle")
-	var recordMimeType = $(event.target).parent().parent().data("recordMimeType")
-	var recordExtension = $(event.target).parent().parent().data("recordExtension")
-	downloadDocument(recordUri, recordTitle, recordExtension, recordMimeType)
-	})
+
 
 $(document).on("click", "#reauthenticate-button", function()
 	{
