@@ -235,3 +235,12 @@
 .fiv-viv{
 	font-size: 24px;
 }
+#records-list-pane{
+	margin: -1px;
+}
+
+#records-list-pane>table>tbody>tr>th{
+	position: sticky;
+	top: 0;
+	z-index: 9999;
+}
