@@ -399,13 +399,17 @@ function getRecordProperties(type, recordUri)
 				success: function(result)
 					{
 					var details = JSON.stringify(result);
+					var dateRegistered = result.Results[0].RecordDateRegistered.DateTime.substr(8, 2) + '/'
+					dateRegistered = dateRegistered + result.Results[0].RecordDateRegistered.DateTime.substr(5, 2) + '/'
+					dateRegistered = dateRegistered + result.Results[0].RecordDateRegistered.DateTime.substr(0, 4) + " at "
+					dateRegistered= dateRegistered + result.Results[0].RecordDateRegistered.DateTime.substr(11, 8)
 					switch(type)
 						{
 						case "folder-intermediate":
 							$("#properties-record-number").html(result.Results[0].RecordNumber.Value)
 							$("#properties-classification").html(result.Results[0].RecordClassification.ClassificationTitle.Value)
 							$("#properties-record-type").html(result.Results[0].RecordRecordType.RecordTypeName.Value)
-							$("#properties-date-registered").html(result.Results[0].RecordDateRegistered.DateTime)
+							$("#properties-date-registered").html(dateRegistered)
 							$("#properties-access-control").html(result.Results[0].RecordAccessControl.Value)
 							$("#properties-retention-schedule").html(result.Results[0].RecordRetentionSchedule.Uri)
 							break;
@@ -413,7 +417,8 @@ function getRecordProperties(type, recordUri)
 							$("#properties-record-number").html(result.Results[0].RecordNumber.Value)
 							$("#properties-container").html(result.Results[0].RecordContainer.RecordNumber.Value + ": " + result.Results[0].RecordContainer.RecordTitle.Value)
 							$("#properties-record-type").html(result.Results[0].RecordRecordType.RecordTypeName.Value)
-							$("#properties-date-registered").html(result.Results[0].RecordDateRegistered.DateTime)
+							$("#properties-date-registered").html(dateRegistered)
+								
 							//$("#properties-access-control").html(result.Results[0].RecordAccessControl.Value)
 							
 							// Upload form.
@@ -425,7 +430,7 @@ function getRecordProperties(type, recordUri)
 							$("#properties-record-number").html(result.Results[0].RecordNumber.Value)
 							$("#properties-container").html(result.Results[0].RecordContainer.RecordNumber.Value + ": " + result.Results[0].RecordContainer.RecordTitle.Value)
 							$("#properties-record-type").html(result.Results[0].RecordRecordType.RecordTypeName.Value)
-							$("#properties-date-registered").html(result.Results[0].RecordDateRegistered.DateTime)
+							$("#properties-date-registered").html(dateRegistered)
 							$("#properties-access-control").html(result.Results[0].RecordAccessControl.Value)
 							break;
 						}
