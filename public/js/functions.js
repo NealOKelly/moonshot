@@ -325,7 +325,15 @@ function getRecords(recordUri)
 						}
 					else
 						{
-						var tableHTML = '<table class="table table-sm"><th style="background-color:#dedede;">Type</th><th style="background-color:#dedede;">Record Number</th><th style="background-color:#dedede;text-align:left;">Title</th><th style="background-color:#dedede;">Date Registered</th><th style="background-color:#dedede;">Download</th>'
+						var tableHTML = '<table id="grid" class="table table-sm">'
+						//tableHTML = tableHTML + '<thead style="background-color:#dedede;""><tr>'
+						tableHTML = tableHTML + '<thead style="background-color:#ffffff;""><tr>'
+						tableHTML = tableHTML + '<th id="th-type" data-type="string" class="unsorted">Type</th>'
+						tableHTML = tableHTML +	'<th id="th-record-number" data-type="string" class="sorted-down">Record Number</i></th>'
+						tableHTML = tableHTML +	'<th id="th-record-title" style="text-align:left;" data-type="string" class="unsorted">Title</th>'
+						tableHTML = tableHTML +	'<th id="th-date-registered" data-type="string" class="unsorted">Date Registered</th>'
+						tableHTML = tableHTML + '<th ">Download</th>'
+						tableHTML = tableHTML + '</tr></thead><tbody">'
 						for(i=0; i<result.TotalResults; i++)
 							{
 							var uri = result.Results[i].Uri;
@@ -341,7 +349,7 @@ function getRecords(recordUri)
 							tableHTML = tableHTML + '<td>' + dateRegistered.DateTime.substr(8, 2) + '/' + dateRegistered.DateTime.substr(5, 2) + '/' + dateRegistered.DateTime.substr(0, 4) + '</td>'
 							tableHTML = tableHTML + '<td><span class="download-grey"></span></td></tr>'
 							}
-						tableHTML = tableHTML + '</table'>
+						tableHTML = tableHTML + '</tbody></table'>
 
 						$("#records-list-pane").html(tableHTML)
 						}

@@ -73,6 +73,81 @@ $(document).on("click", "#upload-button", function()
 	})
 
 
+
+$(document).on("click", "#grid", function()
+	{
+	if (event.target.tagName == 'TH')
+		{
+      	var th = event.target;			
+		if(th.cellIndex!=5)
+			{
+			var currentState;
+			if($(th).hasClass("sorted-down"))
+				{
+				currentState = "sorted-down"
+				}
+			sortGrid($(th).attr("id"), th.cellIndex, th.dataset.type, currentState);				
+			}
+		}
+	})
+
+
+
+function sortGrid(id, colNum, type, currentState)
+	{
+	let tbody = grid.querySelector('tbody');
+	let rowsArray = Array.from(tbody.rows);
+
+	// compare(a, b) compares two rows, need for sorting
+	let compare;
+		
+	switch (type)
+		{
+		case 'number':
+			compare = function(rowA, rowB)
+			{
+            return rowA.cells[colNum].innerHTML - rowB.cells[colNum].innerHTML;
+			};
+			break;
+        case 'string':
+			compare = function(rowA, rowB)
+				{
+				return rowA.cells[colNum].innerHTML > rowB.cells[colNum].innerHTML ? 1 : -1;
+				};
+          	break;
+		}
+
+		//Set all columns to unsorted
+		for(i=1; i<($("#grid tr > th" ).length); i++)
+			{
+			$("#grid tr > th:nth-child(" + i + ")").addClass("unsorted")
+			$("#grid tr > th:nth-child(" + i + ")").removeClass("sorted-up")
+			$("#grid tr > th:nth-child(" + i + ")").removeClass("sorted-down")
+			}
+
+		// sort
+		rowsArray.sort(compare);
+		if(currentState=="sorted-down")
+			{
+			rowsArray.reverse();
+			$("#" + id).addClass("sorted-up")
+			$("#" + id).removeClass("unsorted")
+			}
+		else
+			{
+			$("#" + id).addClass("sorted-down")
+			$("#" + id).removeClass("unsorted")
+			}
+		
+		tbody.append(...rowsArray);
+    }
+
+
+
+
+
+
+
 $(document).on("click", "#upload-status-ok-button", function()
 	{
     $("#upload-status").modal("hide")
@@ -80,6 +155,8 @@ $(document).on("click", "#upload-status-ok-button", function()
 	$("#upload-progress-bar").css("width", "0%")
 	$("#upload-status-ok-button").css("display", "block")
 	})
+
+
 
 
 $(document).on("click", ".record-row", function()

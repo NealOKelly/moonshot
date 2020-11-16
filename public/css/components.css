@@ -236,11 +236,38 @@
 	font-size: 24px;
 }
 #records-list-pane{
-	margin: -1px;
+	margin-top: -1px;
 }
 
-#records-list-pane>table>tbody>tr>th{
+#records-list-pane>table>thead>tr>th{
 	position: sticky;
 	top: 0;
 	z-index: 10;
+	background-color: #dedede;
+	cursor: default;
+}
+
+
+th.unsorted::after{
+	content: " \f0dc";
+    font-family: 'Font Awesome\ 5 Free';
+    font-weight: 900;
+    font-size: 1rem;
+	cursor: pointer;
+}
+
+th.sorted-down::after{
+	content: " \f0dd";
+    font-family: 'Font Awesome\ 5 Free';
+    font-weight: 900;
+    font-size: 1rem;
+	cursor: pointer;
+}
+
+th.sorted-up::after{
+	content: " \f0de";
+    font-family: 'Font Awesome\ 5 Free';
+    font-weight: 900;
+    font-size: 1rem;
+	cursor: pointer;
 }
