@@ -511,24 +511,23 @@ function uploadFile(fileName, extension, file)
 		type: "PUT",
 		data: file,
 		processData: false,
-		//contentType: false,
 		contentType: "multipart/form-data",
 		headers: { Authorization : "Basic bmVhbC5va2VsbHlAZ2lsYnlpbS5jb206Q3JhNTYwNTYh" },
 		success: function (result) 
 			{
-			console.log("This should happen first.")
 			deferredObject.resolve();
-			console.log("Success")
 			$("#upload-progress-bar").css("width", "33%")
 			},
 		error: function(result) 
 			{
+			$("#upload-progress-bar").css("width", "33%")
+			showUploadError()
 			console.log("Error")
-			deferredObject.resolve();
 			}
 		});
 	return deferredObject.promise();
 	}
+
 
 function createRecord(recordTitle, recordType, recordContainerUri, fileName)
 	{
@@ -551,15 +550,13 @@ function createRecord(recordTitle, recordType, recordContainerUri, fileName)
 			{
 			console.log("Record succesfully created.")
 			$("#upload-progress-bar").css("width", "67%")	
-				//console.log(i)
 			attachFileToRecord(result.Results[0].Uri, fileName, recordContainerUri)
-			//deferredObject.resolve(result.Results[0].Uri)
-			//deferredObject.resolveWith(context, ["Can rocks!"])
-
 			}, 
 		error: function(result)
 			{
 			console.log("Oooops!")
+			$("#upload-progress-bar").css("width", "67%")	
+			showUploadError()
 			}
 		});
 		deferredObject.promise()
@@ -569,6 +566,7 @@ function attachFileToRecord(recordUri, fileName, recordContainerUri)
 	{
 	console.log("recordUri: " + recordUri)
 	console.log("fileName: " + fileName)
+	//fileName = "Jonathan"
 	var data = {
 				"Uri": recordUri,
 				"RecordFilePath": fileName,
@@ -584,8 +582,6 @@ function attachFileToRecord(recordUri, fileName, recordContainerUri)
 		xhrFields: { withCredentials: true},
 		success: function(result)
 			{
-			console.log("file attached to record.")
-			console.log(result)
 			// this is similar to clear upload form except that it excludes the container.  Maybe write this better at some point.
 			$("#upload-form-record-title").val("")
 			$("#upload-form-file").val("")
@@ -593,13 +589,27 @@ function attachFileToRecord(recordUri, fileName, recordContainerUri)
 			getRecords(recordContainerUri)
 			$("#upload-progress-bar").css("width", "100%")
 			$("#upload-status-caption").html("Upload completed successfully.")
+			setTimeout(function()
+				{
+				$("#upload-status").modal("hide")
+				$("#upload-progress-bar").css("width", "0%")
+				},
+				500);
 			}, 
 		error: function(result)
 			{
 			console.log("Oooops!")
-			console.log(result)
+			$("#upload-progress-bar").css("width", "100%")
+			showUploadError()
 			}
 		});
+	}
+
+function showUploadError()
+	{
+	$("#upload-progress-bar").addClass("bg-danger")
+	$("#upload-status-caption").html("An error has occured during your upload.  If the problem persists, please contact GilbyIM support.")
+	$("#upload-status-ok-button").css("display", "block")
 	}
 
 function removeAppSessionCookies()

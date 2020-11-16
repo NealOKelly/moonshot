@@ -73,12 +73,12 @@ $(document).on("click", "#upload-button", function()
 	})
 
 
-
-
 $(document).on("click", "#upload-status-ok-button", function()
 	{
     $("#upload-status").modal("hide")
+	$("#upload-progress-bar").addClass("bg-success")
 	$("#upload-progress-bar").css("width", "0%")
+	$("#upload-status-ok-button").css("display", "block")
 	})
 
 
@@ -89,14 +89,15 @@ $(document).on("click", ".record-row", function()
 		//alert("It's a TD, so we know the parent is the row.")
 		var row = $(event.target).parent()
 		//alert(row.attr("id"))
-		$("#classification-treeview li").removeClass("node-selected")
+		//$("#classification-treeview li").removeClass("node-selected")
 		$(".record-row").removeClass("row-selected")
 		$(".record-row > td:nth-child(5) > span").addClass("download-grey")
 		row.addClass("row-selected")
 		$(".record-row > td:nth-child(5) > span").removeClass("download")
 		$("#" + row.attr("id") + " > td:nth-child(5) > span").removeClass("download-grey")
 		$("#" + row.attr("id") + " > td:nth-child(5) > span").addClass("download")
-		
+		drawPropertiesTable("document")
+		getRecordProperties("document", row.attr("id").substr(11))
 		}
 	else
 		{
@@ -104,7 +105,6 @@ $(document).on("click", ".record-row", function()
 			{
 			if($(event.target).hasClass("download"))
 				{
-				//alert("It's the download icon so we do something special.")
 				var row = $(event.target).parent().parent()	
 				row.addClass("row-selected-green")
 				$("#" + row.attr("id") + " > td:nth-child(5) > span").addClass("download-green")
@@ -124,7 +124,6 @@ $(document).on("click", ".record-row", function()
 			else
 				{
 				var row = $(event.target).parent().parent()
-				// They just clicked on the icon.
 				$("#classification-treeview li").removeClass("node-selected")
 				$(".record-row").removeClass("row-selected")
 				$(".record-row > td:nth-child(5) > span").addClass("download-grey")
@@ -132,25 +131,16 @@ $(document).on("click", ".record-row", function()
 				$(".record-row > td:nth-child(5) > span").removeClass("download")
 				$("#" + row.attr("id") + " > td:nth-child(5) > span").removeClass("download-grey")
 				$("#" + row.attr("id") + " > td:nth-child(5) > span").addClass("download")
+				drawPropertiesTable("document")
+				getRecordProperties("document", row.attr("id").substr(11))
 				}
 			}
-		// we do nothing.
-			
-		// now check the class.
-
 		}
-	
-
 	})
-
-
-
-
 
 ///// Classiciation Control Events /////
 function classificationTreeNodeSelected(node)
 	{
-	//$("#records-list-pane").css("display", "none")
 	$("#records-list-pane").html("Select a bottom-level folder to display records.")
 	highlightSelectedNode(node)
 	if((node).attr("id").substr(0, 19) == "classification-uri-")
@@ -299,7 +289,6 @@ $(document).on("click", ".expanded", function()
 	})
 
 
-
 $(document).on("click", "#reauthenticate-button", function()
 	{
 	removeAPISessionCookies();
@@ -318,14 +307,11 @@ $(window).on("beforeunload", function()
     removeAPISessionCookies();  // belt and braces
 	})
 
-
-
 /// To do
 $(document).on("click", ".star", function()
 	{
 	alert("Why have you clicked on this?  THis functionality has not been written yet.  Moron.")
 	})
-
 
 $(document).on("click", ".favourites>a", function()
 	{
@@ -336,7 +322,6 @@ $(document).on("click", ".clock-history", function()
 	{
 	alert("Have you been sent to vex me?")
 	})
-
 
 $(document).on("click", ".recents>a", function()
 	{
