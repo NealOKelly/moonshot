@@ -242,5 +242,5 @@
 #records-list-pane>table>tbody>tr>th{
 	position: sticky;
 	top: 0;
-	z-index: 9999;
+	z-index: 10;
 }
