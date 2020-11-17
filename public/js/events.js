@@ -218,10 +218,18 @@ $(document).on("click", ".record-row", function()
 ///// Classiciation Control Events /////
 function classificationTreeNodeSelected(node)
 	{
+	console.log(node.hasClass("classification-can-attach-records"))
 	$("#records-list-pane").html("Select a bottom-level folder to display records.")
 	highlightSelectedNode(node)
 	if((node).attr("id").substr(0, 19) == "classification-uri-")
 		{
+		$("#upload-form-container").addClass("upload-form-hidden")
+		$("#new-folder-form-container").addClass("new-folder-form-hidden")
+		if(node.hasClass("classification-can-attach-records"))
+			{
+			$("#new-folder-form-container").removeClass("new-folder-form-hidden")	
+			}
+
 		drawPropertiesTable("classification")
 		var classificationUri = node.attr("id").substr(19)
 		getClassificationProperties(classificationUri)
@@ -232,6 +240,7 @@ function classificationTreeNodeSelected(node)
 			{
 			if($(node).hasClass("folder-intermediate"))
 				{
+				$("#new-folder-form-container").addClass("new-folder-form-hidden")
 				drawPropertiesTable("folder-intermediate")
 				getRecordProperties("folder-intermediate", node.attr("id").substr(11))	
 				}
@@ -283,7 +292,11 @@ $(document).on("click", ".record-title>a", function()
 	{
 	var node = $(event.target).parent().parent();
 	highlightSelectedNode(node)
-
+	$("#new-folder-form-container").addClass("new-folder-form-hidden")
+	$(".record-row").removeClass("row-selected")
+	$(".record-row > td:nth-child(5) > span").addClass("download-grey")
+	$(".record-row > td:nth-child(5) > span").removeClass("download")
+	
 	if($(node).hasClass("folder-intermediate"))
 		{
 		$("#records-list-pane").html("Select a bottom-level folder to display records.")
@@ -298,6 +311,7 @@ $(document).on("click", ".record-title>a", function()
 		if($(node).hasClass("folder-terminal"))
 			{
 			$("#records-list-pane").css("display", "block")
+			
 			drawPropertiesTable("folder-terminal")
 			getRecordProperties("folder-terminal", node.attr("id").substr(11))
 			getRecords(node.attr("id").substr(11))

@@ -69,12 +69,14 @@ function refreshClassificationNodes(parentNodeId)
 				var q="parent:" + parentNodeId.substr(19);
 				$.ajax(
 					{
-					url: baseUrl + "/" + apiPath + "/Search?q=" + q + "&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern&trimtype=Classification&pageSize=1000000",
+					url: baseUrl + "/" + apiPath + "/Search?q=" + q + "&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern,ClassificationIdNumber&trimtype=Classification&pageSize=1000000",
 					type: "POST",
 					contentType: 'application/json',
 					xhrFields: { withCredentials: true},
 					success: function(result)
 						{
+						//console.log(result)	
+						
 						if(!$("#" + parentNodeId + " > ul").length)
 							{
 							if(result.TotalResults>0)
@@ -86,7 +88,7 @@ function refreshClassificationNodes(parentNodeId)
 							{
 							if(!$("#classification-uri-" + result.Results[i].Uri).length)
 								{
-								addClassificationNode("#" + parentNodeId + " > ul", result.Results[i].Uri, result.Results[i].ClassificationName.Value, result.Results[i].ClassificationCanAttachRecords.Value, result.Results[i].ClassificationChildPattern.Value)
+								addClassificationNode("#" + parentNodeId + " > ul", result.Results[i].Uri, result.Results[i].ClassificationName.Value, result.Results[i].ClassificationCanAttachRecords.Value, result.Results[i].ClassificationChildPattern.Value, result.Results[i].ClassificationIdNumber.Value)
 								}
 							}
 						for(i=0; i<$("#" + parentNodeId + " > ul > li").length; i++)  // for each <li>
@@ -124,9 +126,9 @@ function refreshClassificationNodes(parentNodeId)
 	}
 
 
-function addClassificationNode(rootNode, classificationUri, classificationName, canAttachRecords, classificationChildPattern)
+function addClassificationNode(rootNode, classificationUri, classificationName, canAttachRecords, classificationChildPattern, classificationNumber)
 	{
-	$(rootNode).append("<li id='classification-uri-" + classificationUri + "'><span class='collapsed'></span><span class='folder'></span><span class='classification-name'><a>" + classificationName + "</a></span></li>")
+	$(rootNode).append("<li id='classification-uri-" + classificationUri + "' data-classification-number='" + classificationNumber + "'><span class='collapsed'></span><span class='folder'></span><span class='classification-name'><a>" + classificationName + "</a></span></li>")
 	if(canAttachRecords)								
 		{
 		$("#classification-uri-" + classificationUri).addClass("classification-can-attach-records")		
