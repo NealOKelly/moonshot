@@ -274,3 +274,7 @@ th.sorted-up::after{
     font-size: 1rem;
 	cursor: pointer;
 }
+
+.no-records{
+	padding-top: 35%;
+}

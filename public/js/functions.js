@@ -330,7 +330,7 @@ function getRecords(recordUri)
 					var details = JSON.stringify(result);
 					if(result.TotalResults=="0")
 						{
-						$("#records-list-pane").html("The selected folder does not contain any records.")		
+						$("#records-list-pane").html("<div class='no-records'>The selected folder does not contain any records.</div>")		
 						}
 					else
 						{
@@ -440,7 +440,7 @@ function getRecordProperties(type, recordUri)
 							
 							// Upload form.
 							clearUploadForm()
-							$("#upload-form-record-container").val(result.Results[0].RecordContainer.RecordNumber.Value + ": " + result.Results[0].RecordContainer.RecordTitle.Value)
+							$("#upload-form-record-container").val(result.Results[0].RecordNumber.Value + ": " + result.Results[0].RecordTitle.Value)
 							$("#upload-form-record-container").data("recordUri", result.Results[0].Uri)
 							break;
 						case "document":

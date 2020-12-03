@@ -223,7 +223,7 @@ $(document).on("click", ".record-row", function()
 function classificationTreeNodeSelected(node)
 	{
 	console.log(node.hasClass("classification-can-attach-records"))
-	$("#records-list-pane").html("Select a bottom-level folder to display records.")
+	$("#records-list-pane").html("<div class='no-records'>Select a bottom-level folder to display records.</div>")
 	highlightSelectedNode(node)
 	if((node).attr("id").substr(0, 19) == "classification-uri-")
 		{
@@ -310,7 +310,7 @@ $(document).on("click", ".record-title>a", function()
 	
 	if($(node).hasClass("folder-intermediate"))
 		{
-		$("#records-list-pane").html("Select a bottom-level folder to display records.")
+		$("#records-list-pane").html("<div class='no-records'>Select a bottom-level folder to display records.</div>")
 		//$("#records-list-pane").css("display", "none")
 		drawPropertiesTable("folder-intermediate")
 		getRecordProperties("folder-intermediate", node.attr("id").substr(11))	
