@@ -227,7 +227,14 @@ function classificationTreeNodeSelected(node)
 		$("#new-folder-form-container").addClass("new-folder-form-hidden")
 		if(node.hasClass("classification-can-attach-records"))
 			{
-			$("#new-folder-form-container").removeClass("new-folder-form-hidden")	
+			var classification = node.data("classificationNumber")
+			var classification = classification + " - " +  $("#" + node.attr("id") + " span:nth-child(3) > a").html()
+			
+			$("#new-folder-form-record-classification").val(classification)
+			$("#new-folder-form-record-classification").data("classificationUri", (node).attr("id").substr(19))
+			// $("#" + node.attr("id") + "ul > li span:nth-child(3) > a").html()
+			$("#new-folder-form-container").removeClass("new-folder-form-hidden")
+			console.log()
 			}
 
 		drawPropertiesTable("classification")
@@ -378,6 +385,20 @@ $(document).on("click", ".expanded", function()
 	$("#" + parentNodeId + " > span.folder-open").addClass("folder")
 	$("#" + parentNodeId + " > span.folder-open").removeClass("folder-open")
 	})
+
+// Create Folder
+$(document).on("click", "#create-folder-button", function()
+	{
+	if($("#new-folder-form-record-title").val().length)
+		{
+		$("#create-folder-status").modal("show")
+		recordTitle = $("#new-folder-form-record-title").val()
+		recordClassificationUri = $("#new-folder-form-record-classification").data("classificationUri")
+		recordType = $("#new-folder-form-record-type").val()
+		createFolder(recordTitle, recordClassificationUri, recordType)	
+		}
+	})
+
 
 
 $(document).on("click", "#reauthenticate-button", function()

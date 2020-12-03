@@ -142,10 +142,14 @@ function addClassificationNode(rootNode, classificationUri, classificationName, 
 
 function refreshFolderNodes(parentNodeType, parentNodeId)
 	{
+	console.log("refreshFolderNodes has been called")
+	console.log("parentNodeType: " + parentNodeType)
+	console.log("parentNodeId: " + parentNodeId)
 	getAuthenticationStatus().then(function () 
 		{
 		if(isAuthenticated)
 			{
+			console.log("isAuthenticated")
 			$("#" + parentNodeId + " > ul").addClass("classification-hidden") // if already exists, hide.
 	
 			var includedProperties = "RecordTitle, RecordRecordType, RecordTypeContentsRule, RecordContainer";
@@ -157,6 +161,7 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 				xhrFields: { withCredentials: true},
 				success: function(result)
 					{
+					console.log("xhr success")
 					var recordTypeDefinitions = result;
 					if(parentNodeType=="classification")
 						{
@@ -182,6 +187,7 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 								{
 								if(result.TotalResults>0)
 									{
+									//$("#" + parentNodeId).append("<ul style='list-style-type:none;' class='classification-hidden'></ul>") // create hidden
 									$("#" + parentNodeId).append("<ul style='list-style-type:none;' class='classification-hidden'></ul>") // create hidden
 									}
 								}
@@ -189,6 +195,7 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 								{
 								if(!$("#record-uri-" + result.Results[i].Uri).length)  // for each search result, check whether the <li> exists and, if not, create it.
 									{
+									console.log("Node does not exist")
 									for(x=0; x<recordTypeDefinitions.TotalResults; x++)
 										{
 										if(result.Results[i].RecordRecordType.Uri==recordTypeDefinitions.Results[x].Uri)
@@ -544,9 +551,59 @@ function uploadFile(fileName, extension, file)
 	}
 
 
+function createFolder(recordTitle, recordClassificationUri, recordType)
+	{
+	console.log("recordTitle: " + recordTitle)
+	console.log("recordClassificationUri: " + recordClassificationUri)
+	console.log("recordType: " + recordType)
+		
+	var url = baseUrl + "/" + apiPath + "/Record"
+	var data = {
+				"RecordTitle" : recordTitle,
+				"RecordRecordType" : recordType,
+				"RecordClassification" : recordClassificationUri
+				}
+
+	$.ajax(
+		{
+		url: url,
+		data: JSON.stringify(data),
+		type: "POST",
+		contentType: 'application/json',
+		xhrFields: { withCredentials: true},
+		success: function(result)
+			{
+			//refreshClassificationNodes("#classification-uri-" + recordClassificationUri.parent().parent().attr("id"))
+			//refreshFolderNodes("classification", $("#classification-uri-" + )
+			//refreshFolderNodes("classification", "#classification-uri-" + recordClassificationUri)
+			console.log("Record succesfully created.")
+			$("#create-folder-progress-bar").css("width", "100%")
+			$("#create-folder-caption").html("Folder created successfully.")
+			setTimeout(function()
+				{
+				$("#create-folder-status").modal("hide")
+				$("#create-folder-progress-bar").css("width", "0%")
+				},
+				500);
+			}, 
+		error: function(result)
+			{
+			console.log("Oooops!")
+//			$("#upload-progress-bar").css("width", "67%")	
+//			showUploadError()
+			}
+		});	
+		
+		
+	}
+
+
+
+
+
 function createRecord(recordTitle, recordType, recordContainerUri, fileName)
 	{
-	var deferredObject = $.Deferred();
+	//var deferredObject = $.Deferred();
 	var url = baseUrl + "/" + apiPath + "/Record"
 	var data = {
 				"RecordTitle" : recordTitle,
@@ -574,7 +631,7 @@ function createRecord(recordTitle, recordType, recordContainerUri, fileName)
 			showUploadError()
 			}
 		});
-		deferredObject.promise()
+		//deferredObject.promise()
 	}
 
 function attachFileToRecord(recordUri, fileName, recordContainerUri)
