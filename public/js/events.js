@@ -3,8 +3,10 @@ var isAuthenticated = false;
 
 $(document).ready(function()
 	{
+	$('#dummy-modal').modal('show')
 	preauthenticateApi().then(function()
 		{
+		
   	   	// populate the #classification-data div
 		var url = baseUrl + "/" + apiPath + "/Search?q=all&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern&trimtype=Classification&pageSize=1000000"
 		$.ajax(
@@ -15,6 +17,7 @@ $(document).ready(function()
 			contentType: 'application/json', 
 			success: function(result)
 			{
+			console.log("Ajax Success")
 			var classifications = result;
 			for(var i=0; i<classifications.TotalResults; i++)  // populate top level classifications.
 				{
@@ -29,6 +32,7 @@ $(document).ready(function()
 				}	
 				// sort	 this list.
 				sortClassificationTree(".classification-name")
+				hideDummyModal()
 				}, 
 			error: function(result)
 				{

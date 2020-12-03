@@ -717,5 +717,11 @@ function getFileExtension(fileName)
 	return fileName.slice((fileName.lastIndexOf(".") - 1 >>> 0) + 2);
 	}
 
-
+function hideDummyModal() 
+	{
+    $('#dummy-modal').on('shown.bs.modal', function (e)
+		{
+        $("#dummy-modal").modal('hide');
+    	})
+	}
 
