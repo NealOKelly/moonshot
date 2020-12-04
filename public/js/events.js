@@ -37,6 +37,9 @@ $(document).ready(function()
 			error: function(result)
 				{
 				console.log("Oooops!")
+				console.log(result)
+				hideDummyModal()
+				$('#connection-failed').modal('show')
 				}
 			});
 		})
