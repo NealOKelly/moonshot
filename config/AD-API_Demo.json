@@ -1,0 +1,16 @@
+{
+"Dataset" : 
+	{
+	"DatasetId" : "AD",
+	"DatasetName" : "API Demo"
+	},
+"Url" :
+	{
+	"ApplicationBaseUrl" : "https://beta.gilbyim.com",
+	"APIPath" : "CMServiceAPI"		
+	},
+"ExcludedRecordTypes" : [
+						"Document",
+						"Folder"
+						]
+}

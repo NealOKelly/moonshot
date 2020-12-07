@@ -14,15 +14,20 @@
     <!-- Favicons -->
 	<link rel="icon" href="favicon.ico">
 
-	  <!-- Custom styles for this template -->
+	<!-- Custom styles for this template -->
     <link href="css/main.css" rel="stylesheet">
 	<link href="css/file-icon-vivid.css" rel="stylesheet" />
 	<link href="css/components.css" rel="stylesheet">
 	
 	<script src="https://kit.fontawesome.com/9e9c0c7a75.js" crossorigin="anonymous"></script>
-    <script>
-		var baseUrl = "<%= baseUrl %>"
-		var apiPath = "<%= apiPath %>"            
+    
+	<!-- Configuration variables -->  
+	<script>
+		var config = JSON.parse("<%=config%>".replace(/&#34;/g, '"'))
+		var hasPreAuthenticated = false;
+		var isAuthenticated = false;
+		var baseUrl = config.Url.ApplicationBaseUrl
+		var apiPath = config.Url.APIPath
     </script>
 
   </head>

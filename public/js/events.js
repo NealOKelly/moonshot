@@ -1,6 +1,3 @@
-var hasPreAuthenticated = false;
-var isAuthenticated = false;
-
 $(document).ready(function()
 	{
 	$('#dummy-modal').modal('show')
