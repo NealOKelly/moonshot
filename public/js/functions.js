@@ -615,10 +615,7 @@ function createRecord(recordTitle, recordType, recordContainerUri, fileName)
 		error: function(result)
 			{
 			console.log("Oooops!")
-				console.log($("#upload-status-caption").length)
-				console.log($("#upload-status-caption").html())
 			$("#upload-status-caption").html(result.responseJSON.ResponseStatus.Message)
-			console.log(result.responseJSON.ResponseStatus.Message)
 			$("#upload-progress-bar").css("width", "67%")	
 			showUploadError(result.responseJSON.ResponseStatus.Message)
 			}
