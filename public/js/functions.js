@@ -593,6 +593,7 @@ function createFolder(recordTitle, recordClassificationUri, recordType)
 
 function createRecord(recordTitle, recordType, recordContainerUri, fileName)
 	{
+	console.log(recordType)
 	var url = baseUrl + "/" + apiPath + "/Record"
 	var data = {
 				"RecordTitle" : recordTitle,

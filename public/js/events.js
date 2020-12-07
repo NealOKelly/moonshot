@@ -158,6 +158,7 @@ function sortGrid(id, colNum, type, currentState)
 $(document).on("click", "#upload-status-ok-button", function()
 	{
     $("#upload-status").modal("hide")
+	$("#upload-progress-bar").removeClass("bg-danger")
 	$("#upload-progress-bar").addClass("bg-success")
 	$("#upload-progress-bar").css("width", "0%")
 	$("#upload-status-ok-button").css("display", "block")
