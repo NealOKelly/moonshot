@@ -298,9 +298,10 @@ $(document).on("click", ".folder-fill", function()
 		getRecords(node.attr("id").substr(11))
 		}
 	clearUploadForm()
+	// It would be easier to read is we got the Container details to populated the New Record form here instead of as part of getRecordProperties, although it would require an extra API call.  Consider changing.
+	populateRecordTypeField("folder-terminal")
 	$("#upload-form-container").removeClass("upload-form-hidden")
 	})
-
 
 $(document).on("click", ".record-title>a", function()
 	{
@@ -314,7 +315,6 @@ $(document).on("click", ".record-title>a", function()
 	if($(node).hasClass("folder-intermediate"))
 		{
 		$("#records-list-pane").html("<div class='no-records'>Select a bottom-level folder to display records.</div>")
-		//$("#records-list-pane").css("display", "none")
 		drawPropertiesTable("folder-intermediate")
 		getRecordProperties("folder-intermediate", node.attr("id").substr(11))	
 		$("#upload-form-container").addClass("upload-form-hidden")
@@ -324,11 +324,12 @@ $(document).on("click", ".record-title>a", function()
 		{
 		if($(node).hasClass("folder-terminal"))
 			{
-			$("#records-list-pane").css("display", "block")
-			
+			//$("#records-list-pane").css("display", "block")
 			drawPropertiesTable("folder-terminal")
 			getRecordProperties("folder-terminal", node.attr("id").substr(11))
 			getRecords(node.attr("id").substr(11))
+			// It would be easier to read is we got the Container details to populated the New Record form here instead of as part of getRecordProperties, although it would require an extra API call.  Consider changing.
+			populateRecordTypeField("folder-terminal")
 			$("#upload-form-container").removeClass("upload-form-hidden")
 			}
 		}

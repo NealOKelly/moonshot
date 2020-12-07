@@ -75,8 +75,6 @@ function refreshClassificationNodes(parentNodeId)
 					xhrFields: { withCredentials: true},
 					success: function(result)
 						{
-						//console.log(result)	
-						
 						if(!$("#" + parentNodeId + " > ul").length)
 							{
 							if(result.TotalResults>0)
@@ -335,7 +333,6 @@ function getRecords(recordUri)
 					else
 						{
 						var tableHTML = '<table id="grid" class="table table-sm">'
-						//tableHTML = tableHTML + '<thead style="background-color:#dedede;""><tr>'
 						tableHTML = tableHTML + '<thead style="background-color:#ffffff;""><tr>'
 						tableHTML = tableHTML + '<th id="th-type" data-type="string" class="unsorted">Type</th>'
 						tableHTML = tableHTML +	'<th id="th-record-number" data-type="string" class="sorted-down">Record Number</i></th>'
@@ -573,44 +570,35 @@ function createFolder(recordTitle, recordClassificationUri, recordType)
 		xhrFields: { withCredentials: true},
 		success: function(result)
 			{
-			//refreshClassificationNodes("#classification-uri-" + recordClassificationUri.parent().parent().attr("id"))
-			//refreshFolderNodes("classification", $("#classification-uri-" + )
-			//refreshFolderNodes("classification", "#classification-uri-" + recordClassificationUri)
-			console.log("Record succesfully created.")
 			$("#create-folder-progress-bar").css("width", "100%")
 			$("#create-folder-caption").html("Folder created successfully.")
+			$("#new-folder-form-record-title").val("")
+			refreshFolderNodes("classification", "classification-uri-" + recordClassificationUri)
 			setTimeout(function()
 				{
 				$("#create-folder-status").modal("hide")
 				$("#create-folder-progress-bar").css("width", "0%")
+				$("#create-folder-caption").html("Creating folder...")
 				},
 				500);
 			}, 
 		error: function(result)
 			{
 			console.log("Oooops!")
-//			$("#upload-progress-bar").css("width", "67%")	
-//			showUploadError()
+			$("#upload-progress-bar").css("width", "67%")	
+			showUploadError()
 			}
 		});	
-		
-		
 	}
-
-
-
-
 
 function createRecord(recordTitle, recordType, recordContainerUri, fileName)
 	{
-	//var deferredObject = $.Deferred();
 	var url = baseUrl + "/" + apiPath + "/Record"
 	var data = {
 				"RecordTitle" : recordTitle,
 				"RecordRecordType" : recordType,
 				"RecordContainer" : recordContainerUri
 				}
-
 	$.ajax(
 		{
 		url: url,
@@ -627,18 +615,18 @@ function createRecord(recordTitle, recordType, recordContainerUri, fileName)
 		error: function(result)
 			{
 			console.log("Oooops!")
+				console.log($("#upload-status-caption").length)
+				console.log($("#upload-status-caption").html())
+			$("#upload-status-caption").html(result.responseJSON.ResponseStatus.Message)
+			console.log(result.responseJSON.ResponseStatus.Message)
 			$("#upload-progress-bar").css("width", "67%")	
-			showUploadError()
+			showUploadError(result.responseJSON.ResponseStatus.Message)
 			}
 		});
-		//deferredObject.promise()
 	}
 
 function attachFileToRecord(recordUri, fileName, recordContainerUri)
 	{
-	console.log("recordUri: " + recordUri)
-	console.log("fileName: " + fileName)
-	//fileName = "Jonathan"
 	var data = {
 				"Uri": recordUri,
 				"RecordFilePath": fileName,
@@ -677,11 +665,22 @@ function attachFileToRecord(recordUri, fileName, recordContainerUri)
 		});
 	}
 
-function showUploadError()
+function showUploadError(trimError)
 	{
-	$("#upload-progress-bar").addClass("bg-danger")
-	$("#upload-status-caption").html("An error has occured during your upload.  If the problem persists, please contact GilbyIM support.")
-	$("#upload-status-ok-button").css("display", "block")
+	console.log(trimError)
+	if(trimError)
+		{
+		$("#upload-progress-bar").addClass("bg-danger")
+		$("#upload-status-caption").html(trimError)
+		$("#upload-status-ok-button").css("display", "block")
+		}
+	else
+		{
+		$("#upload-progress-bar").addClass("bg-danger")
+		$("#upload-status-caption").html("An error has occured during your upload.  If the problem persists, please contact GilbyIM support.")
+		$("#upload-status-ok-button").css("display", "block")
+		}
+
 	}
 
 function removeAppSessionCookies()
@@ -702,6 +701,7 @@ function removeAPISessionCookies()
 function clearUploadForm()
 	{
 	$("#upload-form-record-container").val("")
+	//$("#upload-form-record-type").html("")
 	}
 
 
@@ -719,9 +719,45 @@ function getFileExtension(fileName)
 
 function hideDummyModal() 
 	{
-    $('#dummy-modal').on('shown.bs.modal', function (e)
+	console.log("hideDummyModal() has been called.")
+	setTimeout(function()
 		{
-        $("#dummy-modal").modal('hide');
-    	})
+  		$("#dummy-modal").modal('hide');
+		},
+		300); // this delay ensure the modal has properly been show before attempting to hide it.
 	}
 
+function populateRecordTypeField(parentNodeType)
+	{
+	$("#upload-form-record-type").html("")
+	if(parentNodeType=="folder-terminal")
+		{
+		console.log("This is a terminal folder.")
+		var url = baseUrl + "/" + apiPath + "/Search?q=all&properties=RecordTypeName,RecordTypeUsualBehaviour&trimtype=RecordType"
+		$.ajax(
+			{
+			url: url,
+			type: "POST",
+			xhrFields: { withCredentials: true},
+			contentType: 'application/json',
+			success: function(result)
+				{
+				for(i=0; i<result.Results.length;i++)
+					{
+					if(result.Results[i].RecordTypeUsualBehaviour.Value=="Document")
+						{
+						$("#upload-form-record-type").append("<option>" + result.Results[i].RecordTypeName.Value + "</option>")
+						}
+					}
+				if($("#upload-form-record-type option").length<2)
+					{
+					$("#upload-form-record-type").attr("readonly", "true")
+					}
+				}, 
+			error: function(result)
+				{
+				console.log("Oooops!")
+				}
+			});		
+		}
+	}
