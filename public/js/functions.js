@@ -744,7 +744,24 @@ function populateRecordTypeField(parentNodeType)
 					{
 					if(result.Results[i].RecordTypeUsualBehaviour.Value=="Document")
 						{
-						$("#upload-form-record-type").append("<option>" + result.Results[i].RecordTypeName.Value + "</option>")
+						var exclude = false;
+						for(x=0; x<config.ExcludedRecordTypes.length; x++)
+							{
+								console.log("Search: " + result.Results[i].RecordTypeName.Value)
+								console.log("Config: " + config.ExcludedRecordTypes[x])
+							if(result.Results[i].RecordTypeName.Value==config.ExcludedRecordTypes[x])
+								{
+								exclude = true;
+								console.log("Hello Dolly")		
+
+								}
+							
+							}
+						console.log("exclude: " + exclude)
+						if(!exclude)
+							{
+							$("#upload-form-record-type").append("<option>" + result.Results[i].RecordTypeName.Value + "</option>")	
+							}
 						}
 					}
 				if($("#upload-form-record-type option").length<2)

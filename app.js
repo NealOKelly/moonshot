@@ -11,13 +11,11 @@ var passport = require('passport'),
 
 var app = express();
 require('dotenv').config();
-const applicationBaseUrl = process.env['APPLICATION_BASE_URL']
-const contentManagerServiceAPIPath = process.env['CONTENT_MANAGER_SERVICE_API_PATH'];
 const idpLogoutURL = process.env['PASSPORT_SAML_LOGOUT_URL'];
 const contentManagerDatasetId = process.env['CONTENT_MANAGER_DATASET_ID'];
 const contentManagerDatasetName = process.env['CONTENT_MANAGER_DATASET_NAME'];
 
-console.log("Config file: " + contentManagerDatasetId + "-" + contentManagerDatasetName.replace(/ /g, "_"))
+//console.log("Config file: " + contentManagerDatasetId + "-" + contentManagerDatasetName.replace(/ /g, "_"))
 var config = fs.readFileSync("./config/" + contentManagerDatasetId + "-" + contentManagerDatasetName.replace(/ /g, "_") + ".json")
 
 console.log(JSON.parse(config))
@@ -58,7 +56,7 @@ require('./modules/passport/passport.js');
 // Routes
 app.get('/', ensureAuthenticated, function(req, res)
 	{
-	res.render('index', { user: req.user, title: "Moonshot", baseUrl: applicationBaseUrl, apiPath: contentManagerServiceAPIPath, config: JSON.stringify(JSON.parse(config)) });
+	res.render('index', { user: req.user, title: "GilbyIM Light", config: JSON.stringify(JSON.parse(config)) });
 	});
 
 app.get('/login',
