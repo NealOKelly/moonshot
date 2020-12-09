@@ -59,3 +59,14 @@ code {
     background-color: #75b540;
     border-color: #75b540;
 }
+
+
+
+#left-panel{
+	background-color: #d2232a;
+	background-color: #75b540;
+	color: white;
+	height: 100%;
+	overflow: auto;
+	white-space: nowrap;
+}
