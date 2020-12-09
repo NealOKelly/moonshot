@@ -15,9 +15,9 @@ const idpLogoutURL = process.env['PASSPORT_SAML_LOGOUT_URL'];
 const contentManagerDatasetId = process.env['CONTENT_MANAGER_DATASET_ID'];
 const contentManagerDatasetName = process.env['CONTENT_MANAGER_DATASET_NAME'];
 //const siteLogo = process.env['SITE_LOGO'];
-brandingCss = process.env['BRANDING_CSS'];
+brandingName = process.env['BRANDING_NAME'];
 
-console.log(brandingCss)
+console.log(brandingName)
 
 //console.log("Config file: " + contentManagerDatasetId + "-" + contentManagerDatasetName.replace(/ /g, "_"))
 var config = fs.readFileSync("./config/" + contentManagerDatasetId + "-" + contentManagerDatasetName.replace(/ /g, "_") + ".json")
@@ -60,7 +60,7 @@ require('./modules/passport/passport.js');
 // Routes
 app.get('/', ensureAuthenticated, function(req, res)
 	{
-	res.render('index', { user: req.user, title: "GilbyIM Light", config: JSON.stringify(JSON.parse(config)), brandingCss: brandingCss });
+	res.render('index', { user: req.user, title: "GilbyIM Light", config: JSON.stringify(JSON.parse(config)), brandingName: brandingName });
 	});
 
 app.get('/login',
