@@ -60,7 +60,22 @@ code {
     border-color: #75b540;
 }
 
-
+#site-logo{
+	display: inline-block;
+	height: 56px;
+	width: 56px;
+	/*width: 121px;*/
+	/*background-image: url("../img/lgfl_logo.png");*/
+	background-image: url("../img/rt_logo.png");
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: 100% 100%;
+	/*background-size: 75% 75%;*/
+	margin-top: -.5rem;
+	margin-bottom: -.5rem;
+	margin-left: -.5rem;
+	/*margin-left: -1.5rem;*/	
+}
 
 #left-panel{
 	background-color: #d2232a;
