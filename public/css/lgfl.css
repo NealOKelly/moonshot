@@ -6,10 +6,6 @@ main > .container {
   padding: 60px 15px 0;
 }
 
-.footer {
-  background-color: #555 !important;
-}
-
 .footer > .container {
   padding-right: 15px;
   padding-left: 15px;
@@ -20,44 +16,10 @@ code {
 }
 
 
-/* Neal's Stuff
+/* Custom Branding
 -------------------------------------------------- */
 .navbar-dark{
-	background-color: #000033 !important;
-}
-
-.btn-primary {
-	background-color: #75b540;
-	border-color: #75b540;
-}
-
-.btn-primary:active {
-	background-color: #75b540;
-	border-color: #75b540;
-}
-
-.btn-primary:focus {
-	background-color: #75b540;
-	border-color: #75b540;
-}
-
-.btn-primary:visited {
-	background-color: #75b540;
-	border-color: #75b540;
-}
-
-.btn-outline-success {
-    color: #75b540;
-    background-color: transparent;
-    background-image: none;
-    border-color: #75b540;
-}
-
-
-.btn-outline-success:hover {
-    color: #fff;
-    background-color: #75b540;
-    border-color: #75b540;
+	background-color: #222 !important;
 }
 
 #site-logo{
@@ -75,9 +37,42 @@ code {
 
 #left-panel{
 	background-color: #d2232a;
-	background-color: #75b540;
 	color: white;
 	height: 100%;
 	overflow: auto;
 	white-space: nowrap;
+}
+
+.footer {
+  background-color: #444 !important;
+}
+
+.btn-primary {
+	background-color: #d2232a;
+	border-color: #d2232a;
+}
+
+.btn-primary:not(:disabled):not(.disabled).active, .btn-primary:not(:disabled):not(.disabled):active, .show>.btn-primary.dropdown-toggle{
+	background-color: #d2232a;
+	border-color: #d2232a;
+}
+
+.btn-primary:not(:disabled):not(.disabled).active:focus, .btn-primary:not(:disabled):not(.disabled):active:focus, .show>.btn-primary.dropdown-toggle:focus{
+	box-shadow: 0 0 0 0.2rem #fff;
+}
+
+.btn-primary:focus {
+	background-color: #d2232a;
+	border-color: #d2232a;
+	box-shadow: 0 0 0 0.2rem #fff;
+}
+
+.btn-primary:visited {
+	background-color: #d2232a;
+	border-color: #d2232a;
+}
+
+.btn-primary:hover {
+	background-color: #d2232a;
+	border-color: #d2232a;
 }
