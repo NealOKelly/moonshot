@@ -16,7 +16,7 @@ code {
 }
 
 
-/* Custom Branding
+/* Layout
 -------------------------------------------------- */
 .navbar-dark{
 	background-color: #000033 !important;
@@ -47,6 +47,22 @@ code {
   background-color: #555 !important;
 }
 
+/* Modals
+-------------------------------------------------- */
+
+.modal-header>span{
+	display: inline-block;
+	height: 25px;
+	width: 150px;
+	background-image: url("../img/gilbyim_logo.png");
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: 100% 100%;
+}
+
+
+/* Buttons
+-------------------------------------------------- */
 .btn-primary {
 	background-color: #75b540;
 	border-color: #75b540;
