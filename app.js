@@ -82,7 +82,6 @@ app.post('/login/callback',
 
 app.get('/authentication-status', function(req, res, next)
 	{
-	console.log(req.isAuthenticated())
 	if(req.isAuthenticated())
 		{
 		res.send(true)
