@@ -60,7 +60,7 @@ require('./modules/passport/passport.js');
 // Routes
 app.get('/', ensureAuthenticated, function(req, res)
 	{
-	res.render('index', { user: req.user, title: "GilbyIM Light", config: JSON.stringify(JSON.parse(config)), brandingName: brandingName });
+	res.render('index', { user: req.user, title: "GilbyIM Lite", config: JSON.stringify(JSON.parse(config)), brandingName: brandingName });
 	});
 
 app.get('/login',
