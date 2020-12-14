@@ -375,24 +375,34 @@ function getRecords(recordUri)
 
 function getClassificationProperties(classificationUri)
 	{
-	var url = baseUrl + "/" + apiPath + "/Search?q=" + classificationUri + "&properties=ClassificationName, ClassificationTitle, ClassificationIdNumber, AccessControl&trimtype=Classification"
-	$.ajax(
+	getAuthenticationStatus().then(function () 
 		{
-		url: url,
-		type: "POST",
-		xhrFields: { withCredentials: true},
-		contentType: 'application/json',
-		success: function(result)
+		if(isAuthenticated)
 			{
-			var details = JSON.stringify(result);
-			$("#properties-classification-title").html(result.Results[0].ClassificationTitle.Value)
-			$("#properties-classification-number").html(result.Results[0].ClassificationIdNumber.Value)
-			$("#properties-classification-access-control").html(result.Results[0].ClassificationAccessControl.Value)
+			var url = baseUrl + "/" + apiPath + "/Search?q=" + classificationUri + "&properties=ClassificationName, ClassificationTitle, ClassificationIdNumber, AccessControl&trimtype=Classification"
+			$.ajax(
+				{
+				url: url,
+				type: "POST",
+				xhrFields: { withCredentials: true},
+				contentType: 'application/json',
+				success: function(result)
+					{
+					var details = JSON.stringify(result);
+					$("#properties-classification-title").html(result.Results[0].ClassificationTitle.Value)
+					$("#properties-classification-number").html(result.Results[0].ClassificationIdNumber.Value)
+					$("#properties-classification-access-control").html(result.Results[0].ClassificationAccessControl.Value)
 
-			}, 
-		error: function(result)
+					}, 
+				error: function(result)
+					{
+					console.log("Oooops!")
+					}
+				});
+			}
+		else
 			{
-			console.log("Oooops!")
+			$("#session-expired").modal("show")
 			}
 		});
 	}
@@ -524,24 +534,34 @@ function downloadDocument(recordUri, recordTitle, recordExtension, recordMimeTyp
 function uploadFile(fileName, extension, file)
 	{
 	var deferredObject = $.Deferred();
-	jQuery.ajax(
+	getAuthenticationStatus().then(function () 
 		{
-		url: "https://api.gilbyim.com/WebDAV/Uploads/" + fileName + "." + extension,
-		type: "PUT",
-		data: file,
-		processData: false,
-		contentType: "multipart/form-data",
-		headers: { Authorization : "Basic bmVhbC5va2VsbHlAZ2lsYnlpbS5jb206Q3JhNTYwNTYh" },
-		success: function (result) 
+		if(isAuthenticated)
 			{
-			deferredObject.resolve();
-			$("#upload-progress-bar").css("width", "33%")
-			},
-		error: function(result) 
+			jQuery.ajax(
+				{
+				url: "https://api.gilbyim.com/WebDAV/Uploads/" + fileName + "." + extension,
+				type: "PUT",
+				data: file,
+				processData: false,
+				contentType: "multipart/form-data",
+				headers: { Authorization : "Basic bmVhbC5va2VsbHlAZ2lsYnlpbS5jb206Q3JhNTYwNTYh" },
+				success: function (result) 
+					{
+					deferredObject.resolve();
+					$("#upload-progress-bar").css("width", "33%")
+					},
+				error: function(result) 
+					{
+					$("#upload-progress-bar").css("width", "33%")
+					showUploadError()
+					console.log("Error")
+					}
+				});
+			}
+		else
 			{
-			$("#upload-progress-bar").css("width", "33%")
-			showUploadError()
-			console.log("Error")
+			$("#session-expired").modal("show")
 			}
 		});
 	return deferredObject.promise();
@@ -550,115 +570,145 @@ function uploadFile(fileName, extension, file)
 
 function createFolder(recordTitle, recordClassificationUri, recordType)
 	{
-	console.log("recordTitle: " + recordTitle)
-	console.log("recordClassificationUri: " + recordClassificationUri)
-	console.log("recordType: " + recordType)
-		
-	var url = baseUrl + "/" + apiPath + "/Record"
-	var data = {
-				"RecordTitle" : recordTitle,
-				"RecordRecordType" : recordType,
-				"RecordClassification" : recordClassificationUri
-				}
-
-	$.ajax(
+	getAuthenticationStatus().then(function () 
 		{
-		url: url,
-		data: JSON.stringify(data),
-		type: "POST",
-		contentType: 'application/json',
-		xhrFields: { withCredentials: true},
-		success: function(result)
+		if(isAuthenticated)
 			{
-			$("#create-folder-progress-bar").css("width", "100%")
-			$("#create-folder-caption").html("Folder created successfully.")
-			$("#new-folder-form-record-title").val("")
-			refreshFolderNodes("classification", "classification-uri-" + recordClassificationUri)
-			setTimeout(function()
+			console.log("recordTitle: " + recordTitle)
+			console.log("recordClassificationUri: " + recordClassificationUri)
+			console.log("recordType: " + recordType)
+		
+			var url = baseUrl + "/" + apiPath + "/Record"
+			var data = {
+						"RecordTitle" : recordTitle,
+						"RecordRecordType" : recordType,
+						"RecordClassification" : recordClassificationUri
+						}
+
+			$.ajax(
 				{
-				$("#create-folder-status").modal("hide")
-				$("#create-folder-progress-bar").css("width", "0%")
-				$("#create-folder-caption").html("Creating folder...")
-				},
-				500);
-			}, 
-		error: function(result)
-			{
-			console.log("Oooops!")
-			$("#upload-progress-bar").css("width", "67%")	
-			showUploadError()
+				url: url,
+				data: JSON.stringify(data),
+				type: "POST",
+				contentType: 'application/json',
+				xhrFields: { withCredentials: true},
+				success: function(result)
+					{
+					$("#create-folder-progress-bar").css("width", "100%")
+					$("#create-folder-caption").html("Folder created successfully.")
+					$("#new-folder-form-record-title").val("")
+					refreshFolderNodes("classification", "classification-uri-" + recordClassificationUri)
+					setTimeout(function()
+						{
+						$("#create-folder-status").modal("hide")
+						$("#create-folder-progress-bar").css("width", "0%")
+						$("#create-folder-caption").html("Creating folder...")
+						},
+						500);
+					}, 
+				error: function(result)
+					{
+					console.log("Oooops!")
+					$("#upload-progress-bar").css("width", "67%")	
+					showUploadError()
+					}
+				});	
 			}
-		});	
+		else
+			{
+			$("#session-expired").modal("show")
+			}
+		});
 	}
 
 function createRecord(recordTitle, recordType, recordContainerUri, fileName)
 	{
-	console.log(recordType)
-	var url = baseUrl + "/" + apiPath + "/Record"
-	var data = {
-				"RecordTitle" : recordTitle,
-				"RecordRecordType" : recordType,
-				"RecordContainer" : recordContainerUri
-				}
-	$.ajax(
+	getAuthenticationStatus().then(function () 
 		{
-		url: url,
-		data: JSON.stringify(data),
-		type: "POST",
-		contentType: 'application/json',
-		xhrFields: { withCredentials: true},
-		success: function(result)
+		if(isAuthenticated)
 			{
-			console.log("Record succesfully created.")
-			$("#upload-progress-bar").css("width", "67%")	
-			attachFileToRecord(result.Results[0].Uri, fileName, recordContainerUri)
-			}, 
-		error: function(result)
+			console.log(recordType)
+			var url = baseUrl + "/" + apiPath + "/Record"
+			var data = {
+						"RecordTitle" : recordTitle,
+						"RecordRecordType" : recordType,
+						"RecordContainer" : recordContainerUri
+						}
+			$.ajax(
+				{
+				url: url,
+				data: JSON.stringify(data),
+				type: "POST",
+				contentType: 'application/json',
+				xhrFields: { withCredentials: true},
+				success: function(result)
+					{
+					console.log("Record succesfully created.")
+					$("#upload-progress-bar").css("width", "67%")	
+					attachFileToRecord(result.Results[0].Uri, fileName, recordContainerUri)
+					}, 
+				error: function(result)
+					{
+					console.log("Oooops!")
+					$("#upload-status-caption").html(result.responseJSON.ResponseStatus.Message)
+					$("#upload-progress-bar").css("width", "67%")	
+					showUploadError(result.responseJSON.ResponseStatus.Message)
+					}
+				});
+			}
+		else
 			{
-			console.log("Oooops!")
-			$("#upload-status-caption").html(result.responseJSON.ResponseStatus.Message)
-			$("#upload-progress-bar").css("width", "67%")	
-			showUploadError(result.responseJSON.ResponseStatus.Message)
+			$("#session-expired").modal("show")
 			}
 		});
 	}
 
 function attachFileToRecord(recordUri, fileName, recordContainerUri)
 	{
-	var data = {
-				"Uri": recordUri,
-				"RecordFilePath": fileName,
-				"RecordFinalizeOnSave" : "true"
-				}
-	var url = baseUrl + "/" + apiPath + "/Record"
-	$.ajax(
+	getAuthenticationStatus().then(function () 
 		{
-		url: url,
-		data: JSON.stringify(data),
-		type: "POST",
-		contentType: 'application/json',
-		xhrFields: { withCredentials: true},
-		success: function(result)
+		if(isAuthenticated)
 			{
-			// this is similar to clear upload form except that it excludes the container.  Maybe write this better at some point.
-			$("#upload-form-record-title").val("")
-			$("#upload-form-file").val("")
-			$("#upload-form-file-label").html("Choose file...")
-			getRecords(recordContainerUri)
-			$("#upload-progress-bar").css("width", "100%")
-			$("#upload-status-caption").html("Upload completed successfully.")
-			setTimeout(function()
+			var data = {
+						"Uri": recordUri,
+						"RecordFilePath": fileName,
+						"RecordFinalizeOnSave" : "true"
+						}
+			var url = baseUrl + "/" + apiPath + "/Record"
+			$.ajax(
 				{
-				$("#upload-status").modal("hide")
-				$("#upload-progress-bar").css("width", "0%")
-				},
-				500);
-			}, 
-		error: function(result)
+				url: url,
+				data: JSON.stringify(data),
+				type: "POST",
+				contentType: 'application/json',
+				xhrFields: { withCredentials: true},
+				success: function(result)
+					{
+					// this is similar to clear upload form except that it excludes the container.  Maybe write this better at some point.
+					$("#upload-form-record-title").val("")
+					$("#upload-form-file").val("")
+					$("#upload-form-file-label").html("Choose file...")
+					getRecords(recordContainerUri)
+					$("#upload-progress-bar").css("width", "100%")
+					$("#upload-status-caption").html("Upload completed successfully.")
+					setTimeout(function()
+						{
+						$("#upload-status").modal("hide")
+						$("#upload-progress-bar").css("width", "0%")
+						},
+						500);
+					}, 
+				error: function(result)
+					{
+					console.log("Oooops!")
+					$("#upload-progress-bar").css("width", "100%")
+					showUploadError()
+					}
+				});
+			}
+		else
 			{
-			console.log("Oooops!")
-			$("#upload-progress-bar").css("width", "100%")
-			showUploadError()
+			$("#session-expired").modal("show")
 			}
 		});
 	}
@@ -814,6 +864,10 @@ function populateRecordTypeField(parentNodeType)
 						});	
 						break;
 					}
-			}
+				}
+			else
+				{
+				$("#session-expired").modal("show")
+				}
 		})
 	}
