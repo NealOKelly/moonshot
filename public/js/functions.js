@@ -1,3 +1,15 @@
+///// CONTENTS /////
+// 1. AUTHENTICATION & SESSION MANAGEMENT //
+// 2. CLASSIFICATION & FOLDER TREE //
+// 3. RECORDS LIST PANEL //
+// 4. RIGHT PANEL //
+// 5. PROPERTIES PANEL //
+// 6. CREATE FOLDER //
+// 7. UPLOAD & REGISTER DOCUMENT //
+// 8. DOWNLOAD DOCUMENT //
+
+
+// 1. AUTHENTICATION & SESSION MANAGEMENT //
 function preauthenticateApi()
 	{
 	// Session cookies need to be estabilished before making any AJAX calls to the API server.  This is because the first HTTP200 response
@@ -27,7 +39,6 @@ function preauthenticateApi()
 		});
 	};
 
-
 function getAuthenticationStatus()
 	{
 	var deferredObject = $.Deferred();
@@ -54,6 +65,23 @@ function getAuthenticationStatus()
 		});
 		return deferredObject.promise();
 	}
+
+function removeAppSessionCookies()
+	{
+	//$.cookie("FedAuth", null, { expires: -1, path: "/CMServiceAPI/"} )
+	//$.cookie("FedAuth", null, { expires: -1, path: "/CMServiceAPI/"} )
+	//alert("Hellow Wotlf")
+	}
+
+function removeAPISessionCookies()
+	{
+	$.cookie("FedAuth", null, { expires: -1, path: "/CMServiceAPI/"} )
+	$.cookie("FedAuth", null, { expires: -1, path: "/CMServiceAPI/"} )
+	}
+
+// END AUTHENTICATION & SESSION MANAGEMENT //
+
+// 2. CLASSIFICATION & FOLDER TREE //
 
 function refreshClassificationNodes(parentNodeId) 
 	{
@@ -302,12 +330,56 @@ function sortClassificationTree(sortBy)
 		});
 	}
 
+function classificationTreeNodeSelected(node)
+	{
+	console.log(node.hasClass("classification-can-attach-records"))
+	$("#records-list-pane").html("<div class='no-records'>Select a bottom-level folder to display records.</div>")
+	highlightSelectedNode(node)
+	if((node).attr("id").substr(0, 19) == "classification-uri-")
+		{
+		$("#upload-form-container").addClass("upload-form-hidden")
+		$("#new-folder-form-container").addClass("new-folder-form-hidden")
+		if(node.hasClass("classification-can-attach-records"))
+			{
+			var classification = node.data("classificationNumber")
+			var classification = classification + " - " +  $("#" + node.attr("id") + " span:nth-child(3) > a").html()
+			
+			$("#new-folder-form-record-classification").val(classification)
+			$("#new-folder-form-record-classification").data("classificationUri", (node).attr("id").substr(19))
+			// $("#" + node.attr("id") + "ul > li span:nth-child(3) > a").html()
+			$("#new-folder-form-container").removeClass("new-folder-form-hidden")
+			console.log()
+			}
+
+		drawPropertiesTable("classification")
+		var classificationUri = node.attr("id").substr(19)
+		getClassificationProperties(classificationUri)
+		}
+	else
+		{
+		if((node).attr("id").substr(0, 11) == "record-uri-")
+			{
+			if($(node).hasClass("folder-intermediate"))
+				{
+				$("#new-folder-form-container").addClass("new-folder-form-hidden")
+				drawPropertiesTable("folder-intermediate")
+				getRecordProperties("folder-intermediate", node.attr("id").substr(11))	
+				}
+			}
+		}
+	}
+
 function highlightSelectedNode(node)
 	{
 	$(".record-row").removeClass("row-selected")
 	$("#classification-treeview li").removeClass("node-selected")
 	$("#" + node.attr("id")).addClass("node-selected")
 	}
+
+
+// END CLASSIFICATION & FOLDER TREE //
+
+// 3. RECORDS LIST PANEL //
 
 function getRecords(recordUri)
 	{
@@ -371,6 +443,132 @@ function getRecords(recordUri)
 			$("#session-expired").modal("show")
 			}
 		});
+	}
+
+// END RECORDS LIST PANEL //
+
+// 4. RIGHT PANEL //
+
+function populateRecordTypeField(parentNodeType)
+	{
+	getAuthenticationStatus().then(function () 
+		{
+		if(isAuthenticated)
+			{
+			switch(parentNodeType)
+				{
+				case "classification":
+					$("#new-folder-form-record-type").html("")
+					var url = baseUrl + "/" + apiPath + "/Search?q=all&properties=RecordTypeName,RecordTypeContainerRule&trimtype=RecordType"
+					$.ajax(
+						{
+						url: url,
+						type: "POST",
+						xhrFields: { withCredentials: true},
+						contentType: 'application/json',
+						success: function(result)
+							{
+							console.log(result)
+							for(i=0; i<result.Results.length;i++)
+								{
+								if(result.Results[i].RecordTypeContainerRule.Value=="Prevented")
+									{
+									$("#new-folder-form-record-type").append("<option>" + result.Results[i].RecordTypeName.Value + "</option>")
+									}
+								}
+							if($("#new-folder-form-record-type option").length<2)
+								{
+								$("#new-folder-form-record-type").attr("readonly", "true")
+								}
+							}, 
+						error: function(result)
+							{
+							console.log("Oooops!")
+							}
+						});	
+						break;
+					break;
+				case "folder-intermediate":
+					// do something
+					alert("folder-intermediate")
+					break;
+				case "folder-terminal":
+					$("#upload-form-record-type").html("")
+					var url = baseUrl + "/" + apiPath + "/Search?q=all&properties=RecordTypeName,RecordTypeUsualBehaviour&trimtype=RecordType"
+					$.ajax(
+						{
+						url: url,
+						type: "POST",
+						xhrFields: { withCredentials: true},
+						contentType: 'application/json',
+						success: function(result)
+							{
+							for(i=0; i<result.Results.length;i++)
+								{
+								if(result.Results[i].RecordTypeUsualBehaviour.Value=="Document")
+									{
+									var exclude = false;
+									for(x=0; x<config.ExcludedRecordTypes.length; x++)
+										{
+											console.log("Search: " + result.Results[i].RecordTypeName.Value)
+											console.log("Config: " + config.ExcludedRecordTypes[x])
+										if(result.Results[i].RecordTypeName.Value==config.ExcludedRecordTypes[x])
+											{
+											exclude = true;
+											console.log("Hello Dolly")		
+
+											}
+										}
+									console.log("exclude: " + exclude)
+									if(!exclude)
+										{
+										$("#upload-form-record-type").append("<option>" + result.Results[i].RecordTypeName.Value + "</option>")	
+										}
+									}
+								}
+							if($("#upload-form-record-type option").length<2)
+								{
+								$("#upload-form-record-type").attr("readonly", "true")
+								}
+							}, 
+						error: function(result)
+							{
+							console.log("Oooops!")
+							}
+						});	
+						break;
+					}
+				}
+			else
+				{
+				$("#session-expired").modal("show")
+				}
+		})
+	}
+
+// END RIGHT PANEL //
+
+// 5. PROPERTIES PANEL //
+
+function drawPropertiesTable(type)
+	{
+	switch(type)
+		{
+		case "classification":
+			var tableHTML = '<table class="table table-dark table-sm" style="position:absolute;bottom:0;margin-bottom:0;"><tbody><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Number</td><td id="properties-classification-number" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Classification Title</td><td id="properties-classification-title" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Access Control</td><td id="properties-classification-access-control" style="text-align:left;"></td></tr></tbody></table>'
+			break;
+		case "folder-intermediate":
+			var tableHTML = '<table class="table table-dark table-sm" style="position:absolute;bottom:0;margin-bottom:0;"><tbody><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Record Number</td><td id="properties-record-number" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Classification</td><td id="properties-classification" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Record Type</td><td id="properties-record-type" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Date Registered</td><td id="properties-date-registered" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Access Control</td><td id="properties-access-control" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Retention Schedule</td><td id="properties-retention-schedule" style="text-align:left;"></td></tr><tr><td scope="row" style="width:20%;text-align:left;padding-left:30px;">Date Due for Destruction</td><td id="properties-date-due-for-destruction" style="text-align:left;"></td></tr><tr></tbody></table>'
+			break;
+		case "folder-terminal":
+			var tableHTML = '<table class="table table-dark table-sm" style="position:absolute;bottom:0;margin-bottom:0;"><tbody><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Record Number</td><td id="properties-record-number" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Container</td><td id="properties-container" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Record Type</td><td id="properties-record-type" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Date Registered</td><td id="properties-date-registered" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Access Control</td><td id="properties-access-control" style="text-align:left;"></td></tr></tbody></table>'
+			break;
+		case "document":
+			var tableHTML = '<table class="table table-dark table-sm" style="position:absolute;bottom:0;margin-bottom:0;"><tbody><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Record Number</td><td id="properties-record-number" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Container</td><td id="properties-container" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Record Type</td><td id="properties-record-type" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Date Registered</td><td id="properties-date-registered" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Access Control</td><td id="properties-access-control" style="text-align:left;"></td></tr></tbody></table>'
+			break;
+		}
+	$("#properties-pane > table").remove()
+	$("#properties-pane").append(tableHTML)
 	}
 
 function getClassificationProperties(classificationUri)
@@ -472,101 +670,9 @@ function getRecordProperties(type, recordUri)
 		});
 	}
 
-function drawPropertiesTable(type)
-	{
-	switch(type)
-		{
-		case "classification":
-			var tableHTML = '<table class="table table-dark table-sm" style="position:absolute;bottom:0;margin-bottom:0;"><tbody><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Number</td><td id="properties-classification-number" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Classification Title</td><td id="properties-classification-title" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Access Control</td><td id="properties-classification-access-control" style="text-align:left;"></td></tr></tbody></table>'
-			break;
-		case "folder-intermediate":
-			var tableHTML = '<table class="table table-dark table-sm" style="position:absolute;bottom:0;margin-bottom:0;"><tbody><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Record Number</td><td id="properties-record-number" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Classification</td><td id="properties-classification" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Record Type</td><td id="properties-record-type" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Date Registered</td><td id="properties-date-registered" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Access Control</td><td id="properties-access-control" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Retention Schedule</td><td id="properties-retention-schedule" style="text-align:left;"></td></tr><tr><td scope="row" style="width:20%;text-align:left;padding-left:30px;">Date Due for Destruction</td><td id="properties-date-due-for-destruction" style="text-align:left;"></td></tr><tr></tbody></table>'
-			break;
-		case "folder-terminal":
-			var tableHTML = '<table class="table table-dark table-sm" style="position:absolute;bottom:0;margin-bottom:0;"><tbody><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Record Number</td><td id="properties-record-number" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Container</td><td id="properties-container" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Record Type</td><td id="properties-record-type" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Date Registered</td><td id="properties-date-registered" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Access Control</td><td id="properties-access-control" style="text-align:left;"></td></tr></tbody></table>'
-			break;
-		case "document":
-			var tableHTML = '<table class="table table-dark table-sm" style="position:absolute;bottom:0;margin-bottom:0;"><tbody><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Record Number</td><td id="properties-record-number" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Container</td><td id="properties-container" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Record Type</td><td id="properties-record-type" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Date Registered</td><td id="properties-date-registered" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Access Control</td><td id="properties-access-control" style="text-align:left;"></td></tr></tbody></table>'
-			break;
-		}
-	$("#properties-pane > table").remove()
-	$("#properties-pane").append(tableHTML)
-	}
+// END PROPERTIES PANEL //
 
-
-function downloadDocument(recordUri, recordTitle, recordExtension, recordMimeType)
-	{
-	getAuthenticationStatus().then(function () 
-		{
-		if(isAuthenticated)
-			{
-			var url = baseUrl + "/" + apiPath + "/Record/" + recordUri + "/File/Document"
-			$.ajax(
-				{
-				url: url,
-				xhrFields: { responseType: 'arraybuffer'},
-				success: function(result)
-					{
-					var url = window.URL.createObjectURL(new File([result], "download." + recordExtension, {type: recordMimeType}));
-					var anchorElem = document.createElement("a");
-					anchorElem.style = "display: none";
-					anchorElem.href = url;
-					anchorElem.download = recordTitle + "." + recordExtension.toLowerCase();
-					document.body.appendChild(anchorElem);
-					anchorElem.click();
-					document.body.removeChild(anchorElem);
-					window.URL.revokeObjectURL(url)
-					}, 
-				error: function(result)
-					{
-					console.log("Oooops!")
-					}
-				});
-			}
-		else
-			{
-			$("#session-expired").modal("show")
-			}
-		});
-	}
-
-
-function uploadFile(fileName, extension, file)
-	{
-	var deferredObject = $.Deferred();
-	getAuthenticationStatus().then(function () 
-		{
-		if(isAuthenticated)
-			{
-			jQuery.ajax(
-				{
-				url: "https://api.gilbyim.com/WebDAV/Uploads/" + fileName + "." + extension,
-				type: "PUT",
-				data: file,
-				processData: false,
-				contentType: "multipart/form-data",
-				headers: { Authorization : "Basic bmVhbC5va2VsbHlAZ2lsYnlpbS5jb206Q3JhNTYwNTYh" },
-				success: function (result) 
-					{
-					deferredObject.resolve();
-					$("#upload-progress-bar").css("width", "33%")
-					},
-				error: function(result) 
-					{
-					$("#upload-progress-bar").css("width", "33%")
-					showUploadError()
-					console.log("Error")
-					}
-				});
-			}
-		else
-			{
-			$("#session-expired").modal("show")
-			}
-		});
-	return deferredObject.promise();
-	}
-
+// 6. CREATE FOLDER //
 
 function createFolder(recordTitle, recordClassificationUri, recordType)
 	{
@@ -619,6 +725,57 @@ function createFolder(recordTitle, recordClassificationUri, recordType)
 			$("#session-expired").modal("show")
 			}
 		});
+	}
+
+// END CREATE FOLDER //
+
+// 7. UPLOAD & REGISTER DOCUMENT //
+
+function uuidv4()
+	{
+	return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+	}
+
+function getFileExtension(fileName)
+	{
+	return fileName.slice((fileName.lastIndexOf(".") - 1 >>> 0) + 2);
+	}
+
+function uploadFile(fileName, extension, file)
+	{
+	var deferredObject = $.Deferred();
+	getAuthenticationStatus().then(function () 
+		{
+		if(isAuthenticated)
+			{
+			jQuery.ajax(
+				{
+				url: "https://api.gilbyim.com/WebDAV/Uploads/" + fileName + "." + extension,
+				type: "PUT",
+				data: file,
+				processData: false,
+				contentType: "multipart/form-data",
+				headers: { Authorization : "Basic bmVhbC5va2VsbHlAZ2lsYnlpbS5jb206Q3JhNTYwNTYh" },
+				success: function (result) 
+					{
+					deferredObject.resolve();
+					$("#upload-progress-bar").css("width", "33%")
+					},
+				error: function(result) 
+					{
+					$("#upload-progress-bar").css("width", "33%")
+					showUploadError()
+					console.log("Error")
+					}
+				});
+			}
+		else
+			{
+			$("#session-expired").modal("show")
+			}
+		});
+	return deferredObject.promise();
 	}
 
 function createRecord(recordTitle, recordType, recordContainerUri, fileName)
@@ -713,6 +870,11 @@ function attachFileToRecord(recordUri, fileName, recordContainerUri)
 		});
 	}
 
+function clearUploadForm()
+	{
+	$("#upload-form-record-container").val("")
+	}
+
 function showUploadError(trimError)
 	{
 	console.log(trimError)
@@ -731,39 +893,50 @@ function showUploadError(trimError)
 
 	}
 
-function removeAppSessionCookies()
+// END UPLOAD & REGISTER DOCUMENT //
+
+
+// 8. DOWNLOAD DOCUMENT //
+
+function downloadDocument(recordUri, recordTitle, recordExtension, recordMimeType)
 	{
-	//$.cookie("FedAuth", null, { expires: -1, path: "/CMServiceAPI/"} )
-	//$.cookie("FedAuth", null, { expires: -1, path: "/CMServiceAPI/"} )
-	//alert("Hellow Wotlf")
+	getAuthenticationStatus().then(function () 
+		{
+		if(isAuthenticated)
+			{
+			var url = baseUrl + "/" + apiPath + "/Record/" + recordUri + "/File/Document"
+			$.ajax(
+				{
+				url: url,
+				xhrFields: { responseType: 'arraybuffer'},
+				success: function(result)
+					{
+					var url = window.URL.createObjectURL(new File([result], "download." + recordExtension, {type: recordMimeType}));
+					var anchorElem = document.createElement("a");
+					anchorElem.style = "display: none";
+					anchorElem.href = url;
+					anchorElem.download = recordTitle + "." + recordExtension.toLowerCase();
+					document.body.appendChild(anchorElem);
+					anchorElem.click();
+					document.body.removeChild(anchorElem);
+					window.URL.revokeObjectURL(url)
+					}, 
+				error: function(result)
+					{
+					console.log("Oooops!")
+					}
+				});
+			}
+		else
+			{
+			$("#session-expired").modal("show")
+			}
+		});
 	}
 
+// END DOWNLOAD DOCUMENT //
 
-function removeAPISessionCookies()
-	{
-	$.cookie("FedAuth", null, { expires: -1, path: "/CMServiceAPI/"} )
-	$.cookie("FedAuth", null, { expires: -1, path: "/CMServiceAPI/"} )
-	}
-
-
-function clearUploadForm()
-	{
-	$("#upload-form-record-container").val("")
-	//$("#upload-form-record-type").html("")
-	}
-
-
-function uuidv4()
-	{
-	return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
-	}
-
-
-function getFileExtension(fileName)
-	{
-	return fileName.slice((fileName.lastIndexOf(".") - 1 >>> 0) + 2);
-	}
+// 9. MSICELLANEOUS //
 
 function hideDummyModal() 
 	{
@@ -775,99 +948,4 @@ function hideDummyModal()
 		300); // this delay ensure the modal has properly been show before attempting to hide it.
 	}
 
-function populateRecordTypeField(parentNodeType)
-	{
-	getAuthenticationStatus().then(function () 
-		{
-		if(isAuthenticated)
-			{
-			switch(parentNodeType)
-				{
-				case "classification":
-					$("#new-folder-form-record-type").html("")
-					var url = baseUrl + "/" + apiPath + "/Search?q=all&properties=RecordTypeName,RecordTypeContainerRule&trimtype=RecordType"
-					$.ajax(
-						{
-						url: url,
-						type: "POST",
-						xhrFields: { withCredentials: true},
-						contentType: 'application/json',
-						success: function(result)
-							{
-							console.log(result)
-							for(i=0; i<result.Results.length;i++)
-								{
-								if(result.Results[i].RecordTypeContainerRule.Value=="Prevented")
-									{
-									$("#new-folder-form-record-type").append("<option>" + result.Results[i].RecordTypeName.Value + "</option>")
-									}
-								}
-							if($("#new-folder-form-record-type option").length<2)
-								{
-								$("#new-folder-form-record-type").attr("readonly", "true")
-								}
-							}, 
-						error: function(result)
-							{
-							console.log("Oooops!")
-							}
-						});	
-						break;
-					break;
-				case "folder-intermediate":
-					// do something
-					alert("folder-intermediate")
-					break;
-				case "folder-terminal":
-					$("#upload-form-record-type").html("")
-					var url = baseUrl + "/" + apiPath + "/Search?q=all&properties=RecordTypeName,RecordTypeUsualBehaviour&trimtype=RecordType"
-					$.ajax(
-						{
-						url: url,
-						type: "POST",
-						xhrFields: { withCredentials: true},
-						contentType: 'application/json',
-						success: function(result)
-							{
-							for(i=0; i<result.Results.length;i++)
-								{
-								if(result.Results[i].RecordTypeUsualBehaviour.Value=="Document")
-									{
-									var exclude = false;
-									for(x=0; x<config.ExcludedRecordTypes.length; x++)
-										{
-											console.log("Search: " + result.Results[i].RecordTypeName.Value)
-											console.log("Config: " + config.ExcludedRecordTypes[x])
-										if(result.Results[i].RecordTypeName.Value==config.ExcludedRecordTypes[x])
-											{
-											exclude = true;
-											console.log("Hello Dolly")		
-
-											}
-										}
-									console.log("exclude: " + exclude)
-									if(!exclude)
-										{
-										$("#upload-form-record-type").append("<option>" + result.Results[i].RecordTypeName.Value + "</option>")	
-										}
-									}
-								}
-							if($("#upload-form-record-type option").length<2)
-								{
-								$("#upload-form-record-type").attr("readonly", "true")
-								}
-							}, 
-						error: function(result)
-							{
-							console.log("Oooops!")
-							}
-						});	
-						break;
-					}
-				}
-			else
-				{
-				$("#session-expired").modal("show")
-				}
-		})
-	}
+// END MSICELLANEOUS //

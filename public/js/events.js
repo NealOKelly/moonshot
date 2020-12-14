@@ -221,45 +221,6 @@ $(document).on("click", ".record-row", function()
 	})
 
 ///// Classiciation Control Events /////
-function classificationTreeNodeSelected(node)
-	{
-	console.log(node.hasClass("classification-can-attach-records"))
-	$("#records-list-pane").html("<div class='no-records'>Select a bottom-level folder to display records.</div>")
-	highlightSelectedNode(node)
-	if((node).attr("id").substr(0, 19) == "classification-uri-")
-		{
-		$("#upload-form-container").addClass("upload-form-hidden")
-		$("#new-folder-form-container").addClass("new-folder-form-hidden")
-		if(node.hasClass("classification-can-attach-records"))
-			{
-			var classification = node.data("classificationNumber")
-			var classification = classification + " - " +  $("#" + node.attr("id") + " span:nth-child(3) > a").html()
-			
-			$("#new-folder-form-record-classification").val(classification)
-			$("#new-folder-form-record-classification").data("classificationUri", (node).attr("id").substr(19))
-			// $("#" + node.attr("id") + "ul > li span:nth-child(3) > a").html()
-			$("#new-folder-form-container").removeClass("new-folder-form-hidden")
-			console.log()
-			}
-
-		drawPropertiesTable("classification")
-		var classificationUri = node.attr("id").substr(19)
-		getClassificationProperties(classificationUri)
-		}
-	else
-		{
-		if((node).attr("id").substr(0, 11) == "record-uri-")
-			{
-			if($(node).hasClass("folder-intermediate"))
-				{
-				$("#new-folder-form-container").addClass("new-folder-form-hidden")
-				drawPropertiesTable("folder-intermediate")
-				getRecordProperties("folder-intermediate", node.attr("id").substr(11))	
-				}
-			}
-		}
-	}
-
 
 // Click on folder Icon //
 $(document).on("click", ".folder", function()
@@ -296,7 +257,6 @@ $(document).on("click", ".classification-name>a", function()
 		$("#new-folder-form-container").removeClass("new-folder-form-hidden")			
 		}
 	})
-
 
 // Click on folder-fill Icon //
 $(document).on("click", ".folder-fill", function()
@@ -419,9 +379,7 @@ $(document).on("click", "#create-folder-button", function()
 		createFolder(recordTitle, recordClassificationUri, recordType)	
 		}
 	})
-
-
-
+// Click re-athentication button
 $(document).on("click", "#reauthenticate-button", function()
 	{
 	removeAPISessionCookies();
