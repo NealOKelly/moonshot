@@ -266,6 +266,11 @@ $(document).on("click", ".folder", function()
 	{
 	var node = $(event.target).parent();
 	classificationTreeNodeSelected(node)
+	if(node.hasClass("classification-can-attach-records"))
+		{
+		populateRecordTypeField("classification")
+		$("#new-folder-form-container").removeClass("new-folder-form-hidden")			
+		}
 	})
 
 // Click on open folder icon //
@@ -273,6 +278,11 @@ $(document).on("click", ".folder-open", function()
 	{
 	var node = $(event.target).parent();
 	classificationTreeNodeSelected(node)
+	if(node.hasClass("classification-can-attach-records"))
+		{
+		populateRecordTypeField("classification")
+		$("#new-folder-form-container").removeClass("new-folder-form-hidden")			
+		}
 	})
 
 // Click on Classification Name Hyperlink //
@@ -280,6 +290,11 @@ $(document).on("click", ".classification-name>a", function()
 	{
 	var node = $(event.target).parent().parent();
 	classificationTreeNodeSelected(node)
+	if(node.hasClass("classification-can-attach-records"))
+		{
+		populateRecordTypeField("classification")
+		$("#new-folder-form-container").removeClass("new-folder-form-hidden")			
+		}
 	})
 
 
@@ -298,7 +313,7 @@ $(document).on("click", ".folder-fill", function()
 	clearUploadForm()
 	// It would be easier to read is we got the Container details to populated the New Record form here instead of as part of getRecordProperties, although it would require an extra API call.  Consider changing.
 	populateRecordTypeField("folder-terminal")
-	$("#upload-form-container").removeClass("upload-form-hidden")
+	$("#new-folder-form-container").removeClass("upload-form-hidden")
 	})
 
 $(document).on("click", ".record-title>a", function()

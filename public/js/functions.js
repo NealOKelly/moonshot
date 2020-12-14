@@ -727,52 +727,93 @@ function hideDummyModal()
 
 function populateRecordTypeField(parentNodeType)
 	{
-	$("#upload-form-record-type").html("")
-	if(parentNodeType=="folder-terminal")
+	getAuthenticationStatus().then(function () 
 		{
-		console.log("This is a terminal folder.")
-		var url = baseUrl + "/" + apiPath + "/Search?q=all&properties=RecordTypeName,RecordTypeUsualBehaviour&trimtype=RecordType"
-		$.ajax(
+		if(isAuthenticated)
 			{
-			url: url,
-			type: "POST",
-			xhrFields: { withCredentials: true},
-			contentType: 'application/json',
-			success: function(result)
+			switch(parentNodeType)
 				{
-				for(i=0; i<result.Results.length;i++)
-					{
-					if(result.Results[i].RecordTypeUsualBehaviour.Value=="Document")
+				case "classification":
+					$("#new-folder-form-record-type").html("")
+					var url = baseUrl + "/" + apiPath + "/Search?q=all&properties=RecordTypeName,RecordTypeContainerRule&trimtype=RecordType"
+					$.ajax(
 						{
-						var exclude = false;
-						for(x=0; x<config.ExcludedRecordTypes.length; x++)
+						url: url,
+						type: "POST",
+						xhrFields: { withCredentials: true},
+						contentType: 'application/json',
+						success: function(result)
 							{
-								console.log("Search: " + result.Results[i].RecordTypeName.Value)
-								console.log("Config: " + config.ExcludedRecordTypes[x])
-							if(result.Results[i].RecordTypeName.Value==config.ExcludedRecordTypes[x])
+							console.log(result)
+							for(i=0; i<result.Results.length;i++)
 								{
-								exclude = true;
-								console.log("Hello Dolly")		
-
+								if(result.Results[i].RecordTypeContainerRule.Value=="Prevented")
+									{
+									$("#new-folder-form-record-type").append("<option>" + result.Results[i].RecordTypeName.Value + "</option>")
+									}
 								}
-							
-							}
-						console.log("exclude: " + exclude)
-						if(!exclude)
+							if($("#new-folder-form-record-type option").length<2)
+								{
+								$("#new-folder-form-record-type").attr("readonly", "true")
+								}
+							}, 
+						error: function(result)
 							{
-							$("#upload-form-record-type").append("<option>" + result.Results[i].RecordTypeName.Value + "</option>")	
+							console.log("Oooops!")
 							}
-						}
+						});	
+						break;
+					break;
+				case "folder-intermediate":
+					// do something
+					alert("folder-intermediate")
+					break;
+				case "folder-terminal":
+					$("#upload-form-record-type").html("")
+					var url = baseUrl + "/" + apiPath + "/Search?q=all&properties=RecordTypeName,RecordTypeUsualBehaviour&trimtype=RecordType"
+					$.ajax(
+						{
+						url: url,
+						type: "POST",
+						xhrFields: { withCredentials: true},
+						contentType: 'application/json',
+						success: function(result)
+							{
+							for(i=0; i<result.Results.length;i++)
+								{
+								if(result.Results[i].RecordTypeUsualBehaviour.Value=="Document")
+									{
+									var exclude = false;
+									for(x=0; x<config.ExcludedRecordTypes.length; x++)
+										{
+											console.log("Search: " + result.Results[i].RecordTypeName.Value)
+											console.log("Config: " + config.ExcludedRecordTypes[x])
+										if(result.Results[i].RecordTypeName.Value==config.ExcludedRecordTypes[x])
+											{
+											exclude = true;
+											console.log("Hello Dolly")		
+
+											}
+										}
+									console.log("exclude: " + exclude)
+									if(!exclude)
+										{
+										$("#upload-form-record-type").append("<option>" + result.Results[i].RecordTypeName.Value + "</option>")	
+										}
+									}
+								}
+							if($("#upload-form-record-type option").length<2)
+								{
+								$("#upload-form-record-type").attr("readonly", "true")
+								}
+							}, 
+						error: function(result)
+							{
+							console.log("Oooops!")
+							}
+						});	
+						break;
 					}
-				if($("#upload-form-record-type option").length<2)
-					{
-					$("#upload-form-record-type").attr("readonly", "true")
-					}
-				}, 
-			error: function(result)
-				{
-				console.log("Oooops!")
-				}
-			});		
-		}
+			}
+		})
 	}
