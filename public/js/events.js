@@ -229,7 +229,7 @@ $(document).on("click", ".folder", function()
 	classificationTreeNodeSelected(node)
 	if(node.hasClass("classification-can-attach-records"))
 		{
-		populateRecordTypeField("classification")
+		populateRecordTypeField("classification", node.attr("id").substr(19))
 		$("#new-folder-form-container").removeClass("new-folder-form-hidden")			
 		}
 	})
@@ -241,7 +241,7 @@ $(document).on("click", ".folder-open", function()
 	classificationTreeNodeSelected(node)
 	if(node.hasClass("classification-can-attach-records"))
 		{
-		populateRecordTypeField("classification")
+		populateRecordTypeField("classification", node.attr("id").substr(19))
 		$("#new-folder-form-container").removeClass("new-folder-form-hidden")			
 		}
 	})
@@ -253,7 +253,7 @@ $(document).on("click", ".classification-name>a", function()
 	classificationTreeNodeSelected(node)
 	if(node.hasClass("classification-can-attach-records"))
 		{
-		populateRecordTypeField("classification")
+		populateRecordTypeField("classification", node.attr("id").substr(19))
 		$("#new-folder-form-container").removeClass("new-folder-form-hidden")			
 		}
 	})
@@ -290,8 +290,8 @@ $(document).on("click", ".record-title>a", function()
 		$("#records-list-pane").html("<div class='no-records'>Select a bottom-level folder to display records.</div>")
 		drawPropertiesTable("folder-intermediate")
 		getRecordProperties("folder-intermediate", node.attr("id").substr(11))	
-		$("#upload-form-container").addClass("upload-form-hidden")
-		clearUploadForm()
+		populateRecordTypeField("folder-intermediate")
+		$("#new-folder-form-container").removeClass("new-folder-form-hidden")
 		}
 	else
 		{

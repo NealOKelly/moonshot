@@ -7,6 +7,7 @@
 // 6. CREATE FOLDER //
 // 7. UPLOAD & REGISTER DOCUMENT //
 // 8. DOWNLOAD DOCUMENT //
+// 9. MISCELLANEOUS //
 
 
 // 1. AUTHENTICATION & SESSION MANAGEMENT //
@@ -192,13 +193,13 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 					if(parentNodeType=="classification")
 						{
 						parentNodeUri=parentNodeId.substr(19)
-						var url = baseUrl + "/" + apiPath + "/Search?q=classification:" + parentNodeUri + "&properties=" + includedProperties + "&trimtype=Record"
+						var url = baseUrl + "/" + apiPath + "/Search?q=classification:" + parentNodeUri + "&properties=" + includedProperties + "&trimtype=Record&pageSize=1000000"
 						}
 					else{
 						if(parentNodeType=="record")
 							{
 							parentNodeUri=parentNodeId.substr(11)
-							var url = baseUrl + "/" + apiPath + "/Search?q=container:" + parentNodeUri + "&properties=" + includedProperties + "&trimtype=Record"
+							var url = baseUrl + "/" + apiPath + "/Search?q=container:" + parentNodeUri + "&properties=" + includedProperties + "&trimtype=Record&pageSize=1000000"
 							}
 						}
 					$.ajax(
@@ -449,7 +450,7 @@ function getRecords(recordUri)
 
 // 4. RIGHT PANEL //
 
-function populateRecordTypeField(parentNodeType)
+function populateRecordTypeField(parentNodeType, parentNodeUri)
 	{
 	getAuthenticationStatus().then(function () 
 		{
@@ -458,8 +459,85 @@ function populateRecordTypeField(parentNodeType)
 			switch(parentNodeType)
 				{
 				case "classification":
+					var onlyRecordTypeCount = 0;
+					$("#new-folder-form-record-type").html("")	
+					var url = baseUrl + "/" + apiPath + "/Search?q=behaviour:folder&properties=RecordTypeName,RecordTypeContainerRule,RecordTypeUsualBehaviour&trimtype=RecordType"
+					$.ajax(
+						{
+						url: url,
+						type: "POST",
+						xhrFields: { withCredentials: true},
+						contentType: 'application/json',
+						success: function(result)
+							{
+							var intermediateFolderRecordTypeUris = [];
+							var intermediateFolderRecordTypeNames = [];
+							for(i=0; i<result.Results.length; i++)
+								{
+								if(result.Results[i].RecordTypeContainerRule.Value=="Prevented")
+								   	{
+									intermediateFolderRecordTypeUris.push(result.Results[i].Uri)
+									intermediateFolderRecordTypeNames.push(result.Results[i].RecordTypeName.Value)
+								   	}
+								}
+							for(i=0; i<intermediateFolderRecordTypeUris.length; i++)
+								{
+							   	(function(index)
+								 	{
+									var url = baseUrl + "/" + apiPath + "/Search?q=uri:" + parentNodeUri + ",recordType:" + intermediateFolderRecordTypeUris[i] + "&properties=ClassificationTitle&trimtype=Classification"
+									$.ajax(
+										{
+										url: url,
+										type: "POST",
+										xhrFields: { withCredentials: true},
+										contentType: 'application/json',
+										success: function(result)
+											{
+											if(result.TotalResults>0)
+												{
+												$("#new-folder-form-record-type").append("<option>" + intermediateFolderRecordTypeNames[index] + "</option>")
+												onlyRecordTypeCount++;
+												}
+											if($("#new-folder-form-record-type option").length<2)
+												{
+												$("#new-folder-form-record-type").attr("readonly", true)
+												}
+											else
+												{
+												$("#new-folder-form-record-type").attr("readonly", false)
+
+												}
+											console.log("onlyRecordTypeCount: " + onlyRecordTypeCount)
+											// Search for record types with the usual behavior of folder and where starting classification is null.
+
+												
+											// Find out whether classification is within starting classification.-
+											
+											}, 
+										error: function(result)
+											{
+											console.log("Oooops!")
+											}
+										});
+									if(onlyRecordTypeCount==0)
+									{
+									console.log("Search for record types with the usual behavior of folder and where starting classification is null.")
+									}
+							   		})(i);
+
+								}								
+							}, 
+						error: function(result)
+							{
+							console.log("Oooops!")
+							}
+						});	
+					break;
+				case "folder-intermediate":
+					// do something
+					alert("folder-intermediate")
 					$("#new-folder-form-record-type").html("")
-					var url = baseUrl + "/" + apiPath + "/Search?q=all&properties=RecordTypeName,RecordTypeContainerRule&trimtype=RecordType"
+					var url = baseUrl + "/" + apiPath + "/Search?q=usable&properties=RecordTypeName,RecordTypeContentsRule&trimtype=RecordType"
 					$.ajax(
 						{
 						url: url,
@@ -471,7 +549,7 @@ function populateRecordTypeField(parentNodeType)
 							console.log(result)
 							for(i=0; i<result.Results.length;i++)
 								{
-								if(result.Results[i].RecordTypeContainerRule.Value=="Prevented")
+								if(result.Results[i].RecordTypeContainerRule.Value!="Prevented")
 									{
 									$("#new-folder-form-record-type").append("<option>" + result.Results[i].RecordTypeName.Value + "</option>")
 									}
@@ -486,15 +564,10 @@ function populateRecordTypeField(parentNodeType)
 							console.log("Oooops!")
 							}
 						});	
-						break;
-					break;
-				case "folder-intermediate":
-					// do something
-					alert("folder-intermediate")
 					break;
 				case "folder-terminal":
 					$("#upload-form-record-type").html("")
-					var url = baseUrl + "/" + apiPath + "/Search?q=all&properties=RecordTypeName,RecordTypeUsualBehaviour&trimtype=RecordType"
+					var url = baseUrl + "/" + apiPath + "/Search?q=usable&properties=RecordTypeName,RecordTypeUsualBehaviour&trimtype=RecordType"
 					$.ajax(
 						{
 						url: url,
