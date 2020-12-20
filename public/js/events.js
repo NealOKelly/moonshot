@@ -1,6 +1,6 @@
 $(document).ready(function()
 	{
-	$('#dummy-modal').modal('show')
+	$('#loading').modal('show')
 	preauthenticateApi().then(function()
 		{
 		
@@ -29,13 +29,13 @@ $(document).ready(function()
 				}	
 				// sort	 this list.
 				sortClassificationTree(".classification-name")
-				hideDummyModal()
+				hideLoadingSpinner()
 				}, 
 			error: function(result)
 				{
 				console.log("Oooops!")
 				console.log(result)
-				hideDummyModal()
+				hideLoadingSpinner()
 				$('#connection-failed').modal('show')
 				}
 			});
