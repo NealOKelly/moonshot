@@ -226,6 +226,7 @@ $(document).on("click", ".record-row", function()
 $(document).on("click", ".folder", function()
 	{
 	var node = $(event.target).parent();
+	hideNewRecordForms()
 	classificationTreeNodeSelected(node)
 	if(node.hasClass("classification-can-attach-records"))
 		{
@@ -238,11 +239,11 @@ $(document).on("click", ".folder", function()
 $(document).on("click", ".folder-open", function()
 	{
 	var node = $(event.target).parent();
+	hideNewRecordForms()
 	classificationTreeNodeSelected(node)
 	if(node.hasClass("classification-can-attach-records"))
 		{
 		populateRecordTypeField("classification", node.attr("id").substr(19))
-		$("#new-folder-form-container").removeClass("new-folder-form-hidden")			
 		}
 	})
 
@@ -250,20 +251,21 @@ $(document).on("click", ".folder-open", function()
 $(document).on("click", ".classification-name>a", function()
 	{
 	var node = $(event.target).parent().parent();
+	hideNewRecordForms()
 	classificationTreeNodeSelected(node)
 	if(node.hasClass("classification-can-attach-records"))
 		{
 		populateRecordTypeField("classification", node.attr("id").substr(19))
-		$("#new-folder-form-container").removeClass("new-folder-form-hidden")			
 		}
 	})
 
 // Click on folder-fill Icon //
 $(document).on("click", ".folder-fill", function()
 	{
-	$("#records-list-pane").css("display", "block")
 	var node = $(event.target).parent();
+	hideNewRecordForms()
 	highlightSelectedNode(node)
+	$("#records-list-pane").css("display", "block")
 	if($(node).hasClass("folder-terminal"))
 		{
 		drawPropertiesTable("folder-terminal")
@@ -279,8 +281,8 @@ $(document).on("click", ".folder-fill", function()
 $(document).on("click", ".record-title>a", function()
 	{
 	var node = $(event.target).parent().parent();
+	hideNewRecordForms()
 	highlightSelectedNode(node)
-	$("#new-folder-form-container").addClass("new-folder-form-hidden")
 	$(".record-row").removeClass("row-selected")
 	$(".record-row > td:nth-child(5) > span").addClass("download-grey")
 	$(".record-row > td:nth-child(5) > span").removeClass("download")
@@ -291,7 +293,7 @@ $(document).on("click", ".record-title>a", function()
 		drawPropertiesTable("folder-intermediate")
 		getRecordProperties("folder-intermediate", node.attr("id").substr(11))	
 		populateRecordTypeField("folder-intermediate")
-		$("#new-folder-form-container").removeClass("new-folder-form-hidden")
+		//$("#new-folder-form-container").removeClass("new-folder-form-hidden")
 		}
 	else
 		{

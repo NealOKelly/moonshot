@@ -339,8 +339,8 @@ function classificationTreeNodeSelected(node)
 	highlightSelectedNode(node)
 	if((node).attr("id").substr(0, 19) == "classification-uri-")
 		{
-		$("#upload-form-container").addClass("upload-form-hidden")
-		$("#new-folder-form-container").addClass("new-folder-form-hidden")
+		//$("#upload-form-container").addClass("upload-form-hidden")
+		//$("#new-folder-form-container").addClass("new-folder-form-hidden")
 		if(node.hasClass("classification-can-attach-records"))
 			{
 			var classification = node.data("classificationNumber")
@@ -363,7 +363,7 @@ function classificationTreeNodeSelected(node)
 			{
 			if($(node).hasClass("folder-intermediate"))
 				{
-				$("#new-folder-form-container").addClass("new-folder-form-hidden")
+				//$("#new-folder-form-container").addClass("new-folder-form-hidden")
 				drawPropertiesTable("folder-intermediate")
 				getRecordProperties("folder-intermediate", node.attr("id").substr(11))	
 				}
@@ -460,8 +460,9 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 			switch(parentNodeType)
 				{
 				case "classification":
+					$("#new-folder-form-record-type").html("")
+					$("#new-folder-form-container").removeClass("new-folder-form-hidden")
 					var onlyRecordTypeCount = 0;
-					$("#new-folder-form-record-type").html("")	
 					var url = baseUrl + "/" + apiPath + "/Search?q=behaviour:folder&properties=RecordTypeName,RecordTypeContainerRule,RecordTypeUsualBehaviour&trimtype=RecordType"
 					$.ajax(
 						{
@@ -606,37 +607,12 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 					break;
 				case "folder-intermediate":
 					// do something
-					alert("folder-intermediate")
-					$("#new-folder-form-record-type").html("")
-					var url = baseUrl + "/" + apiPath + "/Search?q=usable&properties=RecordTypeName,RecordTypeContentsRule,RecordTypeClassification&trimtype=RecordType"
-					$.ajax(
-						{
-						url: url,
-						type: "POST",
-						xhrFields: { withCredentials: true},
-						contentType: 'application/json',
-						success: function(result)
-							{
-							console.log(result)
-							for(i=0; i<result.Results.length;i++)
-								{
-								if(result.Results[i].RecordTypeContainerRule.Value!="Prevented")
-									{
-									$("#new-folder-form-record-type").append("<option>" + result.Results[i].RecordTypeName.Value + "</option>")
-									}
-								}
-							if($("#new-folder-form-record-type option").length<2)
-								{
-								$("#new-folder-form-record-type").attr("readonly", "true")
-								}
-							}, 
-						error: function(result)
-							{
-							console.log("Oooops!")
-							}
-						});	
+					$("#new-sub-folder-form-container").removeClass("new-sub-folder-form-hidden")
+					$("#new-sub-folder-form-record-type").html("")
+					
 					break;
 				case "folder-terminal":
+					$("#upload-form-container").removeClass("upload-form-hidden")
 					$("#upload-form-record-type").html("")
 					var url = baseUrl + "/" + apiPath + "/Search?q=usable&properties=RecordTypeName,RecordTypeUsualBehaviour&trimtype=RecordType"
 					$.ajax(
@@ -684,6 +660,15 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 				}
 		})
 	}
+
+function hideNewRecordForms()
+	{
+	$("#new-folder-form-container").addClass("new-folder-form-hidden")
+	$("#new-sub-folder-form-container").addClass("new-sub-folder-form-hidden")
+	$("#upload-form-container").addClass("upload-form-hidden")
+	}
+
+
 
 function addOptionToDropdown(optionId, optionValue)
 	{
