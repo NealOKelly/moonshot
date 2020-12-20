@@ -231,7 +231,16 @@ $(document).on("click", ".folder", function()
 	if(node.hasClass("classification-can-attach-records"))
 		{
 		populateRecordTypeField("classification", node.attr("id").substr(19))
-		$("#new-folder-form-container").removeClass("new-folder-form-hidden")			
+		$("#new-folder-form-record-type").html("")
+		$("#new-folder-form-container").removeClass("new-folder-form-hidden")		
+		}
+	if(node.hasClass("folder-intermediate"))
+		{
+		//alert(node.attr("id").substr(19))
+		populateContainerField("folder-intermediate", node.attr("id").substr(11))
+		populateRecordTypeField("folder-intermediate", node.attr("id").substr(11))
+		$("#new-sub-folder-form-record-type").html("")
+		$("#new-sub-folder-form-container").removeClass("new-sub-folder-form-hidden")
 		}
 	})
 
@@ -244,6 +253,15 @@ $(document).on("click", ".folder-open", function()
 	if(node.hasClass("classification-can-attach-records"))
 		{
 		populateRecordTypeField("classification", node.attr("id").substr(19))
+		$("#new-folder-form-record-type").html("")
+		$("#new-folder-form-container").removeClass("new-folder-form-hidden")
+		}
+	if(node.hasClass("folder-intermediate"))
+		{
+		populateContainerField("folder-intermediate", node.attr("id").substr(11))
+		populateRecordTypeField("folder-intermediate", node.attr("id").substr(11))
+		$("#new-sub-folder-form-record-type").html("")
+		$("#new-sub-folder-form-container").removeClass("new-sub-folder-form-hidden")
 		}
 	})
 
@@ -256,6 +274,8 @@ $(document).on("click", ".classification-name>a", function()
 	if(node.hasClass("classification-can-attach-records"))
 		{
 		populateRecordTypeField("classification", node.attr("id").substr(19))
+		$("#new-folder-form-record-type").html("")
+		$("#new-folder-form-container").removeClass("new-folder-form-hidden")
 		}
 	})
 
@@ -268,14 +288,13 @@ $(document).on("click", ".folder-fill", function()
 	$("#records-list-pane").css("display", "block")
 	if($(node).hasClass("folder-terminal"))
 		{
+		getRecords(node.attr("id").substr(11))
+		populateContainerField("folder-terminal", node.attr("id").substr(11))
+		populateRecordTypeField("folder-terminal")
+		$("#new-folder-form-container").removeClass("upload-form-hidden")
 		drawPropertiesTable("folder-terminal")
 		getRecordProperties("folder-terminal", node.attr("id").substr(11))
-		getRecords(node.attr("id").substr(11))
 		}
-	clearUploadForm()
-	// It would be easier to read is we got the Container details to populated the New Record form here instead of as part of getRecordProperties, although it would require an extra API call.  Consider changing.
-	populateRecordTypeField("folder-terminal")
-	$("#new-folder-form-container").removeClass("upload-form-hidden")
 	})
 
 $(document).on("click", ".record-title>a", function()
@@ -290,22 +309,24 @@ $(document).on("click", ".record-title>a", function()
 	if($(node).hasClass("folder-intermediate"))
 		{
 		$("#records-list-pane").html("<div class='no-records'>Select a bottom-level folder to display records.</div>")
-		drawPropertiesTable("folder-intermediate")
-		getRecordProperties("folder-intermediate", node.attr("id").substr(11))	
+		populateContainerField("folder-intermediate", node.attr("id").substr(11))
 		populateRecordTypeField("folder-intermediate")
-		//$("#new-folder-form-container").removeClass("new-folder-form-hidden")
+		drawPropertiesTable("folder-intermediate")
+		getRecordProperties("folder-intermediate", node.attr("id").substr(11))
+		$("#new-sub-folder-form-record-type").html("")
+		$("#new-sub-folder-form-container").removeClass("new-sub-folder-form-hidden")
 		}
 	else
 		{
 		if($(node).hasClass("folder-terminal"))
 			{
 			//$("#records-list-pane").css("display", "block")
-			drawPropertiesTable("folder-terminal")
-			getRecordProperties("folder-terminal", node.attr("id").substr(11))
 			getRecords(node.attr("id").substr(11))
-			// It would be easier to read is we got the Container details to populated the New Record form here instead of as part of getRecordProperties, although it would require an extra API call.  Consider changing.
+			populateContainerField("folder-terminal", node.attr("id").substr(11))
 			populateRecordTypeField("folder-terminal")
 			$("#upload-form-container").removeClass("upload-form-hidden")
+			drawPropertiesTable("folder-terminal")
+			getRecordProperties("folder-terminal", node.attr("id").substr(11))
 			}
 		}
 	})

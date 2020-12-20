@@ -450,6 +450,38 @@ function getRecords(recordUri)
 // END RECORDS LIST PANEL //
 
 // 4. RIGHT PANEL //
+function populateContainerField(parentNodeType, parentNodeUri)
+	{
+	var url = baseUrl + "/" + apiPath + "/Search?q=" + parentNodeUri + "&properties=RecordTitle,RecordNumber&trimtype=Record"
+	$.ajax(
+		{
+		url: url,
+		type: "POST",
+		xhrFields: { withCredentials: true},
+		contentType: 'application/json',
+		success: function(result)
+			{
+			console.log(result)
+			switch(parentNodeType)
+				{
+				case "folder-intermediate":
+					$("#new-sub-folder-form-record-container").val(result.Results[0].RecordNumber.Value + ": " + result.Results[0].RecordTitle.Value)
+					$("#new-sub-solder-form-record-container").data("recordUri", result.Results[0].Uri)	
+					break;
+				case "folder-terminal":
+					//alert("This is a terminal folder.")
+					clearUploadForm()
+					$("#upload-form-record-container").val(result.Results[0].RecordNumber.Value + ": " + result.Results[0].RecordTitle.Value)
+					$("#upload-form-record-container").data("recordUri", result.Results[0].Uri)	
+					break;
+				}
+			}, 
+		error: function(result)
+			{
+			console.log("Oooops!")
+			}
+		});
+	}
 
 function populateRecordTypeField(parentNodeType, parentNodeUri)
 	{
@@ -460,8 +492,6 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 			switch(parentNodeType)
 				{
 				case "classification":
-					$("#new-folder-form-record-type").html("")
-					$("#new-folder-form-container").removeClass("new-folder-form-hidden")
 					var onlyRecordTypeCount = 0;
 					var url = baseUrl + "/" + apiPath + "/Search?q=behaviour:folder&properties=RecordTypeName,RecordTypeContainerRule,RecordTypeUsualBehaviour&trimtype=RecordType"
 					$.ajax(
@@ -607,8 +637,6 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 					break;
 				case "folder-intermediate":
 					// do something
-					$("#new-sub-folder-form-container").removeClass("new-sub-folder-form-hidden")
-					$("#new-sub-folder-form-record-type").html("")
 					
 					break;
 				case "folder-terminal":
@@ -770,13 +798,6 @@ function getRecordProperties(type, recordUri)
 							$("#properties-container").html(result.Results[0].RecordContainer.RecordNumber.Value + ": " + result.Results[0].RecordContainer.RecordTitle.Value)
 							$("#properties-record-type").html(result.Results[0].RecordRecordType.RecordTypeName.Value)
 							$("#properties-date-registered").html(dateRegistered)
-								
-							//$("#properties-access-control").html(result.Results[0].RecordAccessControl.Value)
-							
-							// Upload form.
-							clearUploadForm()
-							$("#upload-form-record-container").val(result.Results[0].RecordNumber.Value + ": " + result.Results[0].RecordTitle.Value)
-							$("#upload-form-record-container").data("recordUri", result.Results[0].Uri)
 							break;
 						case "document":
 							$("#properties-record-number").html(result.Results[0].RecordNumber.Value)
