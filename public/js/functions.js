@@ -170,14 +170,10 @@ function addClassificationNode(rootNode, classificationUri, classificationName, 
 
 function refreshFolderNodes(parentNodeType, parentNodeId)
 	{
-	console.log("refreshFolderNodes has been called")
-	console.log("parentNodeType: " + parentNodeType)
-	console.log("parentNodeId: " + parentNodeId)
 	getAuthenticationStatus().then(function () 
 		{
 		if(isAuthenticated)
 			{
-			console.log("isAuthenticated")
 			$("#" + parentNodeId + " > ul").addClass("classification-hidden") // if already exists, hide.
 	
 			var includedProperties = "RecordTitle, RecordRecordType, RecordTypeContentsRule, RecordContainer";
@@ -189,7 +185,6 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 				xhrFields: { withCredentials: true},
 				success: function(result)
 					{
-					console.log("xhr success")
 					var recordTypeDefinitions = result;
 					if(parentNodeType=="classification")
 						{
@@ -223,7 +218,6 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 								{
 								if(!$("#record-uri-" + result.Results[i].Uri).length)  // for each search result, check whether the <li> exists and, if not, create it.
 									{
-									console.log("Node does not exist")
 									for(x=0; x<recordTypeDefinitions.TotalResults; x++)
 										{
 										if(result.Results[i].RecordRecordType.Uri==recordTypeDefinitions.Results[x].Uri)
@@ -334,7 +328,6 @@ function sortClassificationTree(sortBy)
 
 function classificationTreeNodeSelected(node)
 	{
-	console.log(node.hasClass("classification-can-attach-records"))
 	$("#records-list-pane").html("<div class='no-records'>Select a bottom-level folder to display records.</div>")
 	highlightSelectedNode(node)
 	if((node).attr("id").substr(0, 19) == "classification-uri-")
@@ -350,7 +343,6 @@ function classificationTreeNodeSelected(node)
 			$("#new-folder-form-record-classification").data("classificationUri", (node).attr("id").substr(19))
 			// $("#" + node.attr("id") + "ul > li span:nth-child(3) > a").html()
 			$("#new-folder-form-container").removeClass("new-folder-form-hidden")
-			console.log()
 			}
 
 		drawPropertiesTable("classification")
@@ -398,7 +390,6 @@ function getRecords(recordUri)
 				xhrFields: { withCredentials: true},
 				success: function(result)
 					{
-					console.log(result)
 					var details = JSON.stringify(result);
 					if(result.TotalResults=="0")
 						{
@@ -461,7 +452,6 @@ function populateContainerField(parentNodeType, parentNodeUri)
 		contentType: 'application/json',
 		success: function(result)
 			{
-			console.log(result)
 			switch(parentNodeType)
 				{
 				case "folder-intermediate":
@@ -553,8 +543,6 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 														contentType: 'application/json',
 														success: function(result)
 															{
-															console.log(result)
-
 															for(x=0; x<result.TotalResults; x++)	
 																{
 																
@@ -636,49 +624,167 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 						});	
 					break;
 				case "folder-intermediate":
-					// do something
-					
+					if(config.ByListContainmentRules.UseApplicationConfig=="true")
+						{
+						var url = baseUrl + "/" + apiPath + "/Search?q=" + parentNodeUri + "&properties=RecordTtitle,RecordRecordType&trimtype=Record"
+						$.ajax(
+							{
+							url: url,
+							type: "POST",
+							xhrFields: { withCredentials: true},
+							contentType: 'application/json',
+							success: function(result)
+								{
+								for(i=0; i<config.ByListContainmentRules.Mappings.length; i++)
+									{
+										if(config.ByListContainmentRules.Mappings[i].ParentRecordType==result.Results[0].RecordRecordType.RecordTypeName.Value)
+										{
+										for(x=0; x<config.ByListContainmentRules.Mappings[i].ContentRecordTypes.length; x++)
+											{
+											$("#new-sub-folder-form-record-type").append("<option>" + config.ByListContainmentRules.Mappings[i].ContentRecordTypes[x] + "</option>")	
+											}
+										}
+									}
+								if($("#new-sub-folder-form-record-type option").length<2)
+									{
+									$("#new-sub-folder-form-record-type").attr("readonly", "true")
+									}
+								else
+									{
+									$("#new-sub-folder-form-record-type").attr("readonly", false)
+									}
+								}, 
+							error: function(result)
+								{
+								console.log("Oooops!")
+								}
+							});
+						}
+					else
+						{
+						var url = baseUrl + "/" + apiPath + "/Search?q=all&properties=RecordTypeName,RecordTypeContainerRule,RecordTypeUsualBehaviour&trimtype=RecordType"
+						$.ajax(
+							{
+							url: url,
+							type: "POST",
+							xhrFields: { withCredentials: true},
+							contentType: 'application/json',
+							success: function(result)
+								{
+								for(i=0; i<result.Results.length; i++)
+									{
+									if(result.Results[i].RecordTypeContainerRule.Value!="Prevented")
+										{
+										var exclude = false;
+										for(x=0; x<config.ExcludedRecordTypes.length; x++)
+											{
+											if(result.Results[i].RecordTypeName.Value==config.ExcludedRecordTypes[x])
+												{
+												exclude = true;
+												}
+											}
+										if(!exclude)
+											{
+											$("#new-sub-folder-form-record-type").append("<option>" + result.Results[i].RecordTypeName.Value + "</option>")		
+											}
+										}
+									}
+								}, 
+							error: function(result)
+								{
+								console.log("Oooops!")
+								}
+							});
+						}
 					break;
 				case "folder-terminal":
 					$("#upload-form-container").removeClass("upload-form-hidden")
+					$("#upload-form-record-container").html("")
 					$("#upload-form-record-type").html("")
-					var url = baseUrl + "/" + apiPath + "/Search?q=usable&properties=RecordTypeName,RecordTypeUsualBehaviour&trimtype=RecordType"
-					$.ajax(
-						{
-						url: url,
-						type: "POST",
-						xhrFields: { withCredentials: true},
-						contentType: 'application/json',
-						success: function(result)
+					if(config.ByListContainmentRules.UseApplicationConfig=="true")
+					   {
+											console.log("Use Application Config")
+						var url = baseUrl + "/" + apiPath + "/Search?q=" + parentNodeUri + "&properties=RecordTtitle,RecordRecordType&trimtype=Record"
+						$.ajax(
 							{
-							for(i=0; i<result.Results.length;i++)
+							url: url,
+							type: "POST",
+							xhrFields: { withCredentials: true},
+							contentType: 'application/json',
+							success: function(result)
 								{
-								if(result.Results[i].RecordTypeUsualBehaviour.Value=="Document")
+								console.log(result)
+								console.log(config.ByListContainmentRules)
+								for(i=0; i<config.ByListContainmentRules.Mappings.length; i++)
 									{
-									var exclude = false;
-									for(x=0; x<config.ExcludedRecordTypes.length; x++)
+										if(config.ByListContainmentRules.Mappings[i].ParentRecordType==result.Results[0].RecordRecordType.RecordTypeName.Value)
 										{
-										if(result.Results[i].RecordTypeName.Value==config.ExcludedRecordTypes[x])
+										for(x=0; x<config.ByListContainmentRules.Mappings[i].ContentRecordTypes.length; x++)
 											{
-											exclude = true;
+											$("#upload-form-record-type").append("<option>" + config.ByListContainmentRules.Mappings[i].ContentRecordTypes[x] + "</option>")	
 											}
 										}
-									if(!exclude)
+									}
+								console.log($("#upload-form-record-type").length)
+								if($("#upload-form-record-type option").length<2)
+									{
+									$("#upload-form-record-type").attr("readonly", "true")
+									}
+								else
+									{
+									$("#upload-form-record-type").attr("readonly", false)
+									}
+								}, 
+							error: function(result)
+								{
+								console.log("Oooops!")
+								}
+							});
+					   }
+					else
+					   {
+					   	var url = baseUrl + "/" + apiPath + "/Search?q=usable&properties=RecordTypeName,RecordTypeUsualBehaviour,RecordTypeContainerRule&trimtype=RecordType"
+						$.ajax(
+							{
+							url: url,
+							type: "POST",
+							xhrFields: { withCredentials: true},
+							contentType: 'application/json',
+							success: function(result)
+								{
+								for(i=0; i<result.Results.length;i++)
+									{
+									if(result.Results[i].RecordTypeContainerRule.Value!="Prevented")
 										{
-										$("#upload-form-record-type").append("<option>" + result.Results[i].RecordTypeName.Value + "</option>")	
+										var exclude = false;
+										for(x=0; x<config.ExcludedRecordTypes.length; x++)
+											{
+											if(result.Results[i].RecordTypeName.Value==config.ExcludedRecordTypes[x])
+												{
+												exclude = true;
+												}
+											}
+										if(!exclude)
+											{
+											$("#upload-form-record-type").append("<option>" + result.Results[i].RecordTypeName.Value + "</option>")	
+											}
 										}
 									}
-								}
-							if($("#upload-form-record-type option").length<2)
+								if($("#upload-form-record-type option").length<2)
+									{
+									$("#upload-form-record-type").attr("readonly", "true")
+									}
+								else
+									{
+									$("#upload-form-record-type").attr("readonly", false)
+									}
+								}, 
+							error: function(result)
 								{
-								$("#upload-form-record-type").attr("readonly", "true")
+								console.log("Oooops!")
 								}
-							}, 
-						error: function(result)
-							{
-							console.log("Oooops!")
-							}
-						});	
+							});
+					   }
 						break;
 					}
 				}
@@ -688,6 +794,105 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 				}
 		})
 	}
+
+function populateAdditionalFields(parentNodeType)
+	{
+	getAuthenticationStatus().then(function () 
+		{
+		if(isAuthenticated)
+			{
+			//var parentNodeType= "classification";
+			var url = baseUrl + "/" + apiPath + "/Search?q=all&properties=FieldDefinitionName, FieldDefinitionIsUsedByRecordTypes, 	FieldDefinitionFormat, FieldDefinitionSearchClause, FieldDefinitionLength&trimtype=FieldDefinition&pageSize=1000"
+			$.ajax(
+				{
+				url: url,
+				type: "POST",
+				contentType: 'application/json',
+				xhrFields: { withCredentials: true},
+				success: function(result)
+					{
+					console.log(result)
+					switch(parentNodeType)
+						{
+						case "classification":
+							var formName = "new-folder-form";
+							$("#" + formName + " .additional-field").remove()
+							break;
+						case "folder-terminal":
+								console.log("It's a terminal folder.")
+							break;
+						case "document":
+								console.log("It's a document.")
+							break;
+						}
+						
+						for(i=0; i<result.TotalResults; i++)
+							{
+							//console.log($("#new-folder-form-record-type").val())
+							if(result.Results[i].FieldDefinitionIsUsedByRecordTypes.Value.includes($("#new-folder-form-record-type").val()))
+								{
+								switch(result.Results[i].FieldDefinitionFormat.Value)
+									{
+									case "String":
+										console.log("Adding " + result.Results[i].FieldDefinitionName.Value)
+										var inputHTML = '<div class="form-group additional-field" data-search-clause-name="' + result.Results[i].FieldDefinitionSearchClause.Value + '">'
+										
+										inputHTML = inputHTML + '<label for="' + formName + '-additional-field-' + result.Results[i].FieldDefinitionSearchClause.Value + '">' + result.Results[i].FieldDefinitionName.Value + '</label>'
+											
+										inputHTML = inputHTML + '<input id="'+ formName + '-additional-field-' + result.Results[i].FieldDefinitionSearchClause.Value + '" class="form-control" maxlength="' + result.Results[i].FieldDefinitionLength.Value + '"></div>'
+										$("#" + formName).append(inputHTML)
+										break;
+									case "Number":
+										console.log("Number inputs are not yet supported.")
+										break;
+									case "Boolean":
+										console.log("Boolean inputs are not yet supported.")
+										break;
+									case "Date":
+										console.log("Date inputs are not yet supported.")
+										break;
+									case "Datetime":
+										console.log("Datetime inputs are not yet supported.")
+										break;
+									case "Decimal":
+										console.log("Decimal inputs are not yet supported.")
+										break;
+									case "Text":
+										console.log("Text inputs are not yet supported.")
+										break;
+									case "Currency":
+										console.log("Currency inputs are not yet supported.")
+										break;
+									case "Object":
+										console.log("Object inputs are not yet supported.")
+										break;
+									case "BigNumber":
+										console.log("BigNumber inputs are not yet supported.")
+										break;
+									case "Xml":
+										console.log("Xml inputs are not yet supported.")
+										break;
+									case "Geography":
+										console.log("Geography inputs are not yet supported.")
+										break;
+									}
+								}
+							}
+
+					}, 
+				error: function(result)
+					{
+					console.log("Oooops!")
+					}
+				});	
+			}
+		else
+			{
+			$("#session-expired").modal("show")
+			}
+		});
+	}
+
 
 function hideNewRecordForms()
 	{
@@ -825,23 +1030,23 @@ function getRecordProperties(type, recordUri)
 
 // 6. CREATE FOLDER //
 
-function createFolder(recordTitle, recordClassificationUri, recordType)
+function createFolder(recordTitle, recordClassificationUri, recordType, additionalFieldKeys, additionalFieldValues)
 	{
 	getAuthenticationStatus().then(function () 
 		{
 		if(isAuthenticated)
 			{
-			console.log("recordTitle: " + recordTitle)
-			console.log("recordClassificationUri: " + recordClassificationUri)
-			console.log("recordType: " + recordType)
-		
 			var url = baseUrl + "/" + apiPath + "/Record"
 			var data = {
 						"RecordTitle" : recordTitle,
 						"RecordRecordType" : recordType,
-						"RecordClassification" : recordClassificationUri
+						"RecordClassification" : recordClassificationUri,
+						"AdditionalFields" : {}
 						}
-
+			for(i=0; i<additionalFieldKeys.length; i++)
+				{
+				data.AdditionalFields[additionalFieldKeys[i]] = additionalFieldValues[i]		
+				}
 			$.ajax(
 				{
 				url: url,
@@ -935,7 +1140,6 @@ function createRecord(recordTitle, recordType, recordContainerUri, fileName)
 		{
 		if(isAuthenticated)
 			{
-			console.log(recordType)
 			var url = baseUrl + "/" + apiPath + "/Record"
 			var data = {
 						"RecordTitle" : recordTitle,

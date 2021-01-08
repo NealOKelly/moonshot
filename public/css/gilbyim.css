@@ -36,7 +36,8 @@ code {
 }
 
 #left-panel{
-	background-color: #75b540;
+	/*background-color: #75b540;*/
+	background-color: #38882f;
 	color: white;
 	height: 100%;
 	overflow: auto;

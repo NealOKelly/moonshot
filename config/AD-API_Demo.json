@@ -10,6 +10,36 @@
 	"APIPath" : "CMServiceAPI"		
 	},
 "ExcludedRecordTypes" : [
-						"Folder"
-						]
+						"Folder",
+						"Document"
+						],
+"ByListContainmentRules" : 
+	{
+	"UseApplicationConfig" : "true",
+	"Mappings" : 
+		[
+			{
+			"ParentRecordType" : "Staff Folder",
+			"ContentRecordTypes" :
+				[
+				"Staff Sub Folder"
+				]
+			},
+			{
+			"ParentRecordType" : "Staff Sub Folder",
+			"ContentRecordTypes" :
+				[
+				"Schools Document"
+				]
+			},
+			{
+			"ParentRecordType" : "Pupil Folder",
+			"ContentRecordTypes" :
+				[
+				"Pupil Sub Folder",
+				"Staff Sub Folder"
+				]
+			}
+		]
+	}
 }

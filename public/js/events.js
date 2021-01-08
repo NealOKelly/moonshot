@@ -14,7 +14,6 @@ $(document).ready(function()
 			contentType: 'application/json', 
 			success: function(result)
 			{
-			console.log("Ajax Success")
 			var classifications = result;
 			for(var i=0; i<classifications.TotalResults; i++)  // populate top level classifications.
 				{
@@ -34,7 +33,6 @@ $(document).ready(function()
 			error: function(result)
 				{
 				console.log("Oooops!")
-				console.log(result)
 				hideLoadingSpinner()
 				$('#connection-failed').modal('show')
 				}
@@ -58,7 +56,6 @@ $(document).on("click", "#upload-button", function()
 				$("#upload-status").modal("show")
 				file = $("#upload-form-file").prop('files')[0];
 				var fileName = uuidv4();
-				console.log(fileName);
 				var extension = getFileExtension($("#upload-form-file").val().substr(12))
 				uploadFile(fileName, extension, file).then(function()
 					{
@@ -146,12 +143,6 @@ function sortGrid(id, colNum, type, currentState)
 		tbody.append(...rowsArray);
     }
 
-
-
-
-
-
-
 $(document).on("click", "#upload-status-ok-button", function()
 	{
     $("#upload-status").modal("hide")
@@ -232,7 +223,8 @@ $(document).on("click", ".folder", function()
 		{
 		populateRecordTypeField("classification", node.attr("id").substr(19))
 		$("#new-folder-form-record-type").html("")
-		$("#new-folder-form-container").removeClass("new-folder-form-hidden")		
+		$("#new-folder-form-container").removeClass("new-folder-form-hidden")
+		populateAdditionalFields("classification")
 		}
 	if(node.hasClass("folder-intermediate"))
 		{
@@ -255,6 +247,7 @@ $(document).on("click", ".folder-open", function()
 		populateRecordTypeField("classification", node.attr("id").substr(19))
 		$("#new-folder-form-record-type").html("")
 		$("#new-folder-form-container").removeClass("new-folder-form-hidden")
+		populateAdditionalFields("classification")
 		}
 	if(node.hasClass("folder-intermediate"))
 		{
@@ -276,6 +269,7 @@ $(document).on("click", ".classification-name>a", function()
 		populateRecordTypeField("classification", node.attr("id").substr(19))
 		$("#new-folder-form-record-type").html("")
 		$("#new-folder-form-container").removeClass("new-folder-form-hidden")
+		populateAdditionalFields("classification")
 		}
 	})
 
@@ -290,7 +284,7 @@ $(document).on("click", ".folder-fill", function()
 		{
 		getRecords(node.attr("id").substr(11))
 		populateContainerField("folder-terminal", node.attr("id").substr(11))
-		populateRecordTypeField("folder-terminal")
+		populateRecordTypeField("folder-terminal", node.attr("id").substr(11))
 		$("#new-folder-form-container").removeClass("upload-form-hidden")
 		drawPropertiesTable("folder-terminal")
 		getRecordProperties("folder-terminal", node.attr("id").substr(11))
@@ -310,7 +304,7 @@ $(document).on("click", ".record-title>a", function()
 		{
 		$("#records-list-pane").html("<div class='no-records'>Select a bottom-level folder to display records.</div>")
 		populateContainerField("folder-intermediate", node.attr("id").substr(11))
-		populateRecordTypeField("folder-intermediate")
+		populateRecordTypeField("folder-intermediate", node.attr("id").substr(11))
 		drawPropertiesTable("folder-intermediate")
 		getRecordProperties("folder-intermediate", node.attr("id").substr(11))
 		$("#new-sub-folder-form-record-type").html("")
@@ -323,7 +317,7 @@ $(document).on("click", ".record-title>a", function()
 			//$("#records-list-pane").css("display", "block")
 			getRecords(node.attr("id").substr(11))
 			populateContainerField("folder-terminal", node.attr("id").substr(11))
-			populateRecordTypeField("folder-terminal")
+			populateRecordTypeField("folder-terminal", node.attr("id").substr(11))
 			$("#upload-form-container").removeClass("upload-form-hidden")
 			drawPropertiesTable("folder-terminal")
 			getRecordProperties("folder-terminal", node.attr("id").substr(11))
@@ -399,9 +393,24 @@ $(document).on("click", "#create-folder-button", function()
 		recordTitle = $("#new-folder-form-record-title").val()
 		recordClassificationUri = $("#new-folder-form-record-classification").data("classificationUri")
 		recordType = $("#new-folder-form-record-type").val()
-		createFolder(recordTitle, recordClassificationUri, recordType)	
+		var additionalFieldKeys = [];
+		var additionalFieldValues = [];
+		for(i=0; i<$("#new-folder-form > .additional-field").length; i++)
+			{
+			additionalFieldKeys.push($("#new-folder-form > .additional-field").eq(i).attr("data-search-clause-name"))
+			additionalFieldValues.push($("#new-folder-form > .additional-field").eq(i).children().eq(1).val())
+			}
+		createFolder(recordTitle, recordClassificationUri, recordType, additionalFieldKeys, additionalFieldValues)
 		}
 	})
+
+$(document).on("change", "#new-folder-form-record-type", function()
+	{
+	populateAdditionalFields("classification")
+	})
+
+
+
 // Click re-athentication button
 $(document).on("click", "#reauthenticate-button", function()
 	{
