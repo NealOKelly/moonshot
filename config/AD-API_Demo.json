@@ -41,5 +41,56 @@
 				]
 			}
 		]
+	},
+"PropertiesPane" :
+	{
+	"Classification" : 
+		{
+		"Core" :
+			{
+			"ClassificationTitle" : "true",
+			"ClassificationIdNumber" : "true",
+			"ClassificationAccessControl" : "true"
+			}
+		},
+	"IntermediateFolder" :
+		{
+		"Core" :
+			{
+			"RecordNumber" : "true",
+			"RecordClassification" : "false",
+			"RecordRecordType" : "true",
+			"RecordDateRegistered" : "false",
+			"RecordAccessControl" : "true",
+			"RecordDestructionDate" : "true"
+			},
+		"AdditionalFields" : "true"
+		},
+	"TerminalFolder" :
+		{
+		"Core" :
+			{
+			"RecordNumber" : "true",
+			"RecordContainer" : "false",
+			"RecordRecordType" : "true",
+			"RecordDateRegistered" : "false",
+			"RecordAccessControl" : "true",
+			"RecordDestructionDate" : "true"
+			},
+		"AdditionalFields" : "true"
+		},
+	"Document" : 
+		{
+		"Core" :
+			{
+			"RecordNumber" : "false",
+			"RecordContainer" : "true",
+			"RecordRecordType" : "true",
+			"RecordDateRegistered" : "false",
+			"RecordAccessControl" : "true",
+			"RecordDestructionDate" : "true"
+			},
+		"AdditionalFields" : "true"
+		}
 	}
 }

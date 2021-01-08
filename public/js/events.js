@@ -178,6 +178,7 @@ $(document).on("click", ".record-row", function()
 	{
 	if($(event.target).prop("nodeName")=="TD")
 		{
+		//alert("clicked")
 		//alert("It's a TD, so we know the parent is the row.")
 		var row = $(event.target).parent()
 		//alert(row.attr("id"))

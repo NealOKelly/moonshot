@@ -460,7 +460,7 @@ function populateContainerField(parentNodeType, parentNodeUri)
 					break;
 				case "folder-terminal":
 					//alert("This is a terminal folder.")
-					clearForm("upload-form")
+					$("#upload-form-record-container").val("")
 					$("#upload-form-record-container").val(result.Results[0].RecordNumber.Value + ": " + result.Results[0].RecordTitle.Value)
 					$("#upload-form-record-container").data("recordUri", result.Results[0].Uri)	
 					break;
@@ -909,7 +909,6 @@ function clearForm(form)
 			break;
 		case "upload-form":
 			$("#upload-form-record-title").val("")
-			$("#upload-form-record-container").val("")
 			$("#upload-form > .additional-field > input").val("")
 			break;
 		}
@@ -940,16 +939,105 @@ function drawPropertiesTable(type)
 	switch(type)
 		{
 		case "classification":
-			var tableHTML = '<table class="table table-dark table-sm" style="position:absolute;bottom:0;margin-bottom:0;"><tbody><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Number</td><td id="properties-classification-number" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Classification Title</td><td id="properties-classification-title" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Access Control</td><td id="properties-classification-access-control" style="text-align:left;"></td></tr></tbody></table>'
+			var tableHTML = '<table class="table table-dark table-sm" style="position:absolute;bottom:0;margin-bottom:0;"><tbody>'
+			if(config.PropertiesPane.Classification.Core.ClassificationIdNumber=="true")
+				{
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Number</td><td id="properties-classification-number" style="text-align:left;"></td></tr>'
+				}
+			if(config.PropertiesPane.Classification.Core.ClassificationTitle=="true")
+				{
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Classification Title</td><td id="properties-classification-title" style="text-align:left;"></td></tr>'
+				}
+			if(config.PropertiesPane.Classification.Core.ClassificationAccessControl=="true")
+				{
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Access Control</td><td id="properties-classification-access-control" style="text-align:left;"></td></tr>'
+				}
+			tableHTML = tableHTML + '</tbody></table>'
 			break;
 		case "folder-intermediate":
-			var tableHTML = '<table class="table table-dark table-sm" style="position:absolute;bottom:0;margin-bottom:0;"><tbody><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Record Number</td><td id="properties-record-number" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Classification</td><td id="properties-classification" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Record Type</td><td id="properties-record-type" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Date Registered</td><td id="properties-date-registered" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Access Control</td><td id="properties-access-control" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Retention Schedule</td><td id="properties-retention-schedule" style="text-align:left;"></td></tr><tr><td scope="row" style="width:20%;text-align:left;padding-left:30px;">Date Due for Destruction</td><td id="properties-date-due-for-destruction" style="text-align:left;"></td></tr><tr></tbody></table>'
+			var tableHTML = '<table class="table table-dark table-sm" style="position:absolute;bottom:0;margin-bottom:0;"><tbody>'
+			if(config.PropertiesPane.IntermediateFolder.Core.RecordNumber=="true")
+				{
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Record Number</td><td id="properties-record-number" style="text-align:left;"></td></tr>'
+				}
+			if(config.PropertiesPane.IntermediateFolder.Core.RecordClassification=="true")
+				{
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Classification</td><td id="properties-classification" style="text-align:left;"></td></tr>'	
+				}
+			if(config.PropertiesPane.IntermediateFolder.Core.RecordRecordType=="true")
+				{
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Record Type</td><td id="properties-record-type" style="text-align:left;"></td></tr>'
+				}
+			if(config.PropertiesPane.IntermediateFolder.Core.RecordDateRegistered=="true")
+				{
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Date Registered</td><td id="properties-date-registered" style="text-align:left;"></td></tr>'
+				}
+			if(config.PropertiesPane.IntermediateFolder.Core.RecordAccessControl=="true")
+				{
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Access Control</td><td id="properties-access-control" style="text-align:left;"></td></tr>'	
+				}
+			if(config.PropertiesPane.IntermediateFolder.Core.RecordDestructionDate=="true")
+				{
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:20%;text-align:left;padding-left:30px;">Date Due for Destruction</td><td id="properties-date-due-for-destruction" style="text-align:left;"></td></tr><tr>'
+				}
+			tableHTML = tableHTML + '</tbody></table>'
 			break;
 		case "folder-terminal":
-			var tableHTML = '<table class="table table-dark table-sm" style="position:absolute;bottom:0;margin-bottom:0;"><tbody><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Record Number</td><td id="properties-record-number" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Container</td><td id="properties-container" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Record Type</td><td id="properties-record-type" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Date Registered</td><td id="properties-date-registered" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Access Control</td><td id="properties-access-control" style="text-align:left;"></td></tr></tbody></table>'
+			var tableHTML = '<table class="table table-dark table-sm" style="position:absolute;bottom:0;margin-bottom:0;"><tbody>'
+			if(config.PropertiesPane.TerminalFolder.Core.RecordNumber=="true")
+				{
+				tableHTML = tableHTML +	'<tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Record Number</td><td id="properties-record-number" style="text-align:left;"></td></tr>'
+				}
+			if(config.PropertiesPane.TerminalFolder.Core.RecordContainer=="true")
+				{
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Container</td><td id="properties-container" style="text-align:left;"></td></tr>'
+				}
+			if(config.PropertiesPane.TerminalFolder.Core.RecordRecordType=="true")
+				{
+				tableHTML = tableHTML +	'<tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Record Type</td><td id="properties-record-type" style="text-align:left;"></td></tr>'
+				}
+			if(config.PropertiesPane.TerminalFolder.Core.RecordDateRegistered=="true")
+				{
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Date Registered</td><td id="properties-date-registered" style="text-align:left;"></td></tr>'
+				}
+			if(config.PropertiesPane.TerminalFolder.Core.RecordAccessControl=="true")
+				{
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Access Control</td><td id="properties-access-control" style="text-align:left;"></td></tr>'
+				}
+			if(config.PropertiesPane.TerminalFolder.Core.RecordDestructionDate=="true")
+				{
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:20%;text-align:left;padding-left:30px;">Date Due for Destruction</td><td id="properties-date-due-for-destruction" style="text-align:left;"></td></tr><tr>'	
+				}
+			tableHTML = tableHTML + '</tbody></table>'
 			break;
 		case "document":
-			var tableHTML = '<table class="table table-dark table-sm" style="position:absolute;bottom:0;margin-bottom:0;"><tbody><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Record Number</td><td id="properties-record-number" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Container</td><td id="properties-container" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Record Type</td><td id="properties-record-type" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Date Registered</td><td id="properties-date-registered" style="text-align:left;"></td></tr><tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Access Control</td><td id="properties-access-control" style="text-align:left;"></td></tr></tbody></table>'
+			$("#properties-pane > table").remove()
+			var tableHTML = '<table class="table table-dark table-sm" style="position:absolute;bottom:0;margin-bottom:0;"><tbody>'
+			if(config.PropertiesPane.Document.Core.RecordNumber=="true")
+				{
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Record Number</td><td id="properties-record-number" style="text-align:left;"></td></tr>'	
+				}
+			if(config.PropertiesPane.Document.Core.RecordContainer=="true")
+				{
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Container</td><td id="properties-container" style="text-align:left;"></td></tr>'		
+				}
+			if(config.PropertiesPane.Document.Core.RecordRecordType=="true")
+				{
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Record Type</td><td id="properties-record-type" style="text-align:left;"></td></tr>'
+				}
+			if(config.PropertiesPane.Document.Core.RecordDateRegistered=="true")
+				{
+				tableHTML = tableHTML +	'<tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Date Registered</td><td id="properties-date-registered" style="text-align:left;"></td></tr>'	
+				}
+			if(config.PropertiesPane.Document.Core.RecordAccessControl=="true")
+				{
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;text-align:left;padding-left:30px;">Access Control</td><td id="properties-access-control" style="text-align:left;"></td></tr>'	
+				}
+			if(config.PropertiesPane.Document.Core.RecordDestructionDate=="true")
+				{
+				tableHTML = tableHTML +	'<tr><td scope="row" style="width:20%;text-align:left;padding-left:30px;">Date Due for Destruction</td><td id="properties-date-due-for-destruction" style="text-align:left;"></td></tr><tr>'
+				}
+			tableHTML = tableHTML + '</tbody></table>'
 			break;
 		}
 	$("#properties-pane > table").remove()
@@ -975,7 +1063,6 @@ function getClassificationProperties(classificationUri)
 					$("#properties-classification-title").html(result.Results[0].ClassificationTitle.Value)
 					$("#properties-classification-number").html(result.Results[0].ClassificationIdNumber.Value)
 					$("#properties-classification-access-control").html(result.Results[0].ClassificationAccessControl.Value)
-
 					}, 
 				error: function(result)
 					{
@@ -996,7 +1083,7 @@ function getRecordProperties(type, recordUri)
 		{
 		if(isAuthenticated)
 			{
-			var url = baseUrl + "/" + apiPath + "/Search?q=" + recordUri + "&properties=RecordTitle, RecordNumber, Classification, RecordContainer, RecordType, DateRegistered, AccessControl, RetentionSchedule&trimtype=Record"
+			var url = baseUrl + "/" + apiPath + "/Search?q=" + recordUri + "&properties=RecordTitle, RecordNumber, Classification, RecordContainer, RecordType, DateRegistered, AccessControl, RecordDestructionDate&trimtype=Record"
 			$.ajax(
 				{
 				url: url, 
@@ -1005,6 +1092,8 @@ function getRecordProperties(type, recordUri)
 				xhrFields: { withCredentials: true},
 				success: function(result)
 					{
+					console.log("getRecordProperties()")
+					console.log(result)
 					var details = JSON.stringify(result);
 					var dateRegistered = result.Results[0].RecordDateRegistered.DateTime.substr(8, 2) + '/'
 					dateRegistered = dateRegistered + result.Results[0].RecordDateRegistered.DateTime.substr(5, 2) + '/'
@@ -1018,13 +1107,15 @@ function getRecordProperties(type, recordUri)
 							$("#properties-record-type").html(result.Results[0].RecordRecordType.RecordTypeName.Value)
 							$("#properties-date-registered").html(dateRegistered)
 							$("#properties-access-control").html(result.Results[0].RecordAccessControl.Value)
-							$("#properties-retention-schedule").html(result.Results[0].RecordRetentionSchedule.Uri)
+							// need to look at behaviour of date due for destruction
 							break;
 						case "folder-terminal":
 							$("#properties-record-number").html(result.Results[0].RecordNumber.Value)
 							$("#properties-container").html(result.Results[0].RecordContainer.RecordNumber.Value + ": " + result.Results[0].RecordContainer.RecordTitle.Value)
 							$("#properties-record-type").html(result.Results[0].RecordRecordType.RecordTypeName.Value)
 							$("#properties-date-registered").html(dateRegistered)
+							$("#properties-access-control").html(result.Results[0].RecordAccessControl.Value)
+							// need to look at behaviour of date due for destruction
 							break;
 						case "document":
 							$("#properties-record-number").html(result.Results[0].RecordNumber.Value)
@@ -1032,6 +1123,7 @@ function getRecordProperties(type, recordUri)
 							$("#properties-record-type").html(result.Results[0].RecordRecordType.RecordTypeName.Value)
 							$("#properties-date-registered").html(dateRegistered)
 							$("#properties-access-control").html(result.Results[0].RecordAccessControl.Value)
+							// need to look at behaviour of date due for destruction
 							break;
 						}
 					}, 
