@@ -149,10 +149,22 @@ $(document).on("click", "#upload-status-ok-button", function()
 	$("#upload-progress-bar").removeClass("bg-danger")
 	$("#upload-progress-bar").addClass("bg-success")
 	$("#upload-progress-bar").css("width", "0%")
-	$("#upload-status-ok-button").css("display", "block")
+	$("#upload-status-ok-button").css("display", "none")
 	})
 
-
+$(document).on("click", "#create-folder-ok-button", function()
+	{
+    $("#create-folder-status").modal("hide")
+	setTimeout(function()
+		{
+		$("#create-folder-caption").html("Creating folder...")
+		$("#create-folder-progress-bar").removeClass("bg-danger")
+		$("#create-folder-progress-bar").addClass("bg-success")
+		$("#create-folder-progress-bar").css("width", "0%")
+		$("#create-folder-ok-button").css("display", "none")
+		},
+		1000);
+	})
 
 
 $(document).on("click", ".record-row", function()

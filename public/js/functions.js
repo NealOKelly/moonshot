@@ -894,6 +894,24 @@ function populateAdditionalFields(parentNodeType)
 		});
 	}
 
+function clearForm(form)
+	{
+	switch(form)
+		{
+		case "new-folder-form":
+			$("#new-folder-form-record-title").val("")
+			$("#new-folder-form > .additional-field > input").val("")
+			break;
+		case "new-sub-folder-form":
+			$("#new-sub-folder-form-record-title").val("")
+			$("#new-sub-folder-form > .additional-field > input").val("")
+			break;
+		case "upload-form":
+			// do something
+			break;
+		}
+	}
+
 
 function hideNewRecordForms()
 	{
@@ -1061,13 +1079,14 @@ function createFolder(recordTitle, recordClassificationUri, recordContainerUri, 
 					{
 					$("#create-folder-progress-bar").css("width", "100%")
 					$("#create-folder-caption").html("Folder created successfully.")
-					$("#new-folder-form-record-title").val("")
 					if(recordClassificationUri != null)
 						{
+						clearForm("new-folder-form")
 						refreshFolderNodes("classification", "classification-uri-" + recordClassificationUri)
 						}
 					if(recordContainerUri != null)
 						{
+						clearForm("new-sub-folder-form")
 						refreshFolderNodes("record", "record-uri-" + recordContainerUri)
 						}
 					setTimeout(function()
@@ -1083,8 +1102,15 @@ function createFolder(recordTitle, recordClassificationUri, recordContainerUri, 
 					{
 					console.log("Oooops!")
 					console.log(result)
-					$("#upload-progress-bar").css("width", "67%")	
-					showUploadError()
+					if(recordClassificationUri != null)
+						{
+						clearForm("new-folder-form")
+						}
+					if(recordContainerUri != null)
+						{
+						clearForm("new-sub-folder-form")							
+						}
+					showCreateFolderError(result.responseJSON.ResponseStatus.Message)
 					}
 				});	
 			}
@@ -1257,8 +1283,28 @@ function showUploadError(trimError)
 		$("#upload-status-caption").html("An error has occured during your upload.  If the problem persists, please contact GilbyIM support.")
 		$("#upload-status-ok-button").css("display", "block")
 		}
-
 	}
+
+function showCreateFolderError(trimError)
+	{
+	console.log(trimError)
+	
+	if(trimError)
+		{
+		$("#create-folder-progress-bar").addClass("bg-danger")
+		$("#create-folder-progress-bar").css("width", "100%")
+		$("#create-folder-caption").html(trimError)
+		$("#create-folder-ok-button").css("display", "block")
+		}
+	else
+		{
+		$("#create-folder-progress-bar").addClass("bg-danger")
+		$("#create-folder-progress-bar").css("width", "100%")
+		$("#create-folder-caption").html("An error has occured during the creationg of the folder.  If the problem persists, please contact GilbyIM support.")
+		$("#create-folder-ok-button").css("display", "block")
+		}
+	}
+
 
 // END UPLOAD & REGISTER DOCUMENT //
 
