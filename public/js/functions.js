@@ -460,7 +460,7 @@ function populateContainerField(parentNodeType, parentNodeUri)
 					break;
 				case "folder-terminal":
 					//alert("This is a terminal folder.")
-					clearUploadForm()
+					clearForm("upload-form")
 					$("#upload-form-record-container").val(result.Results[0].RecordNumber.Value + ": " + result.Results[0].RecordTitle.Value)
 					$("#upload-form-record-container").data("recordUri", result.Results[0].Uri)	
 					break;
@@ -822,8 +822,9 @@ function populateAdditionalFields(parentNodeType)
 							var formName = "new-sub-folder-form";
 							$("#" + formName + " .additional-field").remove()
 							break;
-						case "document":
-								console.log("It's a document.")
+						case "folder-terminal":
+							var formName = "upload-form";
+							$("#" + formName + " .additional-field").remove()
 							break;
 						}
 						
@@ -907,7 +908,9 @@ function clearForm(form)
 			$("#new-sub-folder-form > .additional-field > input").val("")
 			break;
 		case "upload-form":
-			// do something
+			$("#upload-form-record-title").val("")
+			$("#upload-form-record-container").val("")
+			$("#upload-form > .additional-field > input").val("")
 			break;
 		}
 	}
@@ -1172,18 +1175,26 @@ function uploadFile(fileName, extension, file)
 	return deferredObject.promise();
 	}
 
-function createRecord(recordTitle, recordType, recordContainerUri, fileName)
+function createRecord(recordTitle, recordType, recordContainerUri, fileName, additionalFieldKeys, additionalFieldValues)
 	{
 	getAuthenticationStatus().then(function () 
 		{
 		if(isAuthenticated)
 			{
+			console.log(additionalFieldKeys)
+			console.log(additionalFieldValues)
 			var url = baseUrl + "/" + apiPath + "/Record"
 			var data = {
 						"RecordTitle" : recordTitle,
 						"RecordRecordType" : recordType,
-						"RecordContainer" : recordContainerUri
+						"RecordContainer" : recordContainerUri,
+						"AdditionalFields" : {}
 						}
+			for(i=0; i<additionalFieldKeys.length; i++)
+				{
+				data.AdditionalFields[additionalFieldKeys[i]] = additionalFieldValues[i]		
+				}
+			
 			$.ajax(
 				{
 				url: url,
@@ -1194,11 +1205,13 @@ function createRecord(recordTitle, recordType, recordContainerUri, fileName)
 				success: function(result)
 					{
 					console.log("Record succesfully created.")
-					$("#upload-progress-bar").css("width", "67%")	
+					clearForm("upload-form")
+					$("#upload-progress-bar").css("width", "67%")
 					attachFileToRecord(result.Results[0].Uri, fileName, recordContainerUri)
 					}, 
 				error: function(result)
 					{
+					clearForm("upload-form")
 					console.log("Oooops!")
 					$("#upload-status-caption").html(result.responseJSON.ResponseStatus.Message)
 					$("#upload-progress-bar").css("width", "67%")	
@@ -1261,11 +1274,6 @@ function attachFileToRecord(recordUri, fileName, recordContainerUri)
 			$("#session-expired").modal("show")
 			}
 		});
-	}
-
-function clearUploadForm()
-	{
-	$("#upload-form-record-container").val("")
 	}
 
 function showUploadError(trimError)

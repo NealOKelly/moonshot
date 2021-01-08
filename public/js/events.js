@@ -62,7 +62,14 @@ $(document).on("click", "#upload-button", function()
 					var recordTitle = $("#upload-form-record-title").val()
 					var recordType = $("#upload-form-record-type").val()
 					var recordContainerUri = $("#upload-form-record-container").data("recordUri")
-					createRecord(recordTitle, recordType, recordContainerUri, fileName + "." + extension)
+					var additionalFieldKeys = [];
+					var additionalFieldValues = [];
+					for(i=0; i<$("#upload-form > .additional-field").length; i++)
+						{
+						additionalFieldKeys.push($("#upload-form > .additional-field").eq(i).attr("data-search-clause-name"))
+						additionalFieldValues.push($("#upload-form > .additional-field").eq(i).children().eq(1).val())
+						}
+					createRecord(recordTitle, recordType, recordContainerUri, fileName + "." + extension, additionalFieldKeys, additionalFieldValues)
 					})
 				}
 			}
@@ -299,6 +306,7 @@ $(document).on("click", ".folder-fill", function()
 		getRecords(node.attr("id").substr(11))
 		populateContainerField("folder-terminal", node.attr("id").substr(11))
 		populateRecordTypeField("folder-terminal", node.attr("id").substr(11))
+		populateAdditionalFields("folder-terminal")
 		$("#new-folder-form-container").removeClass("upload-form-hidden")
 		drawPropertiesTable("folder-terminal")
 		getRecordProperties("folder-terminal", node.attr("id").substr(11))
@@ -333,6 +341,7 @@ $(document).on("click", ".record-title>a", function()
 			getRecords(node.attr("id").substr(11))
 			populateContainerField("folder-terminal", node.attr("id").substr(11))
 			populateRecordTypeField("folder-terminal", node.attr("id").substr(11))
+			populateAdditionalFields("folder-terminal")
 			$("#upload-form-container").removeClass("upload-form-hidden")
 			drawPropertiesTable("folder-terminal")
 			getRecordProperties("folder-terminal", node.attr("id").substr(11))
@@ -453,7 +462,7 @@ $(document).on("change", "#new-sub-folder-form-record-type", function()
 // Click re-athentication button
 $(document).on("click", "#test-button", function()
 	{
-	populateAdditionalFields("folder-intermediate")
+	populateAdditionalFields("folder-terminal")
 	})
 
 
