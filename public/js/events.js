@@ -233,6 +233,7 @@ $(document).on("click", ".folder", function()
 		populateRecordTypeField("folder-intermediate", node.attr("id").substr(11))
 		$("#new-sub-folder-form-record-type").html("")
 		$("#new-sub-folder-form-container").removeClass("new-sub-folder-form-hidden")
+		populateAdditionalFields("folder-intermediate")
 		}
 	})
 
@@ -255,6 +256,7 @@ $(document).on("click", ".folder-open", function()
 		populateRecordTypeField("folder-intermediate", node.attr("id").substr(11))
 		$("#new-sub-folder-form-record-type").html("")
 		$("#new-sub-folder-form-container").removeClass("new-sub-folder-form-hidden")
+		populateAdditionalFields("folder-intermediate")
 		}
 	})
 
@@ -309,6 +311,7 @@ $(document).on("click", ".record-title>a", function()
 		getRecordProperties("folder-intermediate", node.attr("id").substr(11))
 		$("#new-sub-folder-form-record-type").html("")
 		$("#new-sub-folder-form-container").removeClass("new-sub-folder-form-hidden")
+		populateAdditionalFields("folder-intermediate")
 		}
 	else
 		{
@@ -392,6 +395,7 @@ $(document).on("click", "#create-folder-button", function()
 		$("#create-folder-status").modal("show")
 		recordTitle = $("#new-folder-form-record-title").val()
 		recordClassificationUri = $("#new-folder-form-record-classification").data("classificationUri")
+		var recordContainerUri;
 		recordType = $("#new-folder-form-record-type").val()
 		var additionalFieldKeys = [];
 		var additionalFieldValues = [];
@@ -400,13 +404,44 @@ $(document).on("click", "#create-folder-button", function()
 			additionalFieldKeys.push($("#new-folder-form > .additional-field").eq(i).attr("data-search-clause-name"))
 			additionalFieldValues.push($("#new-folder-form > .additional-field").eq(i).children().eq(1).val())
 			}
-		createFolder(recordTitle, recordClassificationUri, recordType, additionalFieldKeys, additionalFieldValues)
+		createFolder(recordTitle, recordClassificationUri, recordContainerUri, recordType, additionalFieldKeys, additionalFieldValues)
+		}
+	else
+		{
+		$("#create-folder-status").modal("show")
+		recordTitle = $("#new-sub-folder-form-record-title").val()
+		var recordClassificationUri;
+		recordContainerUri = $("#new-sub-folder-form-record-container").data("recordUri")
+		recordType = $("#new-sub-folder-form-record-type").val()
+		var additionalFieldKeys = [];
+		var additionalFieldValues = [];
+		for(i=0; i<$("#new-sub-folder-form > .additional-field").length; i++)
+			{
+			additionalFieldKeys.push($("#new-sub-folder-form > .additional-field").eq(i).attr("data-search-clause-name"))
+			additionalFieldValues.push($("#new-sub-folder-form > .additional-field").eq(i).children().eq(1).val())
+			}
+		createFolder(recordTitle, recordClassificationUri, recordContainerUri, recordType, additionalFieldKeys, additionalFieldValues)
 		}
 	})
+
+
+
+
 
 $(document).on("change", "#new-folder-form-record-type", function()
 	{
 	populateAdditionalFields("classification")
+	})
+
+$(document).on("change", "#new-sub-folder-form-record-type", function()
+	{
+	populateAdditionalFields("folder-intermediate")
+	})
+
+// Click re-athentication button
+$(document).on("click", "#test-button", function()
+	{
+	populateAdditionalFields("folder-intermediate")
 	})
 
 

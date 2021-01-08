@@ -456,7 +456,7 @@ function populateContainerField(parentNodeType, parentNodeUri)
 				{
 				case "folder-intermediate":
 					$("#new-sub-folder-form-record-container").val(result.Results[0].RecordNumber.Value + ": " + result.Results[0].RecordTitle.Value)
-					$("#new-sub-solder-form-record-container").data("recordUri", result.Results[0].Uri)	
+					$("#new-sub-folder-form-record-container").data("recordUri", result.Results[0].Uri)	
 					break;
 				case "folder-terminal":
 					//alert("This is a terminal folder.")
@@ -818,8 +818,9 @@ function populateAdditionalFields(parentNodeType)
 							var formName = "new-folder-form";
 							$("#" + formName + " .additional-field").remove()
 							break;
-						case "folder-terminal":
-								console.log("It's a terminal folder.")
+						case "folder-intermediate":
+							var formName = "new-sub-folder-form";
+							$("#" + formName + " .additional-field").remove()
 							break;
 						case "document":
 								console.log("It's a document.")
@@ -829,7 +830,7 @@ function populateAdditionalFields(parentNodeType)
 						for(i=0; i<result.TotalResults; i++)
 							{
 							//console.log($("#new-folder-form-record-type").val())
-							if(result.Results[i].FieldDefinitionIsUsedByRecordTypes.Value.includes($("#new-folder-form-record-type").val()))
+							if(result.Results[i].FieldDefinitionIsUsedByRecordTypes.Value.includes($("#"+ formName + "-record-type").val()))
 								{
 								switch(result.Results[i].FieldDefinitionFormat.Value)
 									{
@@ -1030,7 +1031,7 @@ function getRecordProperties(type, recordUri)
 
 // 6. CREATE FOLDER //
 
-function createFolder(recordTitle, recordClassificationUri, recordType, additionalFieldKeys, additionalFieldValues)
+function createFolder(recordTitle, recordClassificationUri, recordContainerUri, recordType, additionalFieldKeys, additionalFieldValues)
 	{
 	getAuthenticationStatus().then(function () 
 		{
@@ -1041,8 +1042,10 @@ function createFolder(recordTitle, recordClassificationUri, recordType, addition
 						"RecordTitle" : recordTitle,
 						"RecordRecordType" : recordType,
 						"RecordClassification" : recordClassificationUri,
+						"RecordContainer" : recordContainerUri,
 						"AdditionalFields" : {}
 						}
+		console.log(data)
 			for(i=0; i<additionalFieldKeys.length; i++)
 				{
 				data.AdditionalFields[additionalFieldKeys[i]] = additionalFieldValues[i]		
@@ -1059,7 +1062,14 @@ function createFolder(recordTitle, recordClassificationUri, recordType, addition
 					$("#create-folder-progress-bar").css("width", "100%")
 					$("#create-folder-caption").html("Folder created successfully.")
 					$("#new-folder-form-record-title").val("")
-					refreshFolderNodes("classification", "classification-uri-" + recordClassificationUri)
+					if(recordClassificationUri != null)
+						{
+						refreshFolderNodes("classification", "classification-uri-" + recordClassificationUri)
+						}
+					if(recordContainerUri != null)
+						{
+						refreshFolderNodes("record", "record-uri-" + recordContainerUri)
+						}
 					setTimeout(function()
 						{
 						$("#create-folder-status").modal("hide")
@@ -1067,10 +1077,12 @@ function createFolder(recordTitle, recordClassificationUri, recordType, addition
 						$("#create-folder-caption").html("Creating folder...")
 						},
 						500);
+						console.log(result)
 					}, 
 				error: function(result)
 					{
 					console.log("Oooops!")
+					console.log(result)
 					$("#upload-progress-bar").css("width", "67%")	
 					showUploadError()
 					}
