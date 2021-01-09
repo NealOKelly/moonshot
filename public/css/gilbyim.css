@@ -64,37 +64,58 @@ code {
 
 /* Buttons
 -------------------------------------------------- */
-.btn-primary {
-	background-color: #75b540;
-	border-color: #75b540;
+.btn-indigo {
+	color: #fff;
+	background-color: #000033;
+	border-color: #000033;
 }
 
-.btn-primary:not(:disabled):not(.disabled).active, .btn-primary:not(:disabled):not(.disabled):active, .show>.btn-primary.dropdown-toggle{
-	background-color: #75b540;
-	border-color: #75b540;
+.btn-indigo:active {
+	background-color: #000033;
+	border-color: #000033;
 }
 
-.btn-primary:not(:disabled):not(.disabled).active:focus, .btn-primary:not(:disabled):not(.disabled):active:focus, .show>.btn-primary.dropdown-toggle:focus{
+.btn-indigo:focus {
+	background-color: #000033;
+	border-color: #000033;
 	box-shadow: 0 0 0 0.2rem #fff;
 }
 
-.btn-primary:active {
-	background-color: #75b540;
-	border-color: #75b540;
+.btn-indigo:visited {
+	background-color: #000033;
+	border-color: #000033;
 }
 
-.btn-primary:focus {
-	background-color: #75b540;
-	border-color: #75b540;
+.btn-indigo:hover {
+	color: #fff;
+	background-color: #000033;
+	border-color: #000033;
+}
+
+.btn-green {
+	color: #fff;
+	background-color: #38882f;
+	border-color: #38882f;
+}
+
+.btn-green:active {
+	background-color: #38882f;
+	border-color: #38882f;
+}
+
+.btn-green:focus {
+	background-color: #38882f;
+	border-color: #38882f;
 	box-shadow: 0 0 0 0.2rem #fff;
 }
 
-.btn-primary:visited {
-	background-color: #75b540;
-	border-color: #75b540;
+.btn-green:visited {
+	background-color: #38882f;
+	border-color: #38882f;
 }
 
-.btn-primary:hover {
-	background-color: #75b540;
-	border-color: #75b540;
+.btn-green:hover {
+	color: #fff;
+	background-color: #38882f;
+	border-color: #38882f;
 }
