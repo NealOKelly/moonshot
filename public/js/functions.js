@@ -832,7 +832,7 @@ function populateAdditionalFields(parentNodeType)
 									case "String":
 										var inputHTML = '<div class="form-group additional-field" data-search-clause-name="' + result.Results[i].FieldDefinitionSearchClause.Value + '">'
 										
-										inputHTML = inputHTML + '<label for="' + formName + '-additional-field-' + result.Results[i].FieldDefinitionSearchClause.Value + '" class="display-4" style="color:#000033;font-size:1.5rem;">' + result.Results[i].FieldDefinitionName.Value + '</label>'
+										inputHTML = inputHTML + '<label for="' + formName + '-additional-field-' + result.Results[i].FieldDefinitionSearchClause.Value + '" class="display-4" style="color:#000033;font-size:1.25rem;"><span>' + result.Results[i].FieldDefinitionName.Value + ' </span><span style="font-size:1rem">(optional)</span></label>'
 											
 										inputHTML = inputHTML + '<input id="'+ formName + '-additional-field-' + result.Results[i].FieldDefinitionSearchClause.Value + '" class="form-control" maxlength="' + result.Results[i].FieldDefinitionLength.Value + '"></div>'
 										$("#" + formName).append(inputHTML)
