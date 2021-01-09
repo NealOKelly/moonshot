@@ -80,7 +80,7 @@
 			"RecordNumber" : "true",
 			"RecordContainer" : "false",
 			"RecordRecordType" : "true",
-			"RecordDateRegistered" : "false",
+			"RecordDateRegistered" : "true",
 			"RecordAccessControl" : "true",
 			"RecordDestructionDate" : "true"
 			},

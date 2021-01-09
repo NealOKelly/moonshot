@@ -279,6 +279,27 @@ th.sorted-up::after{
 	cursor: pointer;
 }
 
+#properties-pane{
+	margin-top: 0px;
+}
+
+#properties-pane>table>thead>tr>th{
+	position: sticky;
+	top: 0;
+	z-index: 10;
+	background-color: #343a40;
+	cursor: default;
+	text-align:left;
+	padding-left:30px;
+}
+
+#properties-pane>table>tbody>tr>td{
+	text-align:left;
+}
+
+#properties-pane>table>tbody{
+	overflow-y: auto;
+}
 .no-records{
 	padding-top: 35%;
 }
