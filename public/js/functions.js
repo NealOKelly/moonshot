@@ -1672,7 +1672,6 @@ function uploadFile(fileName, extension, file)
 					},
 				error: function(result) 
 					{
-					$("#upload-progress-bar").css("width", "33%")
 					showUploadError()
 					}
 				});
@@ -1720,7 +1719,6 @@ function createRecord(recordTitle, recordType, recordContainerUri, fileName, add
 					{
 					clearForm("upload-form")
 					$("#upload-status-caption").html(result.responseJSON.ResponseStatus.Message)
-					$("#upload-progress-bar").css("width", "67%")	
 					showUploadError(result.responseJSON.ResponseStatus.Message)
 					}
 				});
@@ -1769,7 +1767,6 @@ function attachFileToRecord(recordUri, fileName, recordContainerUri)
 					}, 
 				error: function(result)
 					{
-					$("#upload-progress-bar").css("width", "100%")
 					showUploadError()
 					}
 				});
@@ -1785,6 +1782,7 @@ function showUploadError(trimError)
 	{
 	if(trimError)
 		{
+		$("#upload-progress-bar").css("width", "100%")
 		$("#upload-progress-bar").addClass("bg-danger")
 		$("#upload-status-caption").html(trimError)
 		$("#upload-status-ok-button").css("display", "block")
