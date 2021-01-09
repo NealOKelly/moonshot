@@ -39,6 +39,13 @@
 				"Pupil Sub Folder",
 				"Staff Sub Folder"
 				]
+			},
+			{
+			"ParentRecordType" : "Pupil Sub Folder",
+			"ContentRecordTypes" :
+				[
+				"Schools Document"
+				]
 			}
 		]
 	},
