@@ -1029,6 +1029,7 @@ function drawPropertiesTable(type)
 			break;
 		}
 	tableHTML = tableHTML + '</tbody></table>'
+	$("#properties-pane-logo").remove()
 	$("#properties-pane > table").remove()
 	$("#properties-pane").append(tableHTML)
 	}
