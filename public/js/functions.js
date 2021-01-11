@@ -393,7 +393,7 @@ function getRecords(recordUri)
 					var details = JSON.stringify(result);
 					if(result.TotalResults=="0")
 						{
-						$("#records-list-pane").html("<div class='no-records'>The selected folder does not contain any records.</div>")		
+						$("#records-list-pane").html("<div class='no-records display-4'>The selected folder does not contain any records.</div>")		
 						}
 					else
 						{
@@ -1075,6 +1075,30 @@ function formatDate(dateTime, format)
 	return formattedDate;
 	}
 
+function parseAccessControlString(string, type)
+	{
+	//console.log(string.search(":"))
+	//console.log(string.search(";"))
+	//console.log(string)
+	var JSONObj = { "ViewDocument" : "", "ViewMetadata" : "", "UpdateDocument" : "", "UpdateRecordMetadata" : "", "ModifyRecordAccess" : "", "DestroyRecord" : "", "ContributeContents" : "" };
+	JSONObj.ViewDocument = string.substr(string.search(":")+2, string.search(";")-string.search(":")-2)
+	string = string.substr(string.search(";")+2)
+	JSONObj.ViewMetadata = string.substr(string.search(":")+2, string.search(";")-string.search(":")-2)
+	string = string.substr(string.search(";")+2)
+	//if(type=="document")
+	JSONObj.UpdateDocument = string.substr(string.search(":")+2, string.search(";")-string.search(":")-2)
+		string = string.substr(string.search(";")+2)		
+	JSONObj.UpdateRecordMetadata = string.substr(string.search(":")+2, string.search(";")-string.search(":")-2)
+	string = string.substr(string.search(";")+2)
+	JSONObj.ModifyRecordAccess = string.substr(string.search(":")+2, string.search(";")-string.search(":")-2)
+	string = string.substr(string.search(";")+2)
+	JSONObj.DestroyRecord = string.substr(string.search(":")+2, string.search(";")-string.search(":")-2)
+	string = string.substr(string.search(";")+2)
+	JSONObj.ContributeContents = string.substr(string.search(":")+2)
+	//console.log(JSONObj)
+	//console.log(JSON.parse(JSON.stringify(JSONObj).replace(/<Unrestricted>/g, "Inherited from Classification")))
+	return JSON.parse(JSON.stringify(JSONObj).replace(/<Unrestricted>/g, "Inherited"));
+	}
 
 
 function getRecordProperties(type, recordUri)
@@ -1102,8 +1126,14 @@ function getRecordProperties(type, recordUri)
 							$("#properties-classification").html(result.Results[0].RecordClassification.ClassificationTitle.Value)
 							$("#properties-record-type").html(result.Results[0].RecordRecordType.RecordTypeName.Value)
 							$("#properties-date-registered").html(dateRegistered)
-							$("#properties-access-control").html(result.Results[0].RecordAccessControl.Value)
-							// need to look at behaviour of date due for destruction
+							
+							// access controls
+							var accessControlHTML = "<div>View Folder: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value).ViewMetadata + "</div>"
+							var accessControlHTML = accessControlHTML + "<div>Update Properties: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value).UpdateRecordMetadata + "</div>"
+							var accessControlHTML = accessControlHTML + "<div>Contribute: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value).ContributeContents + "</div>"
+							$("#properties-access-control").html(accessControlHTML)
+
+								// need to look at behaviour of date due for destruction
 								
 							if(config.PropertiesPane.IntermediateFolder.AdditionalFields=="true")
 								{
@@ -1252,8 +1282,15 @@ function getRecordProperties(type, recordUri)
 							$("#properties-container").html(result.Results[0].RecordContainer.RecordNumber.Value + ": " + result.Results[0].RecordContainer.RecordTitle.Value)
 							$("#properties-record-type").html(result.Results[0].RecordRecordType.RecordTypeName.Value)
 							$("#properties-date-registered").html(dateRegistered)
-							$("#properties-access-control").html(result.Results[0].RecordAccessControl.Value)
+							
+							// access controls
+							var accessControlHTML = "<div>View Folder: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value).ViewMetadata + "</div>"
+							var accessControlHTML = accessControlHTML + "<div>Update Properties: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value).UpdateRecordMetadata + "</div>"
+							var accessControlHTML = accessControlHTML + "<div>Contribute: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value).ContributeContents + "</div>"
+							$("#properties-access-control").html(accessControlHTML)
+								
 							// need to look at behaviour of date due for destruction
+								
 							if(config.PropertiesPane.IntermediateFolder.AdditionalFields=="true")
 								{
 								var recordUri = result.Results[0].Uri
@@ -1402,7 +1439,14 @@ function getRecordProperties(type, recordUri)
 							$("#properties-container").html(result.Results[0].RecordContainer.RecordNumber.Value + ": " + result.Results[0].RecordContainer.RecordTitle.Value)
 							$("#properties-record-type").html(result.Results[0].RecordRecordType.RecordTypeName.Value)
 							$("#properties-date-registered").html(dateRegistered)
-							$("#properties-access-control").html(result.Results[0].RecordAccessControl.Value)
+							
+							// access controls
+							var accessControlHTML = "<div>View: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value).ViewMetadata + "</div>"
+							var accessControlHTML = accessControlHTML + "<div>Update Properties: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value).UpdateRecordMetadata + "</div>"
+							var accessControlHTML = accessControlHTML + "<div>Download: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value).ViewDocument + "</div>"
+							$("#properties-access-control").html(accessControlHTML)
+
+								
 							// need to look at behaviour of date due for destruction
 							if(config.PropertiesPane.IntermediateFolder.AdditionalFields=="true")
 								{
