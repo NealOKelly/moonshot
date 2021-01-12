@@ -10,44 +10,270 @@
 	</div>
 	<div class="col-6" style="background-color: #fff;height:100%; padding:0;overflow:hidden;">
 		<div id="records-list-pane" style="height:75%;text-align:center;overflow:auto;overflow-x:hidden;">
-			<table id="grid" class="table table-sm">
+			<table id="search-results" class="table table-sm">
 				<thead style="background-color:#ffffff;">
 					<tr>
-						<th>Cat</th>
-						<th id="th-type" data-type="string" class="unsorted">Type</th>
-						<th id="th-record-number" data-type="string" class="sorted-down">Record Number</th>
-						<th id="th-record-title" style="text-align:left;" data-type="string" class="unsorted">Title</th><th id="th-date-registered" data-type="string" class="unsorted">Date Registered</th>
+						<th style="text-align:left;padding-left:30px;">Type</th>
+						<th id="th-record-number" data-type="string" class="sorted-down" style="text-align:left;">Record Number</th>
+						<th id="th-record-title" style="text-align:left;" data-type="string" class="unsorted">Title</th><th id="th-date-registered" data-type="string" class="unsorted" style="text-align:left;">Record Type</th>
 						<th>Download</th>
 					</tr>
 				</thead>
-				<tbody style="overflow-y: auto;">
-					<tr id="record-uri-1839" class="record-row" data-record-title="Records Transformation Logo - Stacked - Dark" data-record-extension="PNG" data-record-mime-type="image/png">
-						<td><span class="expanded-green"></span><span class="folder-green"></span></td>
-						<td><span class="fiv-viv fiv-icon-blank fiv-icon-png" arial-label="PNG Icon"></span></td><td>D20/211</td><td style="text-align:left;">Records Transformation Logo - Stacked - Dark</td><td>07/12/2020</td>
-						<td><span class="download-grey"></span></td>
+				<tbody>
+					<tr id="record-uri-1839" class="record-row">
+						<td>
+							<ul>
+								<li>
+									<span class="search-result-caret-collapsed"></span>
+									<span class="search-result-folder"></span>
+								</li>
+							</ul>
+						</td>
+						<td><ul><li>20/211</li></ul></td>
+						<td><ul><li>Brown, William</li></ul></td>
+						<td><ul><li>Pupil Folder</li></ul></td>
+						<td style="text-align:center;"><ul><li><!--Intentionally Blank--></li></ul></td>
 					</tr>
-					<tr id="record-uri-1840" class="record-row" data-record-title="Records Transformation PowerPoint Template" data-record-extension="PPTX" data-record-mime-type="application/vnd.openxmlformats-officedocument.presentationml.presentation">
-						<td>On</td>
-						<td><span class="fiv-viv fiv-icon-blank fiv-icon-pptx" arial-label="PPTX Icon"></span></td><td>D20/212</td>
-						<td style="text-align:left;">Records Transformation PowerPoint Template</td><td>07/12/2020</td><td><span class="download-grey"></span></td>
+					<tr id="record-uri-1840" class="record-row">
+						<td>
+							<ul>
+								<li>
+									<span class="search-result-caret-collapsed"></span>
+									<span class="search-result-folder"></span>
+								</li>
+							</ul>
+						</td>
+						<td><ul><li>20/212</li></ul></td>
+						<td><ul><li>Application Form & References</li></ul></td>
+						<td><ul><li>Staff Sub Folder</li></ul></td>
+						<td><ul><li><!--Intentionally Blank--></li></ul></td>
 					</tr>
-					<tr id="record-uri-1841" class="record-row" data-record-title="G-Cloud 12 Rate Card" data-record-extension="DOCX" data-record-mime-type="application/vnd.openxmlformats-officedocument.wordprocessingml.document">
-						<td>Mat</td>
-						<td><span class="fiv-viv fiv-icon-blank fiv-icon-docx" arial-label="DOCX Icon"></span></td><td>D20/213</td>
-						<td style="text-align:left;">G-Cloud 12 Rate Card</td><td>07/12/2020</td>
-						<td><span class="download-grey"></span></td>
+					
+					<tr id="record-uri-1842" class="record-row">
+						<td style="padding-left:50px">
+							<span class="fiv-viv fiv-icon-blank fiv-icon-pdf" arial-label="PDF Icon"></span>
+						</td>
+						<td><ul><li>D20/214</li></ul></td>
+						<td><ul><li>Return to Work Form</li></ul></td>
+						<td><ul><li>Schools Document</li></ul></td>
+						<td style="text-align:center;"><span class="download-grey"></span></td>
 					</tr>
-					<tr id="record-uri-1842" class="record-row" data-record-title="GilbyIM Service Definition" data-record-extension="PDF" data-record-mime-type="application/pdf">
-						<td>Shat</td>
-						<td><span class="fiv-viv fiv-icon-blank fiv-icon-pdf" arial-label="PDF Icon"></span></td><td>D20/214</td><td style="text-align:left;">GilbyIM Service Definition</td>
-						<td>07/12/2020</td>
-						<td><span class="download-grey"></span></td>
+									
+					<tr id="record-uri-1841" class="record-row" style="color:grey;">
+						<td>
+							<ul>
+								<li>
+									<span class="search-result-caret-expanded"></span>
+									<span class="search-result-folder-open"></span>
+								</li>
+								<li>
+									<ul>
+										<li style="padding-left:48px;">
+											<span class="file-earmark-grey"></span>
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</td>
+						<td>
+							<ul>
+								<li>20/213</li>
+								<li><ul><li>- None</li></ul></li>
+							</ul>
+						</td>
+						<td>
+							<ul>
+								<li>Brown, Tom</li>
+								<li>
+									<ul>
+										<li>- No records found.</li>
+									</ul>
+								</li>
+							</ul>
+						</td>
+						<td>
+							<ul>
+								<li>Pupil Folder</li>
+								<li>
+									<ul>
+										<li>- None</li>
+									</ul>
+								</li>
+							</ul>
+						</td>
+						<td style="text-align:center;"><ul><li><!--Intentionally Blank--></li></ul></td>
 					</tr>
-					<tr id="record-uri-1843" class="record-row" data-record-title="Draft Service Definition" data-record-extension="INDD" data-record-mime-type="">
-						<td>That</td>
-						<td><span class="fiv-viv fiv-icon-blank fiv-icon-indd" arial-label="INDD Icon"></span></td><td>D20/215</td>
-						<td style="text-align:left;">Draft Service Definition</td><td>07/12/2020</td>
-						<td><span class="download-grey"></span></td>
+					<tr id="record-uri-1842" class="record-row">
+						<td>
+							<ul>
+								<li><span class="search-result-caret-expanded"></span><span class="search-result-folder-open"></span></li>
+								<li class="search-result-expanded">
+									<ul>
+										<li>
+											<span class="search-result-caret-collapsed"></span>
+											<span class="search-result-folder"></span>
+										</li>
+										<li>
+											<span class="search-result-caret-collapsed"></span>
+											<span class="search-result-folder"></span>
+										</li>
+										<li>
+											<span class="search-result-caret-collapsed"></span>
+											<span class="search-result-folder"></span>
+										</li>
+										<li>
+											<span class="search-result-caret-collapsed"></span>
+											<span class="search-result-folder"></span>
+										</li>
+										<li>
+											<span class="search-result-caret-collapsed"></span>
+											<span class="search-result-folder"></span>
+										</li>
+										<li>
+											<span class="search-result-caret-collapsed"></span>
+											<span class="search-result-folder"></span>
+										</li>
+										<li>
+											<span class="search-result-caret-expanded"></span>
+											<span class="search-result-folder-open"></span>
+										</li>
+										<li class="search-result-expanded">
+											<ul>
+												<li style="padding-left:48px;">
+													<span class="fiv-viv fiv-icon-blank fiv-icon-pdf" arial-label="PDF Icon"></span>
+												</li>
+												<li style="padding-left:48px;">
+													<span class="fiv-viv fiv-icon-blank fiv-icon-pdf" arial-label="PDF Icon"></span>
+												</li>
+												<li style="padding-left:48px;">
+													<span class="fiv-viv fiv-icon-blank fiv-icon-pdf" arial-label="PDF Icon"></span>
+												</li
+											</ul>
+										</li>
+									</ul>
+								</li>
+								<li><span class="search-result-caret-collapsed"></span><span class="search-result-folder"></span></li>
+							</ul>
+						</td>
+						<td>
+							<ul>
+								<li>20/214</li>
+								<li class="search-result-expanded">
+									<ul>
+										<li>- 20/841</li>
+										<li>- 20/842</li>
+										<li>- 20/843</li>
+										<li>- 20/844</li>
+										<li>- 20/845</li>
+										<li>- 20/846</li>
+										<li>- 20/847</li>
+										<li class="search-result-expanded">
+											<ul>
+												<li>- D20/153</li>
+												<li>- D20/1765</li>
+												<li>- D20/999</li>
+											</ul>
+										</li>
+										<li>20/848</li>
+									</ul>
+								</li>
+							</ul>
+						</td>
+						<td>
+							<ul>
+								<li>Garcia, Ernest</li>
+								<li class="search-result-expanded">
+									<ul>
+										<li>- Absence & OH</li>
+										<li>- Application Form & References</li>
+										<li>- Contract</li>
+										<li>- Correspondence (letters, Emails etc)</li>
+										<li>- DBS</li>
+										<li>- Professional Development</li>
+										<li>- Qualifications</li>
+										<li class="search-result-expanded">
+											<ul>
+												<li>- Degree Certificate from University of Oxford</li>
+												<li>- PGCE Certificate from University of Loughborough</li>
+												<li>- 25 Metre Swimming Badge for Guildford SPectrum Leisure Centre</li>
+											</ul>
+										</li>
+										<li>- Starter Forms</li>
+									</ul>
+								</li>
+							</ul>
+						</td>
+						<td>
+							<ul>
+								<li >Staff Folder</li>
+								<li class="search-result-expanded">
+									<ul>
+										<li>- Staff Sub Folder</li>
+										<li>- Staff Sub Folder</li>
+										<li>- Staff Sub Folder</li>
+										<li>- Staff Sub Folder</li>
+										<li>- Staff Sub Folder</li>
+										<li>- Staff Sub Folder</li>
+										<li>- Staff Sub Folder</li>
+										<li class="search-result-expanded">
+											<ul>
+												<li>- Schools Document</li>			
+												<li>- Schools Doc...</li>
+												<li>- Schools Doc...</li>
+											</ul>
+											
+										</li>
+										<li>- Staff Sub Folder
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</td>
+						<td style="text-align:center;">
+							<ul>
+								<li><!--Intentionally Blank--></li>
+								<li class="search-result-expanded">
+									<ul style="padding-left:0;">
+										<li><!--Intentionally Blank--></li>
+										<li><!--Intentionally Blank--></li>
+										<li><!--Intentionally Blank--></li>
+										<li><!--Intentionally Blank--></li>
+										<li><!--Intentionally Blank--></li>
+										<li><!--Intentionally Blank--></li>
+										<li><!--Intentionally Blank--></li>
+										<li><span class="download-grey"></span></li>
+										<li><span class="download-grey"></span></li>
+										<li><span class="download-grey"></span></li>
+										<li><!--Intentionally Blank--></li>
+									</ul>
+								</li>
+							</ul>
+						</td>
+					</tr>
+					<tr id="record-uri-1843" class="record-row">
+						<td>
+							<ul>
+								<li><span class="search-result-caret-collapsed">
+									</span><span class="search-result-folder"></span>
+								</li>
+							</ul>
+						</td>
+						<td><ul><li>20/215</li></ul></td>
+						<td><ul><li>Flashman, Harry</li></ul></td>
+						<td><ul><li>Pupil Folder</li></ul></td>
+						<td style="text-align:center;"><!--Intentionally Blank--></span></td>
+					</tr>
+					
+					<tr id="record-uri-1843" class="record-row">
+						<td>
+							<ul>
+								<li><span class="search-result-caret-collapsed"></span><span class="search-result-folder"></span></li>
+							</ul>
+						</td>
+						<td><ul><li>20/217</li></ul></td>
+						<td><ul><li>Bunter, Billy</li></ul></td>
+						<td><ul><li>Pupil Folder</li></ul></td>
+						<td style="text-align:center;"><!--Intentionally Blank--></td>
 					</tr>
 				</tbody>
 			</table>
@@ -68,7 +294,5 @@
 			<%- include('./partials/new-folder-form.ejs') %>
 			<%- include('./partials/new-sub-folder-form.ejs') %>
 		</div>
-	</div>
-
 	</div>
 </div>
