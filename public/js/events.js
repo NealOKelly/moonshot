@@ -80,7 +80,220 @@ $(document).on("click", "#upload-button", function()
 		});
 	})
 
+$(document).on("click", "#search-button", function()
+	{
+	$("#records-list-pane").css("display", "none")
+	$("#search-results-pane").css("display", "inline-block")
+	populateSearchResultPane()
+	})
 
+$(document).on("click", ".search-result-caret-collapsed", function()
+	{
+		if($(event.target).parent().parent().parent().parent().attr("id")==null)
+		{
+		alert("this is a sub folder")
+		var recordUri = $(event.target).parent().parent().parent().parent().parent().attr("id").substr(18)
+		//alert(recordUri)
+		}
+	var recordUri = $(event.target).parent().parent().parent().parent().attr("id").substr(18)
+	//alert("Hello World")
+
+	//alert()
+	getAuthenticationStatus().then(function () 
+		{
+		
+		if(isAuthenticated)
+			{
+			//alert("Hello World")
+			//alert(recordUri)
+			$("#search-result-uri-" + recordUri + " >td:nth-child(1)>ul>li>span:nth-child(1)").addClass("search-result-caret-expanded")
+			$("#search-result-uri-" + recordUri + " >td:nth-child(1)>ul>li>span:nth-child(1)").removeClass("search-result-caret-collapsed")
+			
+			//var recordUri = $(event.target).parent().parent().parent().parent().attr("id").substr(5)
+			var url = baseUrl + "/" + apiPath + "/Search?q=container:" + recordUri + "&properties=RecordNumber,RecordTitle,RecordRecordType,RecordMimeType,RecordExtension&trimtype=Record&pageSize=1000"
+			$.ajax(
+				{
+				url: url,
+				type: "POST",
+				contentType: 'application/json',
+				xhrFields: { withCredentials: true},
+				success: function(result)
+					{
+					console.log(result)
+					if(result.TotalResults==0)
+						{
+						//$("#search-result-uri-" + recordUri + " >td>ul>ul>li").css("color", "grey")
+						
+							
+						$("#search-result-uri-" + recordUri + " >td:nth-child(1)>ul").append('<ul><li style="padding-left:48px;"><span class="file-earmark-grey"></span></li></ul>')
+						$("#search-result-uri-" + recordUri + " >td:nth-child(2)>ul").append('<ul><li style="color:grey;">- None</li></ul>')
+						$("#search-result-uri-" + recordUri + " >td:nth-child(3)>ul").append('<ul><li style="color:grey;">- No records found.</li></ul>')
+						$("#search-result-uri-" + recordUri + " >td:nth-child(4)>ul").append('<ul><li style="color:grey;">- None</li></ul>')
+						}
+					else
+						{
+						for(i=0; i<result.TotalResults; i++)
+							{
+							$("#search-result-uri-" + recordUri + " >td:nth-child(1)>ul>li").last().after("<ul><li><span class='search-result-caret-collapsed'></span><span class='search-result-folder'></span></li></ul>")
+							$("#search-result-uri-" + recordUri + " >td:nth-child(2)>ul>li").last().after("<ul><li>- " + result.Results[i].RecordNumber.Value + "</li></ul>")
+							$("#search-result-uri-" + recordUri + " >td:nth-child(3)>ul>li").last().after("<ul><li>- " + result.Results[i].RecordTitle.Value + "</li></ul>")
+							$("#search-result-uri-" + recordUri + " >td:nth-child(4)>ul>li").last().after("<ul><li>- " + result.Results[i].RecordRecordType.RecordTypeName.Value + "</li></ul>")
+							$("#search-result-uri-" + recordUri + " >td:nth-child(5)>ul>li").last().after("<ul style='padding-left:0;'><li><!--Intentionally Blank--></li></ul>")
+							}						
+						}
+					}, 
+				error: function(result)
+					{
+					console.log("Oooops!")
+					}
+				});
+			}
+		else
+			{
+			$("#session-expired").modal("show")
+			}
+		});
+	})
+
+$(document).on("click", ".search-result-caret-expanded", function()
+	{
+	$(event.target).addClass("search-result-caret-collapsed")
+	//$(event.target).addClass("search-result-caret-collapsed").parent()
+	$(event.target).removeClass("search-result-caret-expanded")
+	alert($(event.target).parent().parent().parent().parent().attr("id"))
+	//var myVar = $(event.target).parent().parent().parent().parent().attr("id")
+	$("#" + $(event.target).parent().parent().parent().parent().attr("id") + " >td>ul>ul").remove()
+	})
+
+function populateSearchResultPane()
+	{
+	getAuthenticationStatus().then(function () 
+		{
+		if(isAuthenticated)
+			{
+			url = baseUrl + "/" + apiPath + "/RecordType?q=all&properties=RecordTypeLevel, RecordTypeContentsRule, RecordTypeName&pageSize=1000000"
+			$.ajax(
+				{
+				url: url,
+				type: "GET",
+				contentType: 'application/json',
+				xhrFields: { withCredentials: true},
+				success: function(recordTypeDefinitions)
+					{
+					console.log(recordTypeDefinitions)
+					var q = "all"
+					var url = baseUrl + "/" + apiPath + "/Search?q=" + q + "&properties=RecordNumber,RecordTitle,RecordRecordType,RecordMimeType,RecordExtension&trimtype=Record&pageSize=1000"
+					$.ajax(
+						{
+						url: url,
+						type: "POST",
+						contentType: 'application/json',
+						xhrFields: { withCredentials: true},
+						success: function(result)
+							{
+							console.log(result)
+							for(x=0; x<result.TotalResults; x++)
+								{
+								for(i=0; i<recordTypeDefinitions.TotalResults; i++)
+									{
+										if(recordTypeDefinitions.Results[i].Uri==result.Results[x].RecordRecordType.Uri)
+											{
+											if(!config.ExcludedRecordTypes.includes(result.Results[x].RecordRecordType.RecordTypeName.Value))
+												{
+												switch(recordTypeDefinitions.Results[i].RecordTypeContentsRule.Value)
+													{
+													case "ByLevel":
+														if(recordTypeDefinitions.Results[i].RecordTypeLevel.Value>="5")
+															{
+															addSearchResult(result.Results[x], "folder-intermediate")
+															}
+														else
+															{
+														if(recordTypeDefinitions.Results[i].RecordTypeLevel.Value<"5")
+																{
+																addSearchResult(result.Results[x], "folder-terminal")		
+																}
+															}
+														break;
+													case "ByLevelInclusive":
+														addSearchResult(result.Results[x], "folder-intermediate")
+														break;
+													case "ByBehavior":
+														addSearchResult(result.Results[x], "folder-terminal")
+														break;
+													case "ByList":
+														if(recordTypeDefinitions.Results[i].RecordTypeLevel.Value>="4")
+															{
+																addSearchResult(result.Results[x], "folder-intermediate")
+															}
+														break;
+													case "Prevented":
+														addSearchResult(result.Results[x], "document")
+														break;
+													}	
+												}
+												
+												
+											}
+											
+									}
+
+							}
+
+							//console.log(result)
+
+
+
+
+
+							}, 
+						error: function(result)
+							{
+							console.log("Oooops!")
+							}
+						});
+					}, 
+				error: function(recordTypeDefinitions)
+					{
+					console.log("Oooops!")
+					}
+				});
+			}
+		else
+			{
+			$("#session-expired").modal("show")
+			}
+		});	
+	}
+
+function addSearchResult(record, type)
+	{
+	if(type=="document")
+		{
+		resultRowHTML = '<tr id="search-result-uri-' + record.Uri + '" class="' + type + '" data-record-title="' + record.RecordTitle.Value + '" data-record-extension="' + record.RecordExtension.Value + '" data-record-mime-type="' + record.RecordMimeType.Value + '">'	
+		resultRowHTML = resultRowHTML + '<td style="padding-left:50px"><span class="fiv-viv fiv-icon-blank fiv-icon-' + record.RecordExtension.Value.toLowerCase() + '" arial-label="' + record.RecordExtension.Value.toUpperCase() + '"></span></td>'	
+		
+		}
+	else
+		{
+		resultRowHTML = '<tr id="search-result-uri-' + record.Uri + '" class="' + type + '">'
+		resultRowHTML = resultRowHTML + '<td><ul><li><span class="search-result-caret-collapsed"></span><span class="search-result-folder"></span></li></ul></td>'
+		}
+	resultRowHTML = resultRowHTML + '<td><ul><li>' + record.RecordNumber.Value + '</li></ul></td>'
+	resultRowHTML = resultRowHTML + '<td><ul><li>' + record.RecordTitle.Value + '</li></ul></td>'
+	resultRowHTML = resultRowHTML + '<td><ul><li>' + record.RecordRecordType.RecordTypeName.Value + '</li></ul></td>'
+	if(type=="document")
+		{
+		resultRowHTML = resultRowHTML + '<td style="text-align:center;"><span class="download-grey"></span></td></tr>'
+		}
+	else
+		{
+		resultRowHTML = resultRowHTML + '<td style="text-align:center;"><ul><li><!--Intentionally Blank--></li></ul></td>'	
+		}
+	
+	resultRowHTML = resultRowHTML + '</tr>'
+	$("#search-results>tbody").append(resultRowHTML)
+	}
 
 $(document).on("click", "#grid", function()
 	{

@@ -294,7 +294,7 @@ th.sorted-up::after{
 #search-results>tbody>tr>td>ul>li{
 	margin-left:0;
 }
-#search-results>tbody li>ul li{
+#search-results>tbody>tr>td>ul>ul>li{
 	font-style: italic;
 }
 
