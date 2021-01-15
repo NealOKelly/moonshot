@@ -171,11 +171,12 @@ $(document).on("click", ".search-result-caret-collapsed", function()
 $(document).on("click", ".search-result-caret-expanded", function()
 	{
 	$(event.target).addClass("search-result-caret-collapsed")
-	//$(event.target).addClass("search-result-caret-collapsed").parent()
 	$(event.target).removeClass("search-result-caret-expanded")
-	alert($(event.target).parent().parent().parent().parent().attr("id"))
-	//var myVar = $(event.target).parent().parent().parent().parent().attr("id")
-	$("#" + $(event.target).parent().parent().parent().parent().attr("id") + " >td>ul>ul").remove()
+	columns = $($(event.target).parent().parent().parent().parent()).children().length
+	for(i=0; i<columns; i++)
+		{
+		$($(event.target).parent().parent().parent().parent()).children().eq(i).children().eq(0).find("ul").remove()	
+		}
 	})
 
 function populateSearchResultPane()
