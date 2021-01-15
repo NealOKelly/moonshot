@@ -89,13 +89,13 @@ $(document).on("click", "#search-button", function()
 
 $(document).on("click", ".search-result-caret-collapsed", function()
 	{
-		if($(event.target).parent().parent().parent().parent().attr("id")==null)
+		if($(event.target).parent().attr("id")==null)
 		{
 		alert("this is a sub folder")
 		var recordUri = $(event.target).parent().parent().parent().parent().parent().attr("id").substr(18)
 		//alert(recordUri)
 		}
-	var recordUri = $(event.target).parent().parent().parent().parent().attr("id").substr(18)
+	var recordUri = $(event.target).parent().attr("id").substr(18)
 	//alert("Hello World")
 
 	//alert()
@@ -106,11 +106,11 @@ $(document).on("click", ".search-result-caret-collapsed", function()
 			{
 			//alert("Hello World")
 			//alert(recordUri)
-			$("#search-result-uri-" + recordUri + " >td:nth-child(1)>ul>li>span:nth-child(1)").addClass("search-result-caret-expanded")
-			$("#search-result-uri-" + recordUri + " >td:nth-child(1)>ul>li>span:nth-child(1)").removeClass("search-result-caret-collapsed")
+			$("#search-result-uri-" + recordUri + " >span:nth-child(1)").addClass("search-result-caret-expanded")
+			$("#search-result-uri-" + recordUri + " >span:nth-child(1)").removeClass("search-result-caret-collapsed")
 			
 			//var recordUri = $(event.target).parent().parent().parent().parent().attr("id").substr(5)
-			var url = baseUrl + "/" + apiPath + "/Search?q=container:" + recordUri + "&properties=RecordNumber,RecordTitle,RecordRecordType,RecordMimeType,RecordExtension&trimtype=Record&pageSize=1000"
+			var url = baseUrl + "/" + apiPath + "/Search?q=container:" + recordUri + "&properties=RecordTitle,RecordNumber,RecordRecordType,RecordMimeType,RecordExtension&trimtype=Record&pageSize=1000"
 			$.ajax(
 				{
 				url: url,
@@ -124,21 +124,34 @@ $(document).on("click", ".search-result-caret-collapsed", function()
 						{
 						//$("#search-result-uri-" + recordUri + " >td>ul>ul>li").css("color", "grey")
 						
-							
-						$("#search-result-uri-" + recordUri + " >td:nth-child(1)>ul").append('<ul><li style="padding-left:48px;"><span class="file-earmark-grey"></span></li></ul>')
-						$("#search-result-uri-" + recordUri + " >td:nth-child(2)>ul").append('<ul><li style="color:grey;">- None</li></ul>')
-						$("#search-result-uri-" + recordUri + " >td:nth-child(3)>ul").append('<ul><li style="color:grey;">- No records found.</li></ul>')
-						$("#search-result-uri-" + recordUri + " >td:nth-child(4)>ul").append('<ul><li style="color:grey;">- None</li></ul>')
+						//$("#search-result-uri-" + recordUri).css("background-color", "red")	
+						$("#search-result-uri-" + recordUri).after('<ul><li style="padding-left:48px;"><span class="file-earmark-grey"></span></li></ul>')
+						$("#search-result-uri-" + recordUri).parent().parent().parent().children().eq(1).children().append('<ul><li style="color:grey;">- None</li></ul>')
+						//$("#search-result-uri-" + recordUri + " >td:nth-child(2)>ul").append('<ul><li style="color:grey;">- None</li></ul>')
+						$("#search-result-uri-" + recordUri).parent().parent().parent().children().eq(2).children().append('<ul><li style="color:grey;">- No records found.</li></ul>')
+						$("#search-result-uri-" + recordUri).parent().parent().parent().children().eq(3).children().append('<ul><li style="color:grey;">- None</li></ul>')
 						}
 					else
 						{
 						for(i=0; i<result.TotalResults; i++)
 							{
-							$("#search-result-uri-" + recordUri + " >td:nth-child(1)>ul>li").last().after("<ul><li><span class='search-result-caret-collapsed'></span><span class='search-result-folder'></span></li></ul>")
-							$("#search-result-uri-" + recordUri + " >td:nth-child(2)>ul>li").last().after("<ul><li>- " + result.Results[i].RecordNumber.Value + "</li></ul>")
-							$("#search-result-uri-" + recordUri + " >td:nth-child(3)>ul>li").last().after("<ul><li>- " + result.Results[i].RecordTitle.Value + "</li></ul>")
-							$("#search-result-uri-" + recordUri + " >td:nth-child(4)>ul>li").last().after("<ul><li>- " + result.Results[i].RecordRecordType.RecordTypeName.Value + "</li></ul>")
-							$("#search-result-uri-" + recordUri + " >td:nth-child(5)>ul>li").last().after("<ul style='padding-left:0;'><li><!--Intentionally Blank--></li></ul>")
+							if(i==0)
+								{
+								$("#search-result-uri-" + recordUri).parent().append("<ul><li id='search-result-uri-" + result.Results[i].Uri + "'><span class='search-result-caret-collapsed'></span><span class='search-result-folder'></span></li></ul>")
+								$("#search-result-uri-" + recordUri).parent().parent().parent().children().eq(1).children().append("<ul><li>- " + result.Results[i].RecordNumber.Value + "</li></ul>")
+								$("#search-result-uri-" + recordUri).parent().parent().parent().children().eq(2).children().append("<ul><li>- " + result.Results[i].RecordTitle.Value + "</li></ul>")
+								$("#search-result-uri-" + recordUri).parent().parent().parent().children().eq(3).children().append("<ul><li>- " + result.Results[i].RecordRecordType.RecordTypeName.Value + "</li></ul>")
+								$("#search-result-uri-" + recordUri).parent().parent().parent().children().eq(4).children().append("<ul style='padding-left:0;'><li><!--Intentionally Blank--></li></ul>")	
+								}
+							else
+								{
+								$("#search-result-uri-" + recordUri).parent().children().append("<li id='search-result-uri-" + result.Results[i].Uri + "'><span class='search-result-caret-collapsed'></span><span class='search-result-folder'></span></li>")
+								$("#search-result-uri-" + recordUri).parent().parent().parent().children().eq(1).children().children().last().append("<li>- " + result.Results[i].RecordNumber.Value + "</li>")
+								$("#search-result-uri-" + recordUri).parent().parent().parent().children().eq(2).children().children().last().append("<li>- " + result.Results[i].RecordTitle.Value + "</li>")
+								$("#search-result-uri-" + recordUri).parent().parent().parent().children().eq(3).children().children().last().append("<li>- " + result.Results[i].RecordRecordType.RecordTypeName.Value + "</li>")
+								$("#search-result-uri-" + recordUri).parent().parent().parent().children().eq(4).children().children().last().append("<li><!--Intentionally Blank--></li>")
+								}
+
 							}						
 						}
 					}, 
@@ -182,7 +195,7 @@ function populateSearchResultPane()
 					{
 					console.log(recordTypeDefinitions)
 					var q = "all"
-					var url = baseUrl + "/" + apiPath + "/Search?q=" + q + "&properties=RecordNumber,RecordTitle,RecordRecordType,RecordMimeType,RecordExtension&trimtype=Record&pageSize=1000"
+					var url = baseUrl + "/" + apiPath + "/Search?q=" + q + "&properties=RecordNumber,RecordTitle,RecordRecordType,RecordMimeType,RecordExtension&trimtype=Record&pageSize=1000&sortBy=Title+"
 					$.ajax(
 						{
 						url: url,
@@ -276,8 +289,9 @@ function addSearchResult(record, type)
 		}
 	else
 		{
-		resultRowHTML = '<tr id="search-result-uri-' + record.Uri + '" class="' + type + '">'
-		resultRowHTML = resultRowHTML + '<td><ul><li><span class="search-result-caret-collapsed"></span><span class="search-result-folder"></span></li></ul></td>'
+		//resultRowHTML = '<tr id="search-result-uri-' + record.Uri + '" class="' + type + '">'
+		resultRowHTML = '<tr class="' + type + '">'
+		resultRowHTML = resultRowHTML + '<td><ul><li id="search-result-uri-' + record.Uri + '"><span class="search-result-caret-collapsed"></span><span class="search-result-folder"></span></li></ul></td>'
 		}
 	resultRowHTML = resultRowHTML + '<td><ul><li>' + record.RecordNumber.Value + '</li></ul></td>'
 	resultRowHTML = resultRowHTML + '<td><ul><li>' + record.RecordTitle.Value + '</li></ul></td>'
