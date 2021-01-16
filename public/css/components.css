@@ -291,9 +291,18 @@ th.sorted-up::after{
 	overflow: hidden;
 }
 
+
+/* These remove the indents - it's intended for the download column.  Need to restore the indent elsewhere.*/
 #search-results>tbody>tr>td>ul>li{
 	margin-left:0;
 }
+#search-results>tbody>tr>td>ul>ul>li{
+	margin-left:0;
+}
+#search-results>tbody>tr>td>ul>ul>ul>li{
+	margin-left:0;
+}
+
 #search-results>tbody>tr>td>ul ul>li{
 	font-style: italic;
 	
