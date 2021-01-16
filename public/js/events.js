@@ -91,6 +91,12 @@ $(document).on("click", ".search-result-caret-collapsed", function()
 	{
 	var recordUri = $(event.target).parent().attr("id").substr(31)
 	var level = parseInt($(event.target).parent().attr("id").substr(6, 1), 10)
+	var newTypeNodeId;
+	var newRecordNumberNodeId;
+	var newRecordTitleNodeId;
+	var newRecordTypeNodeId;
+	var newDownloadNodeId;
+	//alert(level)
 
 	$("#" + $(event.target).parent().attr("id") + " >span:nth-child(1)").addClass("search-result-caret-expanded")
 	$("#" + $(event.target).parent().attr("id") + " >span:nth-child(1)").removeClass("search-result-caret-collapsed")
@@ -124,61 +130,69 @@ $(document).on("click", ".search-result-caret-collapsed", function()
 						{
 						for(i=0; i<result.TotalResults; i++)
 							{
-							if(i==0)  // first row
+							if(level==0)
 								{
-								if(result.Results[i].RecordRecordType.RecordTypeName.Value=="Schools Document") // if a document
-									{
-									alert("This is called.")
-									// first row, column 1
-									var theHTML = "<ul><li id='level-" + (level + 1) + "-search-result-type-uri-" + result.Results[i].Uri + "' style='padding-left:51px;' data-record-title='" + result.Results[i].RecordTitle.Value + "' data-record-extension='" + result.Results[i].RecordExtension.Value + "'  data-record-mime-type='" + result.Results[i].RecordMimeType.Value + "'>"
-								
-									theHTML = theHTML + "<span class='fiv-viv fiv-icon-blank fiv-icon-" + result.Results[i].RecordExtension.Value.toLowerCase() + "' aria-label='" + result.Results[i].RecordExtension.Value.toUpperCase() + "'><span></li></ul>"
-								
-									$("#level-" + level + "-search-result-type-uri-" + recordUri).after(theHTML)
-									}
-								else // if not a document
-									{
-									// first row, column 1
-									$("#level-" + level + "-search-result-type-uri-" + recordUri).after("<ul><li id='level-" + (level + 1) + "-search-result-type-uri-" + result.Results[i].Uri + " class='my-class'><span class='search-result-caret-collapsed'></span><span class='search-result-folder'></span></li></ul>")
-									}
-								
-								// first row, columns 2-4
-								$("#level-" + level + "-search-result-recordNumber-uri-" + recordUri).after("<ul><li id='level-" + (level + 1) + "-search-result-recordNumber-uri-" + result.Results[i].Uri + "'>- " + result.Results[i].RecordNumber.Value + "</li></ul>")
-
-								$("#level-" + level + "-search-result-recordTitle-uri-" + recordUri).after("<ul><li id='level-" + (level + 1) + "-search-result-recordTitle-uri-" + result.Results[i].Uri + "'>- " + result.Results[i].RecordTitle.Value + "</li></ul>")
-
-								$("#level-" + level + "-search-result-recordType-uri-" + recordUri).after("<ul><li id='level-" + (level + 1) + "-search-result-recordType-uri-" + result.Results[i].Uri + "'>- " + result.Results[i].RecordRecordType.RecordTypeName.Value + "</li></ul>")
-
-								if(result.Results[i].RecordRecordType.RecordTypeName.Value=="Schools Document") // if a document
-									{
-									alert("And so is this.")
-									// first row, column 5
-									$("#level-" + level + "-search-result-download-uri-" + recordUri).after("<ul style='padding-left:0;'><li id='level-" + (level + 1) + "-search-result-download-uri-" + result.Results[i].Uri + "'><span class='download-grey'><span></li></ul>")	
-									}
-								else // not a document
-									{
-									// first row, column 5
-									$("#level-" + level + "-search-result-download-uri-" + recordUri).after("<ul style='padding-left:0;'><li id='level-" + (level + 1) + "-search-result-download-uri-" + result.Results[i].Uri + "'><!--Intentionally Blank--></li></ul>")	
-									}
-								}
-							else // subsequent rows
-								{
-								// if a document
+								var isDocument = false;
 								if(result.Results[i].RecordRecordType.RecordTypeName.Value=="Schools Document")
 									{
-									// subsequent rows, column 1
-									var theHTML = "<li id='level-" + (level + 1) + "-search-result-type-uri-" + result.Results[i].Uri + "' style='padding-left:51px;' data-record-title='" + result.Results[i].RecordTitle.Value + "' data-record-extension='" + result.Results[i].RecordExtension.Value + "'  data-record-mime-type='" + result.Results[i].RecordMimeType.Value + "'>"
-								
-									theHTML = theHTML + "<span class='fiv-viv fiv-icon-blank fiv-icon-" + result.Results[i].RecordExtension.Value.toLowerCase() + "' aria-label='" + result.Results[i].RecordExtension.Value.toUpperCase() + "'><span></li>"
-								
-									$("#level-" + level + "-search-result-type-uri-" + recordUri).parent().children().last().append(theHTML)
+									isDocument=true;
 									}
-								else // not a document//
+								if(i==0)  // first row
 									{
-									// subsequent rows, column 1
-									$("#level-" + level + "-search-result-type-uri-" + recordUri).parent().children().last().append("<li id='level-" + (level + 1) + "-search-result-type-uri-" + result.Results[i].Uri + "'><span class='search-result-caret-collapsed'></span><span class='search-result-folder'></span></li>")
+									//alert(level)
+									if(isDocument) // if a document
+										{
+										//alert("This is called.")
+										// first row, column 1
+										var theHTML = "<ul><li id='level-" + (level + 1) + "-search-result-type-uri-" + result.Results[i].Uri + "' style='padding-left:51px;' data-record-title='" + result.Results[i].RecordTitle.Value + "' data-record-extension='" + result.Results[i].RecordExtension.Value + "'  data-record-mime-type='" + result.Results[i].RecordMimeType.Value + "'>"
+
+										theHTML = theHTML + "<span class='fiv-viv fiv-icon-blank fiv-icon-" + result.Results[i].RecordExtension.Value.toLowerCase() + "' aria-label='" + result.Results[i].RecordExtension.Value.toUpperCase() + "'><span></li></ul>"
+
+										$("#level-" + level + "-search-result-type-uri-" + recordUri).after(theHTML)
+										}
+									else // if not a document
+										{
+										// first row, column 1
+										$("#level-" + level + "-search-result-type-uri-" + recordUri).after("<ul><li id='level-" + (level + 1) + "-search-result-type-uri-" + result.Results[i].Uri + "'><span class='search-result-caret-collapsed'></span><span class='search-result-folder'></span></li></ul>")
+										}
+
+									// first row, columns 2-4
+									$("#level-" + level + "-search-result-recordNumber-uri-" + recordUri).after("<ul><li id='level-" + (level + 1) + "-search-result-recordNumber-uri-" + result.Results[i].Uri + "'>- " + result.Results[i].RecordNumber.Value + "</li></ul>")
+
+									$("#level-" + level + "-search-result-recordTitle-uri-" + recordUri).after("<ul><li id='level-" + (level + 1) + "-search-result-recordTitle-uri-" + result.Results[i].Uri + "'>- " + result.Results[i].RecordTitle.Value + "</li></ul>")
+
+									$("#level-" + level + "-search-result-recordType-uri-" + recordUri).after("<ul><li id='level-" + (level + 1) + "-search-result-recordType-uri-" + result.Results[i].Uri + "'>- " + result.Results[i].RecordRecordType.RecordTypeName.Value + "</li></ul>")
+
+									if(isDocument) // if a document
+										{
+										alert("And so is this.")
+										// first row, column 5
+										$("#level-" + level + "-search-result-download-uri-" + recordUri).after("<ul style='padding-left:0;'><li id='level-" + (level + 1) + "-search-result-download-uri-" + result.Results[i].Uri + "'><span class='download-grey'><span></li></ul>")	
+										}
+									else // not a document
+										{
+										// first row, column 5
+										$("#level-" + level + "-search-result-download-uri-" + recordUri).after("<ul style='padding-left:0;'><li id='level-" + (level + 1) + "-search-result-download-uri-" + result.Results[i].Uri + "'><!--Intentionally Blank--></li></ul>")	
+										}
 									}
-									
+								else // subsequent rows
+									{
+									// if a document
+									if(isDocument)
+										{
+										// subsequent rows, column 1
+										var theHTML = "<li id='level-" + (level + 1) + "-search-result-type-uri-" + result.Results[i].Uri + "' style='padding-left:51px;' data-record-title='" + result.Results[i].RecordTitle.Value + "' data-record-extension='" + result.Results[i].RecordExtension.Value + "'  data-record-mime-type='" + result.Results[i].RecordMimeType.Value + "'>"
+
+										theHTML = theHTML + "<span class='fiv-viv fiv-icon-blank fiv-icon-" + result.Results[i].RecordExtension.Value.toLowerCase() + "' aria-label='" + result.Results[i].RecordExtension.Value.toUpperCase() + "'><span></li>"
+
+										$("#level-" + level + "-search-result-type-uri-" + recordUri).parent().children().last().append(theHTML)
+										}
+									else // not a document//
+										{
+										// subsequent rows, column 1
+										$("#level-" + level + "-search-result-type-uri-" + recordUri).parent().children().last().append("<li id='level-" + (level + 1) + "-search-result-type-uri-" + result.Results[i].Uri + "'><span class='search-result-caret-collapsed'></span><span class='search-result-folder'></span></li>")
+										}
+
 									// subsequent rows, columns 2-4
 									$("#level-" + level + "-search-result-recordNumber-uri-" + recordUri).parent().children().last().append("<li id='level-" + (level + 1) + "-search-result-recordNumber-uri-" + result.Results[i].Uri + "'>- " + result.Results[i].RecordNumber.Value + "</li>")
 
@@ -186,17 +200,69 @@ $(document).on("click", ".search-result-caret-collapsed", function()
 
 									$("#level-" + level + "-search-result-recordType-uri-" + recordUri).parent().children().last().append("<li id='level-" + (level + 1) + "-search-result-recordType-uri-" + result.Results[i].Uri + "'>- " + result.Results[i].RecordRecordType.RecordTypeName.Value + "</li>")
 
-									if(result.Results[i].RecordRecordType.RecordTypeName.Value=="Schools Document") // if a document
+									if(isDocument) // if a document
 										{
 										// subsequent rows, column 5
-										$("#level-" + level + "-search-result-download-uri-" + recordUri).parent().children().last().append("<ul style='padding-left:0;'><li id='level-" + (level + 1) + "-search-result-download-uri-" + result.Results[i].Uri + "'><span class='download-grey'><span></li></ul>")		
+										$("#level-" + level + "-search-result-download-uri-" + recordUri).parent().children().last().append("<li id='level-" + (level + 1) + "-search-result-download-uri-" + result.Results[i].Uri + "'><span class='download-grey'><span></li>")		
 										}
 									else
 										{
 										// subsequent rows, column 5
-										$("#level-" + level + "-search-result-download-uri-" + recordUri).parent().children().last().append("<ul style='padding-left:0;'><li id='level-" + (level + 1) + "-search-result-download-uri-" + result.Results[i].Uri + "'><!--Intentionally Blank--></li></ul>")	
+										$("#level-" + level + "-search-result-download-uri-" + recordUri).parent().children().last().append("<li id='level-" + (level + 1) + "-search-result-download-uri-" + result.Results[i].Uri + "'><!--Intentionally Blank--></li>")	
 										}
+									}
 								}
+							else // level 1
+								{
+								if(i==0)  // first row
+									{
+									// column 1
+									$("#level-" + level + "-search-result-type-uri-" + recordUri).after("<ul><li id='level-" + (level + 1) + "-search-result-type-uri-" + result.Results[i].Uri + "' data-record-title='" + result.Results[i].RecordTitle.Value + "' data-record-extension='" + result.Results[i].RecordExtension.Value + "'  data-record-mime-type='" + result.Results[i].RecordMimeType.Value + "'><span class='fiv-viv fiv-icon-blank fiv-icon-" + result.Results[i].RecordExtension.Value.toLowerCase() + "' style='padding-left:81px;'></li></ul>")
+									
+									newTypeNodeId="#level-" + (level + 1) + "-search-result-type-uri-" + result.Results[i].Uri
+
+									// column 2
+									$("#level-" + level + "-search-result-recordNumber-uri-" + recordUri).after("<ul><li id='level-" + (level + 1) + "-search-result-recordNumber-uri-" + result.Results[i].Uri + "'>- " + result.Results[i].RecordNumber.Value + "</li></ul>")
+									
+									newRecordNumberNodeId="#level-" + (level + 1) + "-search-result-recordNumber-uri-" + result.Results[i].Uri
+										
+									// column 3
+									$("#level-" + level + "-search-result-recordTitle-uri-" + recordUri).after("<ul><li id='level-" + (level + 1) + "-search-result-recordTitle-uri-" + result.Results[i].Uri + "'>- " + result.Results[i].RecordTitle.Value + "</li></ul>")
+										
+									newRecordTitleNodeId="#level-" + (level + 1) + "-search-result-recordTitle-uri-" + result.Results[i].Uri
+										
+									// column 4
+									$("#level-" + level + "-search-result-recordType-uri-" + recordUri).after("<ul><li id='level-" + (level + 1) + "-search-result-recordType-uri-" + result.Results[i].Uri + "'>- " + result.Results[i].RecordRecordType.RecordTypeName.Value + "</li></ul>")
+										
+									newRecordTypeNodeId = "#level-" + (level + 1) + "-search-result-recordType-uri-" + result.Results[i].Uri
+										
+									// column 5
+									$("#level-" + level + "-search-result-download-uri-" + recordUri).after("<ul style='padding-left:0;'><li id='level-" + (level + 1) + "-search-result-download-uri-" + result.Results[i].Uri + "'><span class='download-grey'><span></li></ul>")	
+										
+									newDownloadNodeId = "#level-" + (level + 1) + "-search-result-download-uri-" + result.Results[i].Uri
+									}
+								else
+									{
+									// column 1
+									$(newTypeNodeId).parent().append("<li id='level-" + (level + 1) + "-search-result-type-uri-" + result.Results[i].Uri + "' data-record-title='" + result.Results[i].RecordTitle.Value + "' data-record-extension='" + result.Results[i].RecordExtension.Value + "'  data-record-mime-type='" + result.Results[i].RecordMimeType.Value + "'><span class='fiv-viv fiv-icon-blank fiv-icon-" + result.Results[i].RecordExtension.Value.toLowerCase() + "' style='padding-left:81px;'></li>")
+
+									// column 2
+									$(newRecordNumberNodeId).parent().append("<li id='level-" + (level + 1) + "-search-result-recordNumber-uri-" + result.Results[i].Uri + "'>- " + result.Results[i].RecordNumber.Value + "</li>")
+										
+									// column 3
+									$(newRecordTitleNodeId).parent().append("<li id='level-" + (level + 1) + "-search-result-recordTitle-uri-" + result.Results[i].Uri + "'>- " + result.Results[i].RecordTitle.Value + "</li>")
+	
+									// column 4
+									$(newRecordTypeNodeId).parent().append("<li id='level-" + (level + 1) + "-search-result-recordType-uri-" + result.Results[i].Uri + "'>- " + result.Results[i].RecordRecordType.RecordTypeName.Value + "</li>")
+									}
+									
+									//column 5
+									$(newDownloadNodeId).parent().append("<li id='level-" + (level + 1) + "-search-result-download-uri-" + result.Results[i].Uri + "'><span class='download-grey'><span></li>")
+								}
+								
+								
+								
+
 							}	
 						}
 					}, 
@@ -220,7 +286,9 @@ $(document).on("click", ".search-result-caret-expanded", function()
 	columns = $($(event.target).parent().parent().parent().parent()).children().length
 	for(i=0; i<columns; i++)
 		{
-		$($(event.target).parent().parent().parent().parent()).children().eq(i).children().eq(0).find("ul").remove()	
+		//$(event.target).parent().next().remove()
+		//alert()
+			$($(event.target).parent().parent().parent().parent()).children().eq(i).children().eq(0).find("ul").remove()	
 		}
 	})
 
