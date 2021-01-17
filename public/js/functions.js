@@ -929,6 +929,7 @@ function addOptionToDropdown(optionId, optionValue)
 
 function drawPropertiesTable(type)
 	{
+	$("#properties-pane").css("display", "block")
 	switch(type)
 		{
 		case "classification":

@@ -83,9 +83,7 @@ $(document).on("click", "#upload-button", function()
 $(document).on("click", "#search-button", function()
 	{
 	showLoadingSpinner()
-	$("#records-list-pane").css("display", "none")
-	$("#search-results-pane").css("display", "inline-block")
-	
+
 	// collapse clafficication tree on search
 	$("#all-files li").removeClass("node-selected")
 	$("#all-files > ul").addClass("classification-hidden")
@@ -94,9 +92,13 @@ $(document).on("click", "#search-button", function()
 	$("#all-files > span.folder-open").addClass("folder")
 	$("#all-files > span.folder-open").removeClass("folder-open")
 	
+	// clear records list pane on search
+	$("#records-list-pane").css("display", "none")
+	
 	// clear existing search result
 	$("#search-results-pane>table>tbody").html("")
-	
+
+	$("#search-results-pane").css("display", "inline-block")
 	populateSearchResultPane()
 	})
 
@@ -492,11 +494,7 @@ $(document).on("click", ".record-row", function()
 	{
 	if($(event.target).prop("nodeName")=="TD")
 		{
-		//alert("clicked")
-		//alert("It's a TD, so we know the parent is the row.")
 		var row = $(event.target).parent()
-		//alert(row.attr("id"))
-		//$("#classification-treeview li").removeClass("node-selected")
 		$(".record-row").removeClass("row-selected")
 		$(".record-row > td:nth-child(5) > span").addClass("download-grey")
 		row.addClass("row-selected")
@@ -623,6 +621,7 @@ $(document).on("click", ".folder-fill", function()
 		populateRecordTypeField("folder-terminal", node.attr("id").substr(11))
 		populateAdditionalFields("folder-terminal")
 		$("#new-folder-form-container").removeClass("upload-form-hidden")
+		$("#properties-pane").css("display", "block")
 		drawPropertiesTable("folder-terminal")
 		getRecordProperties("folder-terminal", node.attr("id").substr(11))
 		}
