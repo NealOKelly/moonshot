@@ -118,7 +118,7 @@ $(document).on("click", ".search-result-caret-collapsed", function()
 					if(result.TotalResults==0)
 						{
 						console.log(recordUri)
-						$("#level-" + level + "-search-result-type-uri-" + recordUri).after('<ul><li style="padding-left:48px;"><span class="file-earmark-grey"></span></li></ul>')
+						$("#level-" + level + "-search-result-type-uri-" + recordUri).after('<ul><li style="padding-left:40px;"><span class="file-earmark-grey"></span></li></ul>')
 							
 						$("#level-" + level + "-search-result-recordNumber-uri-"  + recordUri).after('<ul><li style="color:grey;">- None</li></ul>')
 							
@@ -141,7 +141,7 @@ $(document).on("click", ".search-result-caret-collapsed", function()
 								{
 								if(isDocument) // is a document
 									{
-									$("#level-" + level + "-search-result-type-uri-" + recordUri).after("<ul><li id='level-" + (level + 1) + "-search-result-type-uri-" + result.Results[i].Uri + "' data-record-title='" + result.Results[i].RecordTitle.Value + "' data-record-extension='" + result.Results[i].RecordExtension.Value + "'  data-record-mime-type='" + result.Results[i].RecordMimeType.Value + "'><span class='fiv-viv fiv-icon-blank fiv-icon-" + result.Results[i].RecordExtension.Value.toLowerCase() + "' style='padding-left:81px;'></li></ul>")
+									$("#level-" + level + "-search-result-type-uri-" + recordUri).after("<ul><li id='level-" + (level + 1) + "-search-result-type-uri-" + result.Results[i].Uri + "' style='padding-left:40px;' data-record-title='" + result.Results[i].RecordTitle.Value + "' data-record-extension='" + result.Results[i].RecordExtension.Value + "'  data-record-mime-type='" + result.Results[i].RecordMimeType.Value + "'><span class='fiv-viv fiv-icon-blank fiv-icon-" + result.Results[i].RecordExtension.Value.toLowerCase() + "'></span></li></ul>")
 
 									newTypeNodeId="#level-" + (level + 1) + "-search-result-type-uri-" + result.Results[i].Uri	
 									}
@@ -156,7 +156,7 @@ $(document).on("click", ".search-result-caret-collapsed", function()
 								{
 								if(isDocument) // is a document
 									{
-									$(newTypeNodeId).parent().append("<li id='level-" + (level + 1) + "-search-result-type-uri-" + result.Results[i].Uri + "' data-record-title='" + result.Results[i].RecordTitle.Value + "' data-record-extension='" + result.Results[i].RecordExtension.Value + "'  data-record-mime-type='" + result.Results[i].RecordMimeType.Value + "'><span class='fiv-viv fiv-icon-blank fiv-icon-" + result.Results[i].RecordExtension.Value.toLowerCase() + "' style='padding-left:81px;'></li>")	
+									$(newTypeNodeId).parent().append("<li id='level-" + (level + 1) + "-search-result-type-uri-" + result.Results[i].Uri + "' style='padding-left:40px;' data-record-title='" + result.Results[i].RecordTitle.Value + "' data-record-extension='" + result.Results[i].RecordExtension.Value + "'  data-record-mime-type='" + result.Results[i].RecordMimeType.Value + "'><span class='fiv-viv fiv-icon-blank fiv-icon-" + result.Results[i].RecordExtension.Value.toLowerCase() + "'></span></li>")	
 									}
 								else  // is a folder
 									{
