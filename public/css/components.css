@@ -407,3 +407,16 @@ th.sorted-up::after{
 	padding-top: 35%;
 	font-size:1.25rem;
 }
+
+#properties-pane-logo{
+	maxheight:100%;
+	maxwidth:100%;
+	width:auto;
+	height:auto;
+	position:absolute;
+	top:0;
+	bottom:0;
+	left:0;
+	right:0;
+	margin:auto;
+}

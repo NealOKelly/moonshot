@@ -98,6 +98,11 @@ $(document).on("click", "#search-button", function()
 	// clear existing search result
 	$("#search-results-pane>table>tbody").html("")
 
+	// clear properties pane on search
+	$("#properties-pane").hide()
+	$("#properties-pane-placeholder").html('<img id="properties-pane-logo" src="img/gilbyim-logo-inline-white.png">') // I don't understand why this code is necessary.
+	$("#properties-pane-placeholder").show()
+	
 	$("#search-results-pane").css("display", "inline-block")
 	populateSearchResultPane()
 	})
