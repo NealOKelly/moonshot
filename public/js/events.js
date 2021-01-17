@@ -97,6 +97,7 @@ $(document).on("click", "#search-button", function()
 		// clear records list pane on search
 		$("#records-list-pane").css("display", "none")
 
+
 		// clear existing search result
 		$("#search-results-pane").html("")
 
@@ -308,9 +309,9 @@ function populateSearchResultPane()
 							var thHTML = '<table id="search-results" class="table table-sm">'
 							thHTML = thHTML + '<thead style="background-color:#ffffff;"><tr>'
 							thHTML = thHTML + '<th style="text-align:left;padding-left:30px;">Type</th>'
-							thHTML = thHTML + '<th id="th-record-number" data-type="string" class="sorted-down" style="text-align:left;">Record Number</th>'
-							thHTML = thHTML + '<th id="th-record-title" style="text-align:left;" data-type="string" class="unsorted">Title</th>'
-							thHTML = thHTML + '<th id="th-date-registered" data-type="string" class="unsorted" style="text-align:left;">Record Type</th>'
+							thHTML = thHTML + '<th style="text-align:left;">Number</th>'
+							thHTML = thHTML + '<th id="th-record-title" style="text-align:left;">Title</th>'
+							thHTML = thHTML + '<th id="th-date-registered" style="text-align:left;">Record Type</th>'
 							thHTML = thHTML + '<th>Download</th></tr></thead><tbody>'
 							$("#search-results-pane").append(thHTML)
 							console.log(result)
