@@ -84,6 +84,14 @@ $(document).on("click", "#search-button", function()
 	{
 	$("#records-list-pane").css("display", "none")
 	$("#search-results-pane").css("display", "inline-block")
+	
+	// collapse clafficication tree on search
+	$("#all-files li").removeClass("node-selected")
+	$("#all-files > ul").addClass("classification-hidden")
+	$("#all-files > span.expanded").addClass("collapsed")
+	$("#all-files > span.expanded").removeClass("expanded")
+	$("#all-files > span.folder-open").addClass("folder")
+	$("#all-files > span.folder-open").removeClass("folder-open")
 	populateSearchResultPane()
 	})
 
