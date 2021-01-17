@@ -267,6 +267,18 @@ th.sorted-up::after{
 }
 
 /* #### SEARCH RESULTS #### */
+#search-results-pane{
+	margin-top: -1px;
+}
+
+#search-results>thead>tr>th{
+	position: sticky;
+	top: 0;
+	z-index: 10;
+	background-color: #dedede;
+	cursor: default;
+}
+
 #search-results>tbody{
 	overflow-y: auto;
 }
@@ -299,7 +311,6 @@ th.sorted-up::after{
 }
 #search-results>tbody>tr>td>ul ul>li{
 	font-style: italic;
-	
 }
 
 .search-result-caret-collapsed{
