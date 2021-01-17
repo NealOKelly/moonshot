@@ -98,7 +98,7 @@ $(document).on("click", "#search-button", function()
 		$("#records-list-pane").css("display", "none")
 
 		// clear existing search result
-		$("#search-results-pane>table>tbody").html("")
+		$("#search-results-pane").html("")
 
 		// clear properties pane on search
 		$("#properties-pane").hide()
@@ -305,6 +305,14 @@ function populateSearchResultPane()
 						xhrFields: { withCredentials: true},
 						success: function(result)
 							{
+							var thHTML = '<table id="search-results" class="table table-sm">'
+							thHTML = thHTML + '<thead style="background-color:#ffffff;"><tr>'
+							thHTML = thHTML + '<th style="text-align:left;padding-left:30px;">Type</th>'
+							thHTML = thHTML + '<th id="th-record-number" data-type="string" class="sorted-down" style="text-align:left;">Record Number</th>'
+							thHTML = thHTML + '<th id="th-record-title" style="text-align:left;" data-type="string" class="unsorted">Title</th>'
+							thHTML = thHTML + '<th id="th-date-registered" data-type="string" class="unsorted" style="text-align:left;">Record Type</th>'
+							thHTML = thHTML + '<th>Download</th></tr></thead><tbody>'
+							$("#search-results-pane").append(thHTML)
 							console.log(result)
 							for(x=0; x<result.TotalResults; x++)
 								{
@@ -349,6 +357,8 @@ function populateSearchResultPane()
 										}
 									}
 								}
+							var endHTML = '</tbody></table>'
+							$("#search-results-pane > tbody").append(thHTML)
 							hideLoadingSpinner()
 							}, 
 						error: function(result)
@@ -383,7 +393,6 @@ function addSearchResult(record, type)
 		}
 	else
 		{
-		//resultRowHTML = '<tr id="search-result-uri-' + record.Uri + '" class="' + type + '">'
 		resultRowHTML = '<tr>'
 		resultRowHTML = resultRowHTML + '<td style="width:12%;"><ul><li id="level-0-search-result-type-uri-' + record.Uri + '"><span class="search-result-caret-collapsed"></span><span class="search-result-folder"></span></li></ul></td>'
 		}
@@ -400,7 +409,7 @@ function addSearchResult(record, type)
 		}
 	
 	resultRowHTML = resultRowHTML + '</tr>'
-	$("#search-results>tbody").append(resultRowHTML)
+	$("#search-results").append(resultRowHTML)
 	}
 
 $(document).on("click", "#grid", function()
@@ -470,6 +479,11 @@ function sortGrid(id, colNum, type, currentState)
 		
 		tbody.append(...rowsArray);
     }
+
+
+
+
+
 
 $(document).on("click", "#upload-status-ok-button", function()
 	{
