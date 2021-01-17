@@ -105,6 +105,7 @@ $(document).on("click", "#search-button", function()
 		$("#properties-pane-placeholder").html('<img id="properties-pane-logo" src="img/gilbyim-logo-inline-white.png">') // I don't understand why this code is necessary.
 		$("#properties-pane-placeholder").show()
 
+		$("#search-input").val("")
 		$("#search-results-pane").show()
 		populateSearchResultPane()
 		}
