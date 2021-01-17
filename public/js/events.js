@@ -82,29 +82,32 @@ $(document).on("click", "#upload-button", function()
 
 $(document).on("click", "#search-button", function()
 	{
-	showLoadingSpinner()
+	if($("#search-input").val() != "")
+		{
+		showLoadingSpinner()
 
-	// collapse clafficication tree on search
-	$("#all-files li").removeClass("node-selected")
-	$("#all-files > ul").addClass("classification-hidden")
-	$("#all-files > span.expanded").addClass("collapsed")
-	$("#all-files > span.expanded").removeClass("expanded")
-	$("#all-files > span.folder-open").addClass("folder")
-	$("#all-files > span.folder-open").removeClass("folder-open")
-	
-	// clear records list pane on search
-	$("#records-list-pane").css("display", "none")
-	
-	// clear existing search result
-	$("#search-results-pane>table>tbody").html("")
+		// collapse clafficication tree on search
+		$("#all-files li").removeClass("node-selected")
+		$("#all-files > ul").addClass("classification-hidden")
+		$("#all-files > span.expanded").addClass("collapsed")
+		$("#all-files > span.expanded").removeClass("expanded")
+		$("#all-files > span.folder-open").addClass("folder")
+		$("#all-files > span.folder-open").removeClass("folder-open")
 
-	// clear properties pane on search
-	$("#properties-pane").hide()
-	$("#properties-pane-placeholder").html('<img id="properties-pane-logo" src="img/gilbyim-logo-inline-white.png">') // I don't understand why this code is necessary.
-	$("#properties-pane-placeholder").show()
-	
-	$("#search-results-pane").show()
-	populateSearchResultPane()
+		// clear records list pane on search
+		$("#records-list-pane").css("display", "none")
+
+		// clear existing search result
+		$("#search-results-pane>table>tbody").html("")
+
+		// clear properties pane on search
+		$("#properties-pane").hide()
+		$("#properties-pane-placeholder").html('<img id="properties-pane-logo" src="img/gilbyim-logo-inline-white.png">') // I don't understand why this code is necessary.
+		$("#properties-pane-placeholder").show()
+
+		$("#search-results-pane").show()
+		populateSearchResultPane()
+		}
 	})
 
 $(document).on("click", ".search-result-caret-collapsed", function()
