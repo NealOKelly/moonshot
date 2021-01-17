@@ -82,6 +82,7 @@ $(document).on("click", "#upload-button", function()
 
 $(document).on("click", "#search-button", function()
 	{
+	showLoadingSpinner()
 	$("#records-list-pane").css("display", "none")
 	$("#search-results-pane").css("display", "inline-block")
 	
@@ -335,15 +336,8 @@ function populateSearchResultPane()
 											}
 											
 									}
-
-							}
-
-							//console.log(result)
-
-
-
-
-
+								}
+							hideLoadingSpinner()
 							}, 
 						error: function(result)
 							{

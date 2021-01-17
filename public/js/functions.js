@@ -1902,6 +1902,11 @@ function downloadDocument(recordUri, recordTitle, recordExtension, recordMimeTyp
 // END DOWNLOAD DOCUMENT //
 
 // 9. MSICELLANEOUS //
+function showLoadingSpinner() 
+	{
+	$("#loading").modal('show');
+	}
+
 
 function hideLoadingSpinner() 
 	{
