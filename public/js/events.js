@@ -103,7 +103,7 @@ $(document).on("click", "#search-button", function()
 	$("#properties-pane-placeholder").html('<img id="properties-pane-logo" src="img/gilbyim-logo-inline-white.png">') // I don't understand why this code is necessary.
 	$("#properties-pane-placeholder").show()
 	
-	$("#search-results-pane").css("display", "inline-block")
+	$("#search-results-pane").show()
 	populateSearchResultPane()
 	})
 
@@ -555,6 +555,8 @@ $(document).on("click", ".folder", function()
 	{
 	var node = $(event.target).parent();
 	hideNewRecordForms()
+	$("#search-results-pane").hide()
+	$("#records-list-pane").show()
 	classificationTreeNodeSelected(node)
 	if(node.hasClass("classification-can-attach-records"))
 		{
@@ -579,6 +581,8 @@ $(document).on("click", ".folder-open", function()
 	{
 	var node = $(event.target).parent();
 	hideNewRecordForms()
+	$("#search-results-pane").hide()
+	$("#records-list-pane").show()
 	classificationTreeNodeSelected(node)
 	if(node.hasClass("classification-can-attach-records"))
 		{
@@ -602,6 +606,8 @@ $(document).on("click", ".classification-name>a", function()
 	{
 	var node = $(event.target).parent().parent();
 	hideNewRecordForms()
+	$("#search-results-pane").hide()
+	$("#records-list-pane").show()
 	classificationTreeNodeSelected(node)
 	if(node.hasClass("classification-can-attach-records"))
 		{
@@ -617,6 +623,8 @@ $(document).on("click", ".folder-fill", function()
 	{
 	var node = $(event.target).parent();
 	hideNewRecordForms()
+	$("#search-results-pane").hide()
+	$("#records-list-pane").show()
 	highlightSelectedNode(node)
 	$("#records-list-pane").css("display", "block")
 	if($(node).hasClass("folder-terminal"))
@@ -636,6 +644,8 @@ $(document).on("click", ".record-title>a", function()
 	{
 	var node = $(event.target).parent().parent();
 	hideNewRecordForms()
+	$("#search-results-pane").hide()
+	$("#records-list-pane").show()
 	highlightSelectedNode(node)
 	$(".record-row").removeClass("row-selected")
 	$(".record-row > td:nth-child(5) > span").addClass("download-grey")
