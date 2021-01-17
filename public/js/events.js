@@ -308,8 +308,8 @@ function populateSearchResultPane()
 							{
 							var thHTML = '<table id="search-results" class="table table-sm">'
 							thHTML = thHTML + '<thead style="background-color:#ffffff;"><tr>'
-							thHTML = thHTML + '<th style="text-align:left;padding-left:30px;">Type</th>'
-							thHTML = thHTML + '<th style="text-align:left;">Number</th>'
+							thHTML = thHTML + '<th style="text-align:left;padding-left:30px;width:12%;";>Type</th>'
+							thHTML = thHTML + '<th style="text-align:left;width:15%;">Number</th>'
 							thHTML = thHTML + '<th id="th-record-title" style="text-align:left;">Title</th>'
 							thHTML = thHTML + '<th id="th-date-registered" style="text-align:left;">Record Type</th>'
 							thHTML = thHTML + '<th>Download</th></tr></thead><tbody>'
@@ -385,7 +385,7 @@ function addSearchResult(record, type)
 	{
 	if(type=="document")
 		{
-		resultRowHTML = '<tr><td style="width:12%;">'
+		resultRowHTML = '<tr><td>'
 		resultRowHTML = resultRowHTML + '<ul><li id="level-0-search-result-type-uri-' + record.Uri + '" style="padding-left:45px;" data-record-title="' + record.RecordTitle.Value + '" data-record-extension="' + record.RecordExtension.Value + '" data-record-mime-type="' + record.RecordMimeType.Value + '">'
 		
 		resultRowHTML = resultRowHTML + '<span class="fiv-viv fiv-icon-blank fiv-icon-' + record.RecordExtension.Value.toLowerCase() + '" arial-label="' + record.RecordExtension.Value.toUpperCase() + '">'
@@ -395,7 +395,7 @@ function addSearchResult(record, type)
 	else
 		{
 		resultRowHTML = '<tr>'
-		resultRowHTML = resultRowHTML + '<td style="width:12%;"><ul><li id="level-0-search-result-type-uri-' + record.Uri + '"><span class="search-result-caret-collapsed"></span><span class="search-result-folder"></span></li></ul></td>'
+		resultRowHTML = resultRowHTML + '<td><ul><li id="level-0-search-result-type-uri-' + record.Uri + '"><span class="search-result-caret-collapsed"></span><span class="search-result-folder"></span></li></ul></td>'
 		}
 	resultRowHTML = resultRowHTML + '<td><ul><li id="level-0-search-result-recordNumber-uri-' + record.Uri + '" class="' + type + '">' + record.RecordNumber.Value + '</li></ul></td>'
 	resultRowHTML = resultRowHTML + '<td><ul><li id="level-0-search-result-recordTitle-uri-' + record.Uri + '">' + record.RecordTitle.Value + '</li></ul></td>'

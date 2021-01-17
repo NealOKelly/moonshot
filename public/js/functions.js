@@ -400,7 +400,7 @@ function getRecords(recordUri)
 						var tableHTML = '<table id="grid" class="table table-sm">'
 						tableHTML = tableHTML + '<thead style="background-color:#ffffff;""><tr>'
 						tableHTML = tableHTML + '<th id="th-type" data-type="string" class="unsorted">Type</th>'
-						tableHTML = tableHTML +	'<th id="th-record-number" data-type="string" class="sorted-down">Record Number</i></th>'
+						tableHTML = tableHTML +	'<th id="th-record-number" data-type="string" class="sorted-down">Record</i></th>'
 						tableHTML = tableHTML +	'<th id="th-record-title" style="text-align:left;" data-type="string" class="unsorted">Title</th>'
 						tableHTML = tableHTML +	'<th id="th-date-registered" data-type="string" class="unsorted">Date Registered</th>'
 						tableHTML = tableHTML + '<th ">Download</th>'
