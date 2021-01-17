@@ -93,6 +93,10 @@ $(document).on("click", "#search-button", function()
 	$("#all-files > span.expanded").removeClass("expanded")
 	$("#all-files > span.folder-open").addClass("folder")
 	$("#all-files > span.folder-open").removeClass("folder-open")
+	
+	// clear existing search result
+	$("#search-results-pane>table>tbody").html("")
+	
 	populateSearchResultPane()
 	})
 
@@ -295,46 +299,43 @@ function populateSearchResultPane()
 								{
 								for(i=0; i<recordTypeDefinitions.TotalResults; i++)
 									{
-										if(recordTypeDefinitions.Results[i].Uri==result.Results[x].RecordRecordType.Uri)
+									if(recordTypeDefinitions.Results[i].Uri==result.Results[x].RecordRecordType.Uri)
+										{
+										if(!config.ExcludedRecordTypes.includes(result.Results[x].RecordRecordType.RecordTypeName.Value))
 											{
-											if(!config.ExcludedRecordTypes.includes(result.Results[x].RecordRecordType.RecordTypeName.Value))
+											switch(recordTypeDefinitions.Results[i].RecordTypeContentsRule.Value)
 												{
-												switch(recordTypeDefinitions.Results[i].RecordTypeContentsRule.Value)
-													{
-													case "ByLevel":
-														if(recordTypeDefinitions.Results[i].RecordTypeLevel.Value>="5")
-															{
-															addSearchResult(result.Results[x], "folder-intermediate")
-															}
-														else
-															{
-														if(recordTypeDefinitions.Results[i].RecordTypeLevel.Value<"5")
-																{
-																addSearchResult(result.Results[x], "folder-terminal")		
-																}
-															}
-														break;
-													case "ByLevelInclusive":
+												case "ByLevel":
+													if(recordTypeDefinitions.Results[i].RecordTypeLevel.Value>="5")
+														{
 														addSearchResult(result.Results[x], "folder-intermediate")
-														break;
-													case "ByBehavior":
-														addSearchResult(result.Results[x], "folder-terminal")
-														break;
-													case "ByList":
-														if(recordTypeDefinitions.Results[i].RecordTypeLevel.Value>="4")
+														}
+													else
+														{
+															if(recordTypeDefinitions.Results[i].RecordTypeLevel.Value<"5")
 															{
-																addSearchResult(result.Results[x], "folder-intermediate")
+															addSearchResult(result.Results[x], "folder-terminal")		
 															}
-														break;
-													case "Prevented":
-														addSearchResult(result.Results[x], "document")
-														break;
-													}	
-												}
-												
-												
+														}
+													break;
+												case "ByLevelInclusive":
+													addSearchResult(result.Results[x], "folder-intermediate")
+													break;
+												case "ByBehavior":
+													addSearchResult(result.Results[x], "folder-terminal")
+													break;
+												case "ByList":
+													if(recordTypeDefinitions.Results[i].RecordTypeLevel.Value>="4")
+														{
+															addSearchResult(result.Results[x], "folder-intermediate")
+														}
+													break;
+												case "Prevented":
+													addSearchResult(result.Results[x], "document")
+													break;
+												}	
 											}
-											
+										}
 									}
 								}
 							hideLoadingSpinner()
