@@ -300,6 +300,7 @@ th.sorted-up::after{
 	height: 30px;
 	/*margin-left:12px;*/
 	overflow: hidden;
+	cursor: default;
 }
 
 #search-results>tbody>tr>td>ul>ul{
