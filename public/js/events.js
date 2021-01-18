@@ -103,12 +103,13 @@ $(document).on("click", "#search-button", function()
 
 		// clear properties pane on search
 		$("#properties-pane").hide()
-		$("#properties-pane-placeholder").html('<img id="properties-pane-logo" src="img/gilbyim-logo-inline-white.png">') // I don't understand why this code is necessary.
+		$("#properties-pane-placeholder").html('<img id="properties-pane-logo" src="img/gilbyim-logo-inline-white-2.png">') // I don't understand why this code is necessary.
 		$("#properties-pane-placeholder").show()
 
-		$("#search-input").val("")
+		
 		$("#search-results-pane").show()
-		populateSearchResultPane()
+		populateSearchResultPane($("#search-input").val())
+		$("#search-input").val("")
 		}
 	})
 
@@ -125,6 +126,8 @@ $(document).on("click", ".search-result-caret-collapsed", function()
 
 	$("#" + $(event.target).parent().attr("id") + " >span:nth-child(1)").addClass("search-result-caret-expanded")
 	$("#" + $(event.target).parent().attr("id") + " >span:nth-child(1)").removeClass("search-result-caret-collapsed")
+	$("#" + $(event.target).parent().attr("id") + " >span:nth-child(2)").addClass("search-result-folder-open")
+	$("#" + $(event.target).parent().attr("id") + " >span:nth-child(2)").addClass("search-result-folder")
 
 	getAuthenticationStatus().then(function () 
 		{
@@ -407,8 +410,26 @@ $(document).on("click", "#search-results li", function()
 					nodeType = $("#level-" + level + "-search-result-recordNumber-uri-" + uri).attr("class")
 					drawPropertiesTable(nodeType)
 					getRecordProperties(nodeType, uri)
-					console.log(nodeType)
-
+					hideNewRecordForms()
+					switch(nodeType)
+						{
+						case "folder-intermediate":
+							populateContainerField("folder-intermediate", uri)
+							populateRecordTypeField("folder-intermediate", uri)
+							$("#new-sub-folder-form-record-type").html("")
+							$("#new-sub-folder-form-container").removeClass("new-sub-folder-form-hidden")
+							populateAdditionalFields("folder-intermediate")
+							break;
+						case "folder-terminal":
+							populateContainerField("folder-terminal", uri)
+							populateRecordTypeField("folder-terminal", uri)
+							populateAdditionalFields("folder-terminal")
+							$("#new-folder-form-container").removeClass("upload-form-hidden")
+							break;
+						case "document":
+							// do something
+							break;
+						}
 					}
 			   }
 			}
@@ -437,14 +458,25 @@ $(document).on("click", ".search-result-caret-expanded", function()
 	{
 	$(event.target).addClass("search-result-caret-collapsed")
 	$(event.target).removeClass("search-result-caret-expanded")
-	columns = $($(event.target).parent().parent().parent().parent()).children().length
-	for(i=0; i<columns; i++)
-		{
-			$($(event.target).parent().parent().parent().parent()).children().eq(i).children().eq(0).find("ul").remove()	
-		}
+	$(event.target).parent().children().eq(1).addClass("search-result-folder")
+	$(event.target).parent().children().eq(1).removeClass("search-result-folder-open")
+	
+	var level = $(event.target).parent().attr("id").substr(6, 1)
+	//alert("level:" + level)
+	var uri = $(event.target).parent().attr("id").substr(31)
+	//alert(uri)
+	$("#level-" + level + "-search-result-type-uri-" + uri).parent().find("ul").remove()
+	$("#level-" + level + "-search-result-recordNumber-uri-" + uri).parent().find("ul").remove()
+	$("#level-" + level + "-search-result-recordTitle-uri-" + uri).parent().find("ul").remove()
+	$("#level-" + level + "-search-result-recordType-uri-" + uri).parent().find("ul").remove()
+	$("#level-" + level + "-search-result-download-uri-" + uri).parent().find("ul").remove()
+	
+	//columns = $($(event.target).parent().parent().parent().parent()).children().length
+	//var level = $(event.target).parent().attr("id").substr(6, 1)
+
 	})
 
-function populateSearchResultPane()
+function populateSearchResultPane(searchString)
 	{
 	getAuthenticationStatus().then(function () 
 		{
@@ -459,8 +491,9 @@ function populateSearchResultPane()
 				xhrFields: { withCredentials: true},
 				success: function(recordTypeDefinitions)
 					{
+					console.log(searchString)
 					console.log(recordTypeDefinitions)
-					var q = "all"
+					var q = 'content:"'+ searchString +'" Or anyWord:' + searchString;
 					var url = baseUrl + "/" + apiPath + "/Search?q=" + q + "&properties=RecordNumber,RecordTitle,RecordRecordType,RecordMimeType,RecordExtension&trimtype=Record&pageSize=1000"
 					$.ajax(
 						{

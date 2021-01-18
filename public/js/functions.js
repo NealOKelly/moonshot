@@ -314,7 +314,7 @@ function addTerminalFolderNode(parentNodeId, recordUri, recordTitle)
 
 function sortClassificationTree(sortBy)
 	{
-	$("ul").each(function(_, ul)
+	$("#all-files ul").each(function(_, ul)
 		{
 		// get all the nodes to be sorted
 		var $toSort = $(ul).children("li");
