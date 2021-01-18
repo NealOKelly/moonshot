@@ -143,13 +143,13 @@ $(document).on("click", ".search-result-caret-collapsed", function()
 					if(result.TotalResults==0)
 						{
 						console.log(recordUri)
-						$("#level-" + level + "-search-result-type-uri-" + recordUri).after('<ul><li style="padding-left:40px;"><span class="file-earmark-grey"></span></li></ul>')
+						$("#level-" + level + "-search-result-type-uri-" + recordUri).after('<ul><li class="no-results" style="padding-left:40px;"><span class="file-earmark-grey"></span></li></ul>')
 							
-						$("#level-" + level + "-search-result-recordNumber-uri-"  + recordUri).after('<ul><li style="color:grey;">- None</li></ul>')
+						$("#level-" + level + "-search-result-recordNumber-uri-"  + recordUri).after('<ul><li class="no-results"  style="color:grey;">- None</li></ul>')
 							
-						$("#level-" + level + "-search-result-recordTitle-uri-"  + recordUri).after('<ul><li style="color:grey;">- No records found.</li></ul>')
+						$("#level-" + level + "-search-result-recordTitle-uri-"  + recordUri).after('<ul><li class="no-results" style="color:grey;">- No records found.</li></ul>')
 							
-						$("#level-" + level + "-search-result-recordType-uri-"  + recordUri).after('<ul><li style="color:grey;">- None</li></ul>')	
+						$("#level-" + level + "-search-result-recordType-uri-"  + recordUri).after('<ul><li class="no-results" style="color:grey;">- None</li></ul>')	
 						}
 					else
 						{
@@ -192,13 +192,13 @@ $(document).on("click", ".search-result-caret-collapsed", function()
 							// column 2
 							if(i==0)  // first row	
 								{
-								$("#level-" + level + "-search-result-recordNumber-uri-" + recordUri).after("<ul><li id='level-" + (level + 1) + "-search-result-recordNumber-uri-" + result.Results[i].Uri + "'>- " + result.Results[i].RecordNumber.Value + "</li></ul>")
+								$("#level-" + level + "-search-result-recordNumber-uri-" + recordUri).after("<ul><li id='level-" + (level + 1) + "-search-result-recordNumber-uri-" + result.Results[i].Uri + "' class='document'>- " + result.Results[i].RecordNumber.Value + "</li></ul>")
 
 								newRecordNumberNodeId="#level-" + (level + 1) + "-search-result-recordNumber-uri-" + result.Results[i].Uri
 								}
 							else // subsequent rows
 								{
-								$(newRecordNumberNodeId).parent().append("<li id='level-" + (level + 1) + "-search-result-recordNumber-uri-" + result.Results[i].Uri + "'>- " + result.Results[i].RecordNumber.Value + "</li>")	
+								$(newRecordNumberNodeId).parent().append("<li id='level-" + (level + 1) + "-search-result-recordNumber-uri-" + result.Results[i].Uri + "' ' class='document'>- " + result.Results[i].RecordNumber.Value + "</li>")	
 								}
 								
 							// column 3
@@ -230,7 +230,7 @@ $(document).on("click", ".search-result-caret-collapsed", function()
 								{
 								if(isDocument) // is a document
 									{
-									$("#level-" + level + "-search-result-download-uri-" + recordUri).after("<ul style='padding-left:0;'><li id='level-" + (level + 1) + "-search-result-download-uri-" + result.Results[i].Uri + "'><span class='download-grey'><span></li></ul>")	
+									$("#level-" + level + "-search-result-download-uri-" + recordUri).after("<ul style='padding-left:0;'><li id='level-" + (level + 1) + "-search-result-download-uri-" + result.Results[i].Uri + "'><span class='download-grey'></span></li></ul>")	
 
 									newDownloadNodeId = "#level-" + (level + 1) + "-search-result-download-uri-" + result.Results[i].Uri	
 									}
@@ -245,11 +245,11 @@ $(document).on("click", ".search-result-caret-collapsed", function()
 								{
 								if(isDocument) // is a document
 									{
-									$(newDownloadNodeId).parent().append("<li id='level-" + (level + 1) + "-search-result-download-uri-" + result.Results[i].Uri + "'><span class='download-grey'><span></li>")	
+									$(newDownloadNodeId).parent().append("<li id='level-" + (level + 1) + "-search-result-download-uri-" + result.Results[i].Uri + "'><span class='download-grey'></span></li>")	
 									}
 								else // is a folder
 									{
-									$(newDownloadNodeId).parent().append("<li id='level-" + (level + 1) + "-search-result-download-uri-" + result.Results[i].Uri + "'><!--Intentionally Blank--><span></li>")	
+									$(newDownloadNodeId).parent().append("<li id='level-" + (level + 1) + "-search-result-download-uri-" + result.Results[i].Uri + "'><!--Intentionally Blank--></li>")	
 									}	
 								}
 								
@@ -268,6 +268,105 @@ $(document).on("click", ".search-result-caret-collapsed", function()
 			}
 		});
 	})
+
+$(document).on("click", "#search-results li", function()
+	{
+	//alert($(event.target).attr("id"))
+	
+	if(!$(event.target).hasClass("search-result-caret-expanded"))
+		{
+		if(!$(event.target).hasClass("search-result-caret-collapsed"))
+			{
+			if(!$(event.target).hasClass("file-earmark-grey"))
+			   {
+				if(!$(event.target).hasClass("no-results"))
+					{
+					if($(event.target).hasClass("search-result-folder"))
+						{
+						level = $(event.target).parent().attr("id").substr(6, 1)
+						uri = $(event.target).parent().attr("id").substr(31)
+						}
+					else
+						{
+						if($(event.target).hasClass("fiv-viv"))
+							{
+							level = $(event.target).parent().attr("id").substr(6, 1)
+							uri = $(event.target).parent().attr("id").substr(31)
+							}
+						else
+							{
+							if($(event.target).hasClass("download-grey"))
+								{
+								level = $(event.target).parent().attr("id").substr(6, 1)
+								uri = $(event.target).parent().attr("id").substr(35)	
+								}
+							else
+								{
+								if($(event.target).hasClass("download"))
+									{
+									// Do the download.
+									var level = $(event.target).parent().attr("id").substr(6, 1)
+									var recordUri = $(event.target).parent().attr("id").substr(35)
+									var recordTitle = $("#level-" + level + "-search-result-type-uri-"+ recordUri).data("record-title")
+									var recordExtension = $("#level-" + level + "-search-result-type-uri-"+ recordUri).data("record-extension")
+									var recordMimeType = $("#level-" + level + "-search-result-type-uri-"+ recordUri).data("record-mime-type")
+									console.log(recordUri)
+									console.log(recordTitle)
+									console.log(recordExtension)
+									console.log(recordMimeType)
+									downloadDocument(recordUri, recordTitle, recordExtension, recordMimeType)
+									}
+								else
+									{
+									level = $(event.target).attr("id").substr(6, 1)		
+									if($(event.target).attr("id").includes("search-result-type"))
+										{
+										uri = $(event.target).attr("id").substr(31)
+										}
+									if($(event.target).attr("id").includes("search-result-recordNumber"))
+										{
+										uri = $(event.target).attr("id").substr(39)
+										}
+									if($(event.target).attr("id").includes("search-result-recordTitle"))
+										{
+										uri = $(event.target).attr("id").substr(38)
+										}
+									if($(event.target).attr("id").includes("search-result-recordType"))
+										{
+										uri = $(event.target).attr("id").substr(37)
+										}
+									if($(event.target).attr("id").includes("search-result-download"))
+										{
+										uri = $(event.target).attr("id").substr(35)
+										}
+									}
+								}
+							}
+						}
+					highlightSelectedSearchResult(uri, level)			
+					}
+			   }
+			}
+		}
+	})
+
+function highlightSelectedSearchResult(uri, level)
+	{
+	$("#search-results li").css("font-weight", "normal")
+	$("[id*='-search-result-download-uri-'] span").removeClass("download")
+	$("[id*='-search-result-download-uri-'] span").addClass("download-grey")
+	//$("#level-" + level + "-search-result-download-uri-" + uri + ">span").addClass("download-grey")
+	$("#level-" + level + "-search-result-recordNumber-uri-" + uri).css("font-weight", "bold")
+	$("#level-" + level + "-search-result-recordTitle-uri-" + uri).css("font-weight", "bold")
+	$("#level-" + level + "-search-result-recordType-uri-" + uri).css("font-weight", "bold")
+	if($("#level-" + level + "-search-result-recordNumber-uri-" + uri).hasClass("document"))
+		{
+		//alert("It's a document.")
+		$("#level-" + level + "-search-result-download-uri-" + uri + ">span").removeClass("download-grey")
+		$("#level-" + level + "-search-result-download-uri-" + uri + ">span").addClass("download")
+		}
+	}
+
 
 $(document).on("click", ".search-result-caret-expanded", function()
 	{
