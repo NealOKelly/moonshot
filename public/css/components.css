@@ -100,7 +100,8 @@
 .folder-fill{
 	display: inline-block;
   	content: "";
-  	background-image: url("../img/bootstrap-icons/folder-fill.svg");
+  	/*background-image: url("../img/bootstrap-icons/folder-fill.svg");*/
+	background-image: url("../img/bootstrap-icons/folder.svg");
 	background-size: cover;
 	background-repeat: no-repeat;
     width: 24px;

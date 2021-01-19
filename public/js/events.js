@@ -82,10 +82,11 @@ $(document).on("click", "#upload-button", function()
 
 $(document).on("click", "#search-button", function()
 	{
+	//alert("cclicked")
 	if($("#search-input").val() != "")
 		{
 		showLoadingSpinner()
-
+		hideNewRecordForms()
 		// collapse clafficication tree on search
 		$("#all-files li").removeClass("node-selected")
 		$("#all-files > ul").addClass("classification-hidden")
@@ -112,6 +113,14 @@ $(document).on("click", "#search-button", function()
 		$("#search-input").val("")
 		}
 	})
+
+$('#search-input').keydown(function (e){
+    if(e.keyCode == 13){
+    	$("#search-button").click()
+		return false;
+		//alert('you pressed enter ^_^');
+    }
+})
 
 $(document).on("click", ".search-result-caret-collapsed", function()
 	{
@@ -416,7 +425,8 @@ $(document).on("click", "#search-results li", function()
 						case "folder-intermediate":
 							populateContainerField("folder-intermediate", uri)
 							populateRecordTypeField("folder-intermediate", uri)
-							$("#new-sub-folder-form-record-type").html("")
+							$("#new-sub-folder-form-record-title").val("")
+							$("#new-sub-folder-form-record-type").val("")
 							$("#new-sub-folder-form-container").removeClass("new-sub-folder-form-hidden")
 							populateAdditionalFields("folder-intermediate")
 							break;
@@ -424,6 +434,7 @@ $(document).on("click", "#search-results li", function()
 							populateContainerField("folder-terminal", uri)
 							populateRecordTypeField("folder-terminal", uri)
 							populateAdditionalFields("folder-terminal")
+							$("#new-folder-form-record-title").val("")
 							$("#new-folder-form-container").removeClass("upload-form-hidden")
 							break;
 						case "document":
@@ -465,11 +476,19 @@ $(document).on("click", ".search-result-caret-expanded", function()
 	//alert("level:" + level)
 	var uri = $(event.target).parent().attr("id").substr(31)
 	//alert(uri)
-	$("#level-" + level + "-search-result-type-uri-" + uri).parent().find("ul").remove()
-	$("#level-" + level + "-search-result-recordNumber-uri-" + uri).parent().find("ul").remove()
-	$("#level-" + level + "-search-result-recordTitle-uri-" + uri).parent().find("ul").remove()
-	$("#level-" + level + "-search-result-recordType-uri-" + uri).parent().find("ul").remove()
-	$("#level-" + level + "-search-result-download-uri-" + uri).parent().find("ul").remove()
+	$("#level-" + level + "-search-result-type-uri-" + uri).next().addClass("remove-me")
+	$("#level-" + level + "-search-result-recordNumber-uri-" + uri).next().addClass("remove-me")
+	$("#level-" + level + "-search-result-recordTitle-uri-" + uri).next().addClass("remove-me")
+	$("#level-" + level + "-search-result-recordType-uri-" + uri).next().addClass("remove-me")
+	$("#level-" + level + "-search-result-download-uri-" + uri).next().addClass("remove-me")
+	$(".remove-me").html("")
+	$(".remove-me").removeClass("remove-me")
+	
+	//$("#level-" + level + "-search-result-type-uri-" + uri).parent().find("ul").remove()
+	//$("#level-" + level + "-search-result-recordNumber-uri-" + uri).parent().find("ul").remove()
+	//$("#level-" + level + "-search-result-recordTitle-uri-" + uri).parent().find("ul").remove()
+	//$("#level-" + level + "-search-result-recordType-uri-" + uri).parent().find("ul").remove()
+	//$("#level-" + level + "-search-result-download-uri-" + uri).parent().find("ul").remove()
 	
 	//columns = $($(event.target).parent().parent().parent().parent()).children().length
 	//var level = $(event.target).parent().attr("id").substr(6, 1)
@@ -503,61 +522,72 @@ function populateSearchResultPane(searchString)
 						xhrFields: { withCredentials: true},
 						success: function(result)
 							{
-							var thHTML = '<table id="search-results" class="table table-sm">'
-							thHTML = thHTML + '<thead style="background-color:#ffffff;"><tr>'
-							thHTML = thHTML + '<th style="text-align:left;padding-left:30px;width:12%;";>Type</th>'
-							thHTML = thHTML + '<th style="text-align:left;width:15%;">Number</th>'
-							thHTML = thHTML + '<th id="th-record-title" style="text-align:left;">Title</th>'
-							thHTML = thHTML + '<th id="th-date-registered" style="text-align:left;">Record Type</th>'
-							thHTML = thHTML + '<th>Download</th></tr></thead><tbody>'
-							$("#search-results-pane").append(thHTML)
-							console.log(result)
-							for(x=0; x<result.TotalResults; x++)
+							if(result.TotalResults==0)
 								{
-								for(i=0; i<recordTypeDefinitions.TotalResults; i++)
+								$("#search-results-pane").html("<div class='no-records display-4'>Your search did not return any records.</div>")
+								//Browse or search to display records.
+								//<div class='no-records display-4'>Browse or search to display records.</div>
+								hideLoadingSpinner()	
+								}
+							else
+								{
+								var thHTML = '<table id="search-results" class="table table-sm">'
+								thHTML = thHTML + '<thead style="background-color:#ffffff;"><tr>'
+								thHTML = thHTML + '<th style="text-align:left;padding-left:30px;width:12%;";>Type</th>'
+								thHTML = thHTML + '<th style="text-align:left;width:15%;">Number</th>'
+								thHTML = thHTML + '<th id="th-record-title" style="text-align:left;">Title</th>'
+								thHTML = thHTML + '<th id="th-date-registered" style="text-align:left;">Record Type</th>'
+								thHTML = thHTML + '<th>Download</th></tr></thead><tbody>'
+								$("#search-results-pane").append(thHTML)
+								console.log(result)
+								
+								for(x=0; x<result.TotalResults; x++)
 									{
-									if(recordTypeDefinitions.Results[i].Uri==result.Results[x].RecordRecordType.Uri)
+									for(i=0; i<recordTypeDefinitions.TotalResults; i++)
 										{
-										if(!config.ExcludedRecordTypes.includes(result.Results[x].RecordRecordType.RecordTypeName.Value))
+										if(recordTypeDefinitions.Results[i].Uri==result.Results[x].RecordRecordType.Uri)
 											{
-											switch(recordTypeDefinitions.Results[i].RecordTypeContentsRule.Value)
+											if(!config.ExcludedRecordTypes.includes(result.Results[x].RecordRecordType.RecordTypeName.Value))
 												{
-												case "ByLevel":
-													if(recordTypeDefinitions.Results[i].RecordTypeLevel.Value>="5")
-														{
-														addSearchResult(result.Results[x], "folder-intermediate")
-														}
-													else
-														{
-															if(recordTypeDefinitions.Results[i].RecordTypeLevel.Value<"5")
+												switch(recordTypeDefinitions.Results[i].RecordTypeContentsRule.Value)
+													{
+													case "ByLevel":
+														if(recordTypeDefinitions.Results[i].RecordTypeLevel.Value>="5")
 															{
-															addSearchResult(result.Results[x], "folder-terminal")		
-															}
-														}
-													break;
-												case "ByLevelInclusive":
-													addSearchResult(result.Results[x], "folder-intermediate")
-													break;
-												case "ByBehavior":
-													addSearchResult(result.Results[x], "folder-terminal")
-													break;
-												case "ByList":
-													if(recordTypeDefinitions.Results[i].RecordTypeLevel.Value>="4")
-														{
 															addSearchResult(result.Results[x], "folder-intermediate")
-														}
-													break;
-												case "Prevented":
-													addSearchResult(result.Results[x], "document")
-													break;
-												}	
+															}
+														else
+															{
+																if(recordTypeDefinitions.Results[i].RecordTypeLevel.Value<"5")
+																{
+																addSearchResult(result.Results[x], "folder-terminal")		
+																}
+															}
+														break;
+													case "ByLevelInclusive":
+														addSearchResult(result.Results[x], "folder-intermediate")
+														break;
+													case "ByBehavior":
+														addSearchResult(result.Results[x], "folder-terminal")
+														break;
+													case "ByList":
+														if(recordTypeDefinitions.Results[i].RecordTypeLevel.Value>="4")
+															{
+																addSearchResult(result.Results[x], "folder-intermediate")
+															}
+														break;
+													case "Prevented":
+														addSearchResult(result.Results[x], "document")
+														break;
+													}	
+												}
 											}
 										}
 									}
+								var endHTML = '</tbody></table>'
+								$("#search-results-pane > tbody").append(thHTML)
+								hideLoadingSpinner()	
 								}
-							var endHTML = '</tbody></table>'
-							$("#search-results-pane > tbody").append(thHTML)
-							hideLoadingSpinner()
 							}, 
 						error: function(result)
 							{
@@ -786,7 +816,8 @@ $(document).on("click", ".folder", function()
 		//alert(node.attr("id").substr(19))
 		populateContainerField("folder-intermediate", node.attr("id").substr(11))
 		populateRecordTypeField("folder-intermediate", node.attr("id").substr(11))
-		$("#new-sub-folder-form-record-type").html("")
+		$("#new-sub-folder-form-record-title").val("")
+		$("#new-sub-folder-form-record-type").val("")
 		$("#new-sub-folder-form-container").removeClass("new-sub-folder-form-hidden")
 		populateAdditionalFields("folder-intermediate")
 		}
@@ -811,7 +842,8 @@ $(document).on("click", ".folder-open", function()
 		{
 		populateContainerField("folder-intermediate", node.attr("id").substr(11))
 		populateRecordTypeField("folder-intermediate", node.attr("id").substr(11))
-		$("#new-sub-folder-form-record-type").html("")
+		$("#new-sub-folder-form-record-title").val("")
+		$("#new-sub-folder-form-record-type").val("")
 		$("#new-sub-folder-form-container").removeClass("new-sub-folder-form-hidden")
 		populateAdditionalFields("folder-intermediate")
 		}
@@ -849,6 +881,7 @@ $(document).on("click", ".folder-fill", function()
 		populateContainerField("folder-terminal", node.attr("id").substr(11))
 		populateRecordTypeField("folder-terminal", node.attr("id").substr(11))
 		populateAdditionalFields("folder-terminal")
+		$("#new-folder-form-record-title").val("")
 		$("#new-folder-form-container").removeClass("upload-form-hidden")
 		$("#properties-pane").css("display", "block")
 		drawPropertiesTable("folder-terminal")
@@ -869,12 +902,13 @@ $(document).on("click", ".record-title>a", function()
 	
 	if($(node).hasClass("folder-intermediate"))
 		{
-		$("#records-list-pane").html("<div class='no-records'>Select a bottom-level folder to display records.</div>")
+		$("#records-list-pane").html("<div class='no-records display-4'>Browse or search to display records.</div>")
 		populateContainerField("folder-intermediate", node.attr("id").substr(11))
 		populateRecordTypeField("folder-intermediate", node.attr("id").substr(11))
 		drawPropertiesTable("folder-intermediate")
 		getRecordProperties("folder-intermediate", node.attr("id").substr(11))
-		$("#new-sub-folder-form-record-type").html("")
+		$("#new-sub-folder-form-record-title").val("")
+		$("#new-sub-folder-form-record-type").val("")
 		$("#new-sub-folder-form-container").removeClass("new-sub-folder-form-hidden")
 		populateAdditionalFields("folder-intermediate")
 		}
@@ -887,6 +921,7 @@ $(document).on("click", ".record-title>a", function()
 			populateContainerField("folder-terminal", node.attr("id").substr(11))
 			populateRecordTypeField("folder-terminal", node.attr("id").substr(11))
 			populateAdditionalFields("folder-terminal")
+			$("#upload-form-record-type").html("")
 			$("#upload-form-container").removeClass("upload-form-hidden")
 			drawPropertiesTable("folder-terminal")
 			getRecordProperties("folder-terminal", node.attr("id").substr(11))
@@ -913,7 +948,9 @@ $(document).on("click", ".collapsed", function()
 		$("#" + parentNodeId + " > span.collapsed").removeClass("collapsed")
 		$("#" + parentNodeId + " > span.folder").addClass("folder-open")
 		$("#" + parentNodeId + " > span.folder").removeClass("folder")
-
+		$("#" + parentNodeId + " > span.folder-fill").addClass("folder-open")
+		$("#" + parentNodeId + " > span.folder-fill").removeClass("folder-fill")
+			
 		$("#" + parentNodeId).find(".expanded").each(function()
 			{
 			if($(this).parent().hasClass("classification-can-have-children"))

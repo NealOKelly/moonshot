@@ -309,7 +309,9 @@ function addIntermediateFolderNode(parentNodeId, recordUri, recordTitle)
 
 function addTerminalFolderNode(parentNodeId, recordUri, recordTitle)
 	{
-	$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + recordUri + "' class='folder-terminal'><span style='padding: 12px 20px;'></span><span class='folder-fill'></span><span class='record-title'><a>" + recordTitle + "</a></span></li>")
+//	$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + recordUri + "' class='folder-terminal'><span style='padding: 12px 20px;'></span><span class='folder-fill'></span><span class='record-title'><a>" + recordTitle + "</a></span></li>")
+	$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + recordUri + "' class='folder-terminal'><span class='collapsed'></span><span class='folder-fill'></span><span class='record-title'><a>" + recordTitle + "</a></span></li>")
+
 	}
 
 function sortClassificationTree(sortBy)
@@ -328,7 +330,7 @@ function sortClassificationTree(sortBy)
 
 function classificationTreeNodeSelected(node)
 	{
-	$("#records-list-pane").html("<div class='no-records'>Select a bottom-level folder to display records.</div>")
+	$("#records-list-pane").html("<div class='no-records display-4'>Browse or search to display records.</div>")
 	highlightSelectedNode(node)
 	if((node).attr("id").substr(0, 19) == "classification-uri-")
 		{
@@ -338,10 +340,9 @@ function classificationTreeNodeSelected(node)
 			{
 			var classification = node.data("classificationNumber")
 			var classification = classification + " - " +  $("#" + node.attr("id") + " span:nth-child(3) > a").html()
-			
+			$("#new-folder-form-record-title").val("")
 			$("#new-folder-form-record-classification").val(classification)
 			$("#new-folder-form-record-classification").data("classificationUri", (node).attr("id").substr(19))
-			// $("#" + node.attr("id") + "ul > li span:nth-child(3) > a").html()
 			$("#new-folder-form-container").removeClass("new-folder-form-hidden")
 			}
 
@@ -698,8 +699,9 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 						}
 					break;
 				case "folder-terminal":
+					$("#upload-form-record-title").val("")
 					$("#upload-form-container").removeClass("upload-form-hidden")
-					$("#upload-form-record-container").html("")
+					$("#upload-form-record-container").val("")
 					$("#upload-form-record-type").html("")
 					if(config.ByListContainmentRules.UseApplicationConfig=="true")
 					   {
@@ -902,6 +904,7 @@ function clearForm(form)
 			break;
 		case "upload-form":
 			$("#upload-form-record-title").val("")
+			$("#upload-form-record-type").val("")
 			$("#upload-form > .additional-field > input").val("")
 			break;
 		}
