@@ -98,6 +98,12 @@ app.get('/logout', function(req, res)
 	res.redirect(idpLogoutURL);
 	});
 
+app.get('/healthcheck', function(req, res)
+	{
+	res.send("OK");
+	});
+
+
 app.listen(3000, () => {
   console.log('Example app listening at http://localhost:3000')
 })

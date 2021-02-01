@@ -16,7 +16,9 @@ function preauthenticateApi()
 	// Session cookies need to be estabilished before making any AJAX calls to the API server.  This is because the first HTTP200 response
 	// (i.e what is returned by the ajax call) is actually a page served by ADFS server that uses JavaScript to POST the SAML assertion 
 	// to the API server.  As a workaround, we load a resource from the API server into an IFRAME instead.
-
+	console.log("Preauthenticating.")
+	console.log(baseUrl)
+	console.log(apiPath)
 	return $.Deferred(function(d)
 	{
 	if(hasPreAuthenticated)
@@ -28,17 +30,34 @@ function preauthenticateApi()
 		iFrame.hide();
 		iFrame.appendTo("body");
 		iFrame.attr('src', baseUrl + "/" + apiPath + "/help/index");
+		
+	
+		/// need to do a setTiemout loop
+		
+		
 		iFrame.on('load', function () 
 			{
+			console.log("iFrame loaded.")
+			console.log("Frame Title: " + $("#authentication-frame").contents().find("title").html())
+			
 			if($("#authentication-frame").contents().find("title").html()=="Content Manager - ServiceAPI Help Index")
 				{
 				hasPreAuthenticated = true;
+				console.log(hasPreAuthenticated)
 				iFrame.remove();
 				d.resolve();					
 				}
 			});
 		});
 	};
+
+
+$('#authentication-frame').on('load', function() {
+    // do stuff 
+	alert("I frame loaded.")
+});
+
+
 
 function getAuthenticationStatus()
 	{
@@ -809,6 +828,7 @@ function populateAdditionalFields(parentNodeType)
 				xhrFields: { withCredentials: true},
 				success: function(result)
 					{
+					console.log(result)
 					switch(parentNodeType)
 						{
 						case "classification":
@@ -1707,7 +1727,7 @@ function uploadFile(fileName, extension, file)
 			{
 			jQuery.ajax(
 				{
-				url: "https://api.gilbyim.com/WebDAV/Uploads/" + fileName + "." + extension,
+				url: baseUrl + "/WebDAV/Uploads/" + fileName + "." + extension,
 				type: "PUT",
 				data: file,
 				processData: false,
@@ -1816,6 +1836,7 @@ function attachFileToRecord(recordUri, fileName, recordContainerUri)
 				error: function(result)
 					{
 					showUploadError()
+					console.log(result)
 					}
 				});
 			}
@@ -1873,7 +1894,7 @@ function downloadDocument(recordUri, recordTitle, recordExtension, recordMimeTyp
 		{
 		if(isAuthenticated)
 			{
-			var url = baseUrl + "/" + apiPath + "/Record/" + recordUri + "/File/Document"
+			var url = baseUrl + "/" + apiPath + "/Record/" + recordUri + "/File/Document?SuppressLastAction=false"
 			$.ajax(
 				{
 				url: url,

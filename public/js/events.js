@@ -1,12 +1,14 @@
 $(document).ready(function()
 	{
+	console.log("Lalalala")
 	$('#loading').modal('show')
 	preauthenticateApi().then(function()
 		{
-		
+		console.log("Hello")
   	   	// populate the #classification-data div
 		var url = baseUrl + "/" + apiPath + "/Search?q=all&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern&trimtype=Classification&pageSize=1000000"
 		$.ajax(
+			{
 			{
 			url: url,
 			type: "POST",
@@ -14,6 +16,7 @@ $(document).ready(function()
 			contentType: 'application/json', 
 			success: function(result)
 			{
+			console.log("Success")
 			var classifications = result;
 			for(var i=0; i<classifications.TotalResults; i++)  // populate top level classifications.
 				{
@@ -33,6 +36,7 @@ $(document).ready(function()
 			error: function(result)
 				{
 				console.log("Oooops!")
+				console.log(result)
 				hideLoadingSpinner()
 				$('#connection-failed').modal('show')
 				}
@@ -109,7 +113,16 @@ $(document).on("click", "#search-button", function()
 
 		
 		$("#search-results-pane").show()
-		populateSearchResultPane($("#search-input").val())
+		if($("#folders-only").is(":checked"))
+			{
+			populateSearchResultPane($("#search-input").val(), "true")		
+			}
+		else
+			{
+			populateSearchResultPane($("#search-input").val(), "false")		
+			}
+			//if($("#folders-only").val())
+		
 		$("#search-input").val("")
 		}
 	})
@@ -151,7 +164,7 @@ $(document).on("click", ".search-result-caret-collapsed", function()
 				xhrFields: { withCredentials: true},
 				success: function(recordTypeDefinitions)
 					{
-					var url = baseUrl + "/" + apiPath + "/Search?q=all and container:" + recordUri + "&properties=RecordTitle,RecordNumber,RecordRecordType,RecordMimeType,RecordExtension&trimtype=Record&pageSize=1000"
+					var url = baseUrl + "/" + apiPath + "/Search?q=all and container:" + recordUri + "&properties=RecordTitle,RecordNumber,RecordRecordType,RecordMimeType,RecordExtension&trimtype=Record&pageSize=1000&sortBy=typedTitle"
 					$.ajax(
 						{
 						url: url,
@@ -377,15 +390,34 @@ $(document).on("click", "#search-results li", function()
 								if($(event.target).hasClass("download"))
 									{
 									// Do the download.
+							
+										
 									var level = $(event.target).parent().attr("id").substr(6, 1)
 									var recordUri = $(event.target).parent().attr("id").substr(35)
 									var recordTitle = $("#level-" + level + "-search-result-type-uri-"+ recordUri).data("record-title")
 									var recordExtension = $("#level-" + level + "-search-result-type-uri-"+ recordUri).data("record-extension")
 									var recordMimeType = $("#level-" + level + "-search-result-type-uri-"+ recordUri).data("record-mime-type")
+									
 									console.log(recordUri)
 									console.log(recordTitle)
 									console.log(recordExtension)
 									console.log(recordMimeType)
+									$("#level-" + level + "-search-result-download-uri-"+ recordUri + ">span").toggleClass("download-green download")
+									$("#level-" + level + "-search-result-recordNumber-uri-"+ recordUri).toggleClass("search-result-green")
+									$("#level-" + level + "-search-result-recordTitle-uri-"+ recordUri).toggleClass("search-result-green")
+									$("#level-" + level + "-search-result-recordType-uri-"+ recordUri).toggleClass("search-result-green")
+									
+									
+									setTimeout(function()
+										{
+										$("#level-" + level + "-search-result-download-uri-"+ recordUri + ">span").toggleClass("download-green download")
+										$("#level-" + level + "-search-result-recordNumber-uri-"+ recordUri).toggleClass("search-result-green")
+										$("#level-" + level + "-search-result-recordTitle-uri-"+ recordUri).toggleClass("search-result-green")
+										$("#level-" + level + "-search-result-recordType-uri-"+ recordUri).toggleClass("search-result-green")
+										},
+										1000);
+										
+
 									downloadDocument(recordUri, recordTitle, recordExtension, recordMimeType)
 									}
 								else
@@ -415,8 +447,19 @@ $(document).on("click", "#search-results li", function()
 								}
 							}
 						}
+					console.log("uri: " + uri)
+					console.log("level: " + level)
 					highlightSelectedSearchResult(uri, level)
-					nodeType = $("#level-" + level + "-search-result-recordNumber-uri-" + uri).attr("class")
+					if($("#level-" + level + "-search-result-recordNumber-uri-" + uri).attr("class").includes("search-result-green"))
+						{
+						nodeType="document"
+						}
+					else
+						{
+						nodeType = $("#level-" + level + "-search-result-recordNumber-uri-" + uri).attr("class")		
+						}
+					
+					console.log(nodeType)
 					drawPropertiesTable(nodeType)
 					getRecordProperties(nodeType, uri)
 					hideNewRecordForms()
@@ -426,7 +469,7 @@ $(document).on("click", "#search-results li", function()
 							populateContainerField("folder-intermediate", uri)
 							populateRecordTypeField("folder-intermediate", uri)
 							$("#new-sub-folder-form-record-title").val("")
-							$("#new-sub-folder-form-record-type").val("")
+							$("#new-sub-folder-form-record-type").html("")
 							$("#new-sub-folder-form-container").removeClass("new-sub-folder-form-hidden")
 							populateAdditionalFields("folder-intermediate")
 							break;
@@ -449,20 +492,25 @@ $(document).on("click", "#search-results li", function()
 
 function highlightSelectedSearchResult(uri, level)
 	{
-	$("#search-results li").css("font-weight", "normal")
-	$("[id*='-search-result-download-uri-'] span").removeClass("download")
-	$("[id*='-search-result-download-uri-'] span").addClass("download-grey")
-	//$("#level-" + level + "-search-result-download-uri-" + uri + ">span").addClass("download-grey")
-	$("#level-" + level + "-search-result-recordNumber-uri-" + uri).css("font-weight", "bold")
-	$("#level-" + level + "-search-result-recordTitle-uri-" + uri).css("font-weight", "bold")
-	$("#level-" + level + "-search-result-recordType-uri-" + uri).css("font-weight", "bold")
-	if($("#level-" + level + "-search-result-recordNumber-uri-" + uri).hasClass("document"))
+	console.log($("#level-" + level + "-search-result-recordNumber-uri-" + uri).css("font-weight"))
+	if($("#level-" + level + "-search-result-recordNumber-uri-" + uri).css("font-weight")!="700")
 		{
-		//alert("It's a document.")
-		$("#level-" + level + "-search-result-download-uri-" + uri + ">span").removeClass("download-grey")
-		$("#level-" + level + "-search-result-download-uri-" + uri + ">span").addClass("download")
+		$("#search-results li").css("font-weight", "normal")
+		$("[id*='-search-result-download-uri-'] span").removeClass("download")
+		$("[id*='-search-result-download-uri-'] span").addClass("download-grey")
+		//$("#level-" + level + "-search-result-download-uri-" + uri + ">span").addClass("download-grey")
+		$("#level-" + level + "-search-result-recordNumber-uri-" + uri).css("font-weight", "bold")
+		$("#level-" + level + "-search-result-recordTitle-uri-" + uri).css("font-weight", "bold")
+		$("#level-" + level + "-search-result-recordType-uri-" + uri).css("font-weight", "bold")
+		if($("#level-" + level + "-search-result-recordNumber-uri-" + uri).hasClass("document"))
+			{
+			//alert("It's a document.")
+			$("#level-" + level + "-search-result-download-uri-" + uri + ">span").removeClass("download-grey")
+			$("#level-" + level + "-search-result-download-uri-" + uri + ">span").addClass("download")
+			}
 		}
 	}
+
 
 
 $(document).on("click", ".search-result-caret-expanded", function()
@@ -495,8 +543,9 @@ $(document).on("click", ".search-result-caret-expanded", function()
 
 	})
 
-function populateSearchResultPane(searchString)
+function populateSearchResultPane(searchString, foldersOnly)
 	{
+	console.log("folders-on ly:" + foldersOnly)
 	getAuthenticationStatus().then(function () 
 		{
 		if(isAuthenticated)
@@ -513,7 +562,7 @@ function populateSearchResultPane(searchString)
 					console.log(searchString)
 					console.log(recordTypeDefinitions)
 					var q = 'content:"'+ searchString +'" Or anyWord:' + searchString;
-					var url = baseUrl + "/" + apiPath + "/Search?q=" + q + "&properties=RecordNumber,RecordTitle,RecordRecordType,RecordMimeType,RecordExtension&trimtype=Record&pageSize=1000"
+					var url = baseUrl + "/" + apiPath + "/Search?q=" + q + "&properties=RecordNumber,RecordTitle,RecordRecordType,RecordMimeType,RecordExtension&trimtype=Record&pageSize=1000&sortBy=typedTitle"
 					$.ajax(
 						{
 						url: url,
@@ -560,7 +609,10 @@ function populateSearchResultPane(searchString)
 															{
 																if(recordTypeDefinitions.Results[i].RecordTypeLevel.Value<"5")
 																{
-																addSearchResult(result.Results[x], "folder-terminal")		
+																if(foldersOnly=="false")
+																	{
+																	addSearchResult(result.Results[x], "folder-terminal")				
+																	}
 																}
 															}
 														break;
@@ -568,7 +620,11 @@ function populateSearchResultPane(searchString)
 														addSearchResult(result.Results[x], "folder-intermediate")
 														break;
 													case "ByBehavior":
-														addSearchResult(result.Results[x], "folder-terminal")
+														if(foldersOnly=="false")
+															{
+															addSearchResult(result.Results[x], "folder-terminal")		
+															}
+														
 														break;
 													case "ByList":
 														if(recordTypeDefinitions.Results[i].RecordTypeLevel.Value>="4")
@@ -577,7 +633,10 @@ function populateSearchResultPane(searchString)
 															}
 														break;
 													case "Prevented":
+														if(foldersOnly=="false")
+															{
 														addSearchResult(result.Results[x], "document")
+															}
 														break;
 													}	
 												}
@@ -817,7 +876,7 @@ $(document).on("click", ".folder", function()
 		populateContainerField("folder-intermediate", node.attr("id").substr(11))
 		populateRecordTypeField("folder-intermediate", node.attr("id").substr(11))
 		$("#new-sub-folder-form-record-title").val("")
-		$("#new-sub-folder-form-record-type").val("")
+		$("#new-sub-folder-form-record-type").html("")
 		$("#new-sub-folder-form-container").removeClass("new-sub-folder-form-hidden")
 		populateAdditionalFields("folder-intermediate")
 		}
@@ -908,7 +967,7 @@ $(document).on("click", ".record-title>a", function()
 		drawPropertiesTable("folder-intermediate")
 		getRecordProperties("folder-intermediate", node.attr("id").substr(11))
 		$("#new-sub-folder-form-record-title").val("")
-		$("#new-sub-folder-form-record-type").val("")
+		$("#new-sub-folder-form-record-type").html("")
 		$("#new-sub-folder-form-container").removeClass("new-sub-folder-form-hidden")
 		populateAdditionalFields("folder-intermediate")
 		}
@@ -1033,6 +1092,7 @@ $(document).on("click", "#create-folder-button", function()
 
 $(document).on("change", "#new-folder-form-record-type", function()
 	{
+	console.log("Record type changed.")
 	populateAdditionalFields("classification")
 	})
 
@@ -1044,7 +1104,8 @@ $(document).on("change", "#new-sub-folder-form-record-type", function()
 // Click re-athentication button
 $(document).on("click", "#test-button", function()
 	{
-	populateAdditionalFields("folder-terminal")
+	alert("hello world.")
+	console.log("Frame Title: " + $("#authentication-frame").contents().find("title").html())
 	})
 
 

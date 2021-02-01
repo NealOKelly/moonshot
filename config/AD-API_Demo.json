@@ -6,7 +6,7 @@
 	},
 "Url" :
 	{
-	"ApplicationBaseUrl" : "https://beta.gilbyim.com",
+	"ApplicationBaseUrl" : "https://demo.gilbyim.com",
 	"APIPath" : "CMServiceAPI"		
 	},
 "ExcludedRecordTypes" : [
@@ -78,7 +78,7 @@
 		"Core" :
 			{
 			"RecordNumber" : "true",
-			"RecordContainer" : "false",
+			"RecordContainer" : "true",
 			"RecordRecordType" : "true",
 			"RecordDateRegistered" : "true",
 			"RecordAccessControl" : "true",
