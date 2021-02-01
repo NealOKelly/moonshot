@@ -346,8 +346,6 @@ function classificationTreeNodeSelected(node)
 	highlightSelectedNode(node)
 	if((node).attr("id").substr(0, 19) == "classification-uri-")
 		{
-		//$("#upload-form-container").addClass("upload-form-hidden")
-		//$("#new-folder-form-container").addClass("new-folder-form-hidden")
 		if(node.hasClass("classification-can-attach-records"))
 			{
 			var classification = node.data("classificationNumber")
@@ -355,7 +353,6 @@ function classificationTreeNodeSelected(node)
 			$("#new-folder-form-record-title").val("")
 			$("#new-folder-form-record-classification").val(classification)
 			$("#new-folder-form-record-classification").data("classificationUri", (node).attr("id").substr(19))
-			$("#new-folder-form-container").removeClass("new-folder-form-hidden")
 			}
 
 		drawPropertiesTable("classification")
@@ -488,6 +485,7 @@ function populateContainerField(parentNodeType, parentNodeUri)
 
 function populateRecordTypeField(parentNodeType, parentNodeUri)
 	{
+	var deferredObject = $.Deferred();
 	getAuthenticationStatus().then(function () 
 		{
 		if(isAuthenticated)
@@ -628,7 +626,9 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 											}
 										});
 							   		})(i);
-								}								
+								}	
+							console.log("Resolving deferred object (populateRecordTypeField().")
+							deferredObject.resolve();
 							}, 
 						error: function(result)
 							{
@@ -801,12 +801,15 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 			else
 				{
 				$("#session-expired").modal("show")
+				deferredObject.resolve();
 				}
 		})
+		return deferredObject.promise();
 	}
 
 function populateAdditionalFields(parentNodeType)
 	{
+	var deferredObject = $.Deferred();
 	getAuthenticationStatus().then(function () 
 		{
 		if(isAuthenticated)
@@ -887,7 +890,8 @@ function populateAdditionalFields(parentNodeType)
 									}
 								}
 							}
-
+						console.log("Resolving deferred object (populateAdditionalFields().")
+						deferredObject.resolve();
 					}, 
 				error: function(result)
 					{
@@ -898,8 +902,10 @@ function populateAdditionalFields(parentNodeType)
 		else
 			{
 			$("#session-expired").modal("show")
+			deferredObject.resolve();
 			}
 		});
+		return deferredObject.promise();
 	}
 
 function clearForm(form)

@@ -843,10 +843,14 @@ $(document).on("click", ".folder", function()
 	classificationTreeNodeSelected(node)
 	if(node.hasClass("classification-can-attach-records"))
 		{
-		populateRecordTypeField("classification", node.attr("id").substr(19))
 		$("#new-folder-form-record-type").html("")
-		$("#new-folder-form-container").removeClass("new-folder-form-hidden")
-		populateAdditionalFields("classification")
+		populateRecordTypeField("classification", node.attr("id").substr(19)).then(function()
+			{
+			populateAdditionalFields("classification").then(function()
+				{
+				$("#new-folder-form-container").removeClass("new-folder-form-hidden")	
+				})
+			})
 		}
 	if(node.hasClass("folder-intermediate"))
 		{
@@ -870,10 +874,14 @@ $(document).on("click", ".folder-open", function()
 	classificationTreeNodeSelected(node)
 	if(node.hasClass("classification-can-attach-records"))
 		{
-		populateRecordTypeField("classification", node.attr("id").substr(19))
 		$("#new-folder-form-record-type").html("")
-		$("#new-folder-form-container").removeClass("new-folder-form-hidden")
-		populateAdditionalFields("classification")
+		populateRecordTypeField("classification", node.attr("id").substr(19)).then(function()
+			{
+			populateAdditionalFields("classification").then(function()
+				{
+				$("#new-folder-form-container").removeClass("new-folder-form-hidden")	
+				})
+			})
 		}
 	if(node.hasClass("folder-intermediate"))
 		{
@@ -896,10 +904,14 @@ $(document).on("click", ".classification-name>a", function()
 	classificationTreeNodeSelected(node)
 	if(node.hasClass("classification-can-attach-records"))
 		{
-		populateRecordTypeField("classification", node.attr("id").substr(19))
 		$("#new-folder-form-record-type").html("")
-		$("#new-folder-form-container").removeClass("new-folder-form-hidden")
-		populateAdditionalFields("classification")
+		populateRecordTypeField("classification", node.attr("id").substr(19)).then(function()
+			{
+			populateAdditionalFields("classification").then(function()
+				{
+				$("#new-folder-form-container").removeClass("new-folder-form-hidden")	
+				})
+			})
 		}
 	})
 
