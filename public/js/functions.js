@@ -16,9 +16,6 @@ function preauthenticateApi()
 	// Session cookies need to be estabilished before making any AJAX calls to the API server.  This is because the first HTTP200 response
 	// (i.e what is returned by the ajax call) is actually a page served by ADFS server that uses JavaScript to POST the SAML assertion 
 	// to the API server.  As a workaround, we load a resource from the API server into an IFRAME instead.
-	console.log("Preauthenticating.")
-	console.log(baseUrl)
-	console.log(apiPath)
 	return $.Deferred(function(d)
 	{
 	if(hasPreAuthenticated)
@@ -37,13 +34,9 @@ function preauthenticateApi()
 		
 		iFrame.on('load', function () 
 			{
-			console.log("iFrame loaded.")
-			console.log("Frame Title: " + $("#authentication-frame").contents().find("title").html())
-			
 			if($("#authentication-frame").contents().find("title").html()=="Content Manager - ServiceAPI Help Index")
 				{
 				hasPreAuthenticated = true;
-				console.log(hasPreAuthenticated)
 				iFrame.remove();
 				d.resolve();					
 				}
@@ -828,7 +821,6 @@ function populateAdditionalFields(parentNodeType)
 				xhrFields: { withCredentials: true},
 				success: function(result)
 					{
-					console.log(result)
 					switch(parentNodeType)
 						{
 						case "classification":
@@ -1101,9 +1093,6 @@ function formatDate(dateTime, format)
 
 function parseAccessControlString(string, type)
 	{
-	//console.log(string.search(":"))
-	//console.log(string.search(";"))
-	//console.log(string)
 	var JSONObj = { "ViewDocument" : "", "ViewMetadata" : "", "UpdateDocument" : "", "UpdateRecordMetadata" : "", "ModifyRecordAccess" : "", "DestroyRecord" : "", "ContributeContents" : "" };
 	JSONObj.ViewDocument = string.substr(string.search(":")+2, string.search(";")-string.search(":")-2)
 	string = string.substr(string.search(";")+2)
@@ -1119,8 +1108,6 @@ function parseAccessControlString(string, type)
 	JSONObj.DestroyRecord = string.substr(string.search(":")+2, string.search(";")-string.search(":")-2)
 	string = string.substr(string.search(";")+2)
 	JSONObj.ContributeContents = string.substr(string.search(":")+2)
-	//console.log(JSONObj)
-	//console.log(JSON.parse(JSON.stringify(JSONObj).replace(/<Unrestricted>/g, "Inherited from Classification")))
 	return JSON.parse(JSON.stringify(JSONObj).replace(/<Unrestricted>/g, "Inherited"));
 	}
 
@@ -1679,7 +1666,6 @@ function createFolder(recordTitle, recordClassificationUri, recordContainerUri, 
 						$("#create-folder-caption").html("Creating folder...")
 						},
 						500);
-						console.log(result)
 					}, 
 				error: function(result)
 					{
@@ -1836,7 +1822,6 @@ function attachFileToRecord(recordUri, fileName, recordContainerUri)
 				error: function(result)
 					{
 					showUploadError()
-					console.log(result)
 					}
 				});
 			}
