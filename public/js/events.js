@@ -1094,7 +1094,8 @@ $(document).on("change", "#new-sub-folder-form-record-type", function()
 // Click re-athentication button
 $(document).on("click", "#test-button", function()
 	{
-	console.log("Frame Title: " + $("#authentication-frame").contents().find("title").html())
+	//console.log("Frame Title: " + $("#authentication-frame").contents().find("title").html())
+	alert("Length: " + $('select[id=new-folder-form-record-type] option').length)
 	})
 
 
