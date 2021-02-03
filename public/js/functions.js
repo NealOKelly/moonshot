@@ -493,6 +493,7 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 			switch(parentNodeType)
 				{
 				case "classification":
+					// Retirm as list of record type that are configure to behave like folders.
 					var onlyRecordTypeCount = 0;
 					var url = baseUrl + "/" + apiPath + "/Search?q=behaviour:folder&properties=RecordTypeName,RecordTypeContainerRule,RecordTypeUsualBehaviour&trimtype=RecordType"
 					$.ajax(
@@ -503,17 +504,19 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 						contentType: 'application/json',
 						success: function(result)
 							{
+							console.log("Get folders - success.")
 							var intermediateFolderRecordTypeUris = [];
 							var intermediateFolderRecordTypeNames = [];
 							for(i=0; i<result.Results.length; i++)
 								{
+								// The GilbyIM Lite application require folders (that can attach to classifications) to configured so they cannot be contained other records.
 								if(result.Results[i].RecordTypeContainerRule.Value=="Prevented")
 								   	{
 									intermediateFolderRecordTypeUris.push(result.Results[i].Uri)
 									intermediateFolderRecordTypeNames.push(result.Results[i].RecordTypeName.Value)
 								   	}
 								}
-							for(i=0; i<intermediateFolderRecordTypeUris.length; i++)
+							for(i=0; i<intermediateFolderRecordTypeUris.length; i++)  // for each folder Record Type, confirm if the Record Type can be used with it.
 								{
 							   	(function(index)
 								 	{
@@ -542,11 +545,10 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 											lastIndex = intermediateFolderRecordTypeUris.length - 1
 											if(index==(lastIndex))
 												{
-												if(onlyRecordTypeCount==0)
+												if(onlyRecordTypeCount==0) // i.e. the selected classification does not have an Only Record Types rule configured.
 													{
 													var url = baseUrl + "/" + apiPath + "/Search?q=behaviour:folder&properties=RecordTypeName,RecordTypeContainerRule,RecordTypeUsualBehaviour,RecordTypeClassification,RecordTypeClassificationMandatory&trimtype=RecordType"
-													// !="By List"
-													$.ajax(
+													$.ajax(  // return the properties of the record type.
 														{
 														url: url,
 														type: "POST",
@@ -556,25 +558,24 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 															{
 															for(x=0; x<result.TotalResults; x++)	
 																{
-																
-																if(!result.Results[x].hasOwnProperty("RecordTypeClassification"))
+																if(!result.Results[x].hasOwnProperty("RecordTypeClassification"))  // if the Record Type doesn't have a Starting Classification then it can be used with the selected classification.
 																	{
-																	if(result.Results[x].RecordTypeContainerRule.Value!="ByList")
+																		if(result.Results[x].RecordTypeContainerRule.Value=="Prevented") // filter out (again) the Record Types that can be contained by other records.
 																		{
 																		$("#new-folder-form-record-type").append("<option>" + result.Results[x].RecordTypeName.Value + "</option>")
 																		}
-																		if($("#new-folder-form-record-type option").length<2)
-																			{
-																			$("#new-folder-form-record-type").attr("readonly", true)
-																			}
-																		else
-																			{
-																			$("#new-folder-form-record-type").attr("readonly", false)
-																			}
+																	if($("#new-folder-form-record-type option").length<2)
+																		{
+																		$("#new-folder-form-record-type").attr("readonly", true)
+																		}
+																	else
+																		{
+																		$("#new-folder-form-record-type").attr("readonly", false)
+																		}
 																	}
 																else
 																	{
-																	// if record type has a starting classification AND it is mandatory, then we need to check whether it the classification 
+																	// if record type does have a Starting Classification AND it is mandatory, then we need to check whether the selected classification is the mandatory starting classification. 
 																	if(result.Results[x].RecordTypeClassificationMandatory.Value)
 																	   {
 																		var recordTypeClassification = result.Results[x].RecordTypeClassification.ClassificationTitle.Value
@@ -595,6 +596,7 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 																					if($("#new-folder-form-record-type option").length<2)
 																						{
 																						$("#new-folder-form-record-type").attr("readonly", true)
+																						
 																						}
 																					else
 																						{
@@ -607,7 +609,6 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 																				console.log("Oooops!")
 																				}
 																			}); 
-																		  
 																	   }
 																	}
 																}
@@ -617,7 +618,12 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 															console.log("Oooops!")
 															}
 														});
-													}
+													} // end of onlyRecordTypeCount==0; i.e. the selected classification does not have an Only Record Types rule configured.
+												helperSelectRecordType("classification").then(function()
+													{
+													console.log("Selected: " + $('select[id=new-folder-form-record-type] option:nth-child(1)').selected)
+													deferredObject.resolve();	
+													})
 												}
 											}, 
 										error: function(result)
@@ -626,9 +632,7 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 											}
 										});
 							   		})(i);
-								}	
-							console.log("Resolving deferred object (populateRecordTypeField().")
-							deferredObject.resolve();
+								} // end of outer for loop
 							}, 
 						error: function(result)
 							{
@@ -650,7 +654,7 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 								{
 								for(i=0; i<config.ByListContainmentRules.Mappings.length; i++)
 									{
-										if(config.ByListContainmentRules.Mappings[i].ParentRecordType==result.Results[0].RecordRecordType.RecordTypeName.Value)
+									if(config.ByListContainmentRules.Mappings[i].ParentRecordType==result.Results[0].RecordRecordType.RecordTypeName.Value)
 										{
 										for(x=0; x<config.ByListContainmentRules.Mappings[i].ContentRecordTypes.length; x++)
 											{
@@ -728,7 +732,7 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 								{
 								for(i=0; i<config.ByListContainmentRules.Mappings.length; i++)
 									{
-										if(config.ByListContainmentRules.Mappings[i].ParentRecordType==result.Results[0].RecordRecordType.RecordTypeName.Value)
+									if(config.ByListContainmentRules.Mappings[i].ParentRecordType==result.Results[0].RecordRecordType.RecordTypeName.Value)
 										{
 										for(x=0; x<config.ByListContainmentRules.Mappings[i].ContentRecordTypes.length; x++)
 											{
@@ -807,6 +811,17 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 		return deferredObject.promise();
 	}
 
+function helperSelectRecordType(type)
+	{
+	console.log("Helper called.")
+	var deferredObject = $.Deferred();
+	$('select[id=new-folder-form-record-type] option:nth-child(1)').selected = true;
+	console.log("Length: " + $('select[id=new-folder-form-record-type] option').length)
+	console.log("Selected: " + $('select[id=new-folder-form-record-type] option:nth-child(1)').selected)
+	deferredObject.resolve();
+	return deferredObject.promise();
+	}
+
 function populateAdditionalFields(parentNodeType)
 	{
 	var deferredObject = $.Deferred();
@@ -842,6 +857,8 @@ function populateAdditionalFields(parentNodeType)
 						
 						for(i=0; i<result.TotalResults; i++)
 							{
+							//console.log("The deferred object resolition is now with in the for loop.")
+							console.log("RecordType: " + $("#"+ formName + "-record-type").val())
 							if(result.Results[i].FieldDefinitionIsUsedByRecordTypes.Value.includes($("#"+ formName + "-record-type").val()))
 								{
 								switch(result.Results[i].FieldDefinitionFormat.Value)
@@ -889,9 +906,12 @@ function populateAdditionalFields(parentNodeType)
 										break;
 									}
 								}
+						if(i==(result.TotalResults-1))
+							{
+							console.log("Resolving deferred object (populateAdditionalFields().")
+							deferredObject.resolve();	
 							}
-						console.log("Resolving deferred object (populateAdditionalFields().")
-						deferredObject.resolve();
+						}
 					}, 
 				error: function(result)
 					{
