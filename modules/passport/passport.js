@@ -5,9 +5,9 @@ var fs = require('fs'),
 
 // Constants
 require('dotenv').config();
-const entryPoint = process.env['IDENTITY_PROVIDER_PROTOCOL'] + "://" + process.env['IDENTITY_PROVIDER_HOST'] + process.env['ENTRY_POINT_RESOURCE'];
+const entryPoint = process.env['IDENTITY_PROVIDER_PROTOCOL'] + "://" + process.env['IDENTITY_PROVIDER_HOST'] + process.env['ENTRY_POINT_PATH'];
 const issuer = process.env['APPLICATION_PROTOCOL'] + "://" + process.env['APPLICATION_HOST'];
-const callbackUrl = process.env['APPLICATION_PROTOCOL'] + "://" + process.env['APPLICATION_HOST'] + process.env['CALLBACK_URL'];
+const callbackUrl = process.env['APPLICATION_PROTOCOL'] + "://" + process.env['APPLICATION_HOST'] + process.env['CALLBACK_PATH'];
 
 //https://authenticate.gilbyim.com/adfs/ls/?wa=wsignout1.0&wreply=https://test.gilbyim.com
 

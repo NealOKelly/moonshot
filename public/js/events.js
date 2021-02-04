@@ -4,7 +4,7 @@ $(document).ready(function()
 	preauthenticateApi().then(function()
 		{
   	   	// populate the #classification-data div
-		var url = baseUrl + "/" + apiPath + "/Search?q=all&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern&trimtype=Classification&pageSize=1000000"
+		var url = baseUrl + apiPath + "/Search?q=all&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern&trimtype=Classification&pageSize=1000000"
 		$.ajax(
 			{
 			url: url,
@@ -150,7 +150,7 @@ $(document).on("click", ".search-result-caret-collapsed", function()
 		{
 		if(isAuthenticated)
 			{
-			url = baseUrl + "/" + apiPath + "/RecordType?q=all&properties=RecordTypeLevel, RecordTypeContentsRule, RecordTypeName&pageSize=1000000"
+			url = baseUrl + apiPath + "/RecordType?q=all&properties=RecordTypeLevel, RecordTypeContentsRule, RecordTypeName&pageSize=1000000"
 			$.ajax(
 				{
 				url: url,
@@ -159,7 +159,7 @@ $(document).on("click", ".search-result-caret-collapsed", function()
 				xhrFields: { withCredentials: true},
 				success: function(recordTypeDefinitions)
 					{
-					var url = baseUrl + "/" + apiPath + "/Search?q=all and container:" + recordUri + "&properties=RecordTitle,RecordNumber,RecordRecordType,RecordMimeType,RecordExtension&trimtype=Record&pageSize=1000&sortBy=typedTitle"
+					var url = baseUrl + apiPath + "/Search?q=all and container:" + recordUri + "&properties=RecordTitle,RecordNumber,RecordRecordType,RecordMimeType,RecordExtension&trimtype=Record&pageSize=1000&sortBy=typedTitle"
 					$.ajax(
 						{
 						url: url,
@@ -531,7 +531,7 @@ function populateSearchResultPane(searchString, foldersOnly)
 		{
 		if(isAuthenticated)
 			{
-			url = baseUrl + "/" + apiPath + "/RecordType?q=all&properties=RecordTypeLevel, RecordTypeContentsRule, RecordTypeName&pageSize=1000000"
+			url = baseUrl + apiPath + "/RecordType?q=all&properties=RecordTypeLevel, RecordTypeContentsRule, RecordTypeName&pageSize=1000000"
 			$.ajax(
 				{
 				url: url,
@@ -541,7 +541,7 @@ function populateSearchResultPane(searchString, foldersOnly)
 				success: function(recordTypeDefinitions)
 					{
 					var q = 'content:"'+ searchString +'" Or anyWord:' + searchString;
-					var url = baseUrl + "/" + apiPath + "/Search?q=" + q + "&properties=RecordNumber,RecordTitle,RecordRecordType,RecordMimeType,RecordExtension&trimtype=Record&pageSize=1000&sortBy=typedTitle"
+					var url = baseUrl + apiPath + "/Search?q=" + q + "&properties=RecordNumber,RecordTitle,RecordRecordType,RecordMimeType,RecordExtension&trimtype=Record&pageSize=1000&sortBy=typedTitle"
 					$.ajax(
 						{
 						url: url,

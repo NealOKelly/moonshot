@@ -4,11 +4,6 @@
 	"DatasetId" : "AD",
 	"DatasetName" : "API Demo"
 	},
-"Url" :
-	{
-	"ApplicationBaseUrl" : "https://demo.gilbyim.com",
-	"APIPath" : "CMServiceAPI"		
-	},
 "ExcludedRecordTypes" : [
 						"Folder",
 						"Document"

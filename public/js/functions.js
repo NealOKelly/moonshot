@@ -26,7 +26,7 @@ function preauthenticateApi()
 		var iFrame = $("<iframe id='authentication-frame' sandbox='allow-scripts allow-forms allow-same-origin'></iframe>");
 		iFrame.hide();
 		iFrame.appendTo("body");
-		iFrame.attr('src', baseUrl + "/" + apiPath + "/help/index");
+		iFrame.attr('src', baseUrl + apiPath + "/help/index");
 		
 	
 		/// need to do a setTiemout loop
@@ -111,7 +111,7 @@ function refreshClassificationNodes(parentNodeId)
 				var q="parent:" + parentNodeId.substr(19);
 				$.ajax(
 					{
-					url: baseUrl + "/" + apiPath + "/Search?q=" + q + "&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern,ClassificationIdNumber&trimtype=Classification&pageSize=1000000",
+					url: baseUrl + apiPath + "/Search?q=" + q + "&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern,ClassificationIdNumber&trimtype=Classification&pageSize=1000000",
 					type: "POST",
 					contentType: 'application/json',
 					xhrFields: { withCredentials: true},
@@ -191,7 +191,7 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 			var includedProperties = "RecordTitle, RecordRecordType, RecordTypeContentsRule, RecordContainer";
 			$.ajax(
 				{
-				url: baseUrl + "/" + apiPath + "/RecordType?q=all&properties=RecordTypeLevel, RecordTypeContentsRule, RecordTypeName&pageSize=1000000",
+				url: baseUrl + apiPath + "/RecordType?q=all&properties=RecordTypeLevel, RecordTypeContentsRule, RecordTypeName&pageSize=1000000",
 				type: "GET",
 				contentType: 'application/json',
 				xhrFields: { withCredentials: true},
@@ -201,13 +201,13 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 					if(parentNodeType=="classification")
 						{
 						parentNodeUri=parentNodeId.substr(19)
-						var url = baseUrl + "/" + apiPath + "/Search?q=classification:" + parentNodeUri + "&properties=" + includedProperties + "&trimtype=Record&pageSize=1000000"
+						var url = baseUrl + apiPath + "/Search?q=classification:" + parentNodeUri + "&properties=" + includedProperties + "&trimtype=Record&pageSize=1000000"
 						}
 					else{
 						if(parentNodeType=="record")
 							{
 							parentNodeUri=parentNodeId.substr(11)
-							var url = baseUrl + "/" + apiPath + "/Search?q=container:" + parentNodeUri + "&properties=" + includedProperties + "&trimtype=Record&pageSize=1000000"
+							var url = baseUrl + piPath + "/Search?q=container:" + parentNodeUri + "&properties=" + includedProperties + "&trimtype=Record&pageSize=1000000"
 							}
 						}
 					$.ajax(
@@ -391,7 +391,7 @@ function getRecords(recordUri)
 		{
 		if(isAuthenticated)
 			{
-			var url = baseUrl + "/" + apiPath + "/Search?q=container:" + recordUri + "&properties=RecordTitle, RecordNumber, DateRegistered, RecordMimeType, RecordExtension&trimtype=Record&pageSize=1000000"
+			var url = baseUrl + apiPath + "/Search?q=container:" + recordUri + "&properties=RecordTitle, RecordNumber, DateRegistered, RecordMimeType, RecordExtension&trimtype=Record&pageSize=1000000"
 			$.ajax(
 				{
 				url: url,
@@ -453,7 +453,7 @@ function getRecords(recordUri)
 // 4. RIGHT PANEL //
 function populateContainerField(parentNodeType, parentNodeUri)
 	{
-	var url = baseUrl + "/" + apiPath + "/Search?q=" + parentNodeUri + "&properties=RecordTitle,RecordNumber&trimtype=Record"
+	var url = baseUrl + apiPath + "/Search?q=" + parentNodeUri + "&properties=RecordTitle,RecordNumber&trimtype=Record"
 	$.ajax(
 		{
 		url: url,
@@ -495,7 +495,7 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 				case "classification":
 					// Retirm as list of record type that are configure to behave like folders.
 					var onlyRecordTypeCount = 0;
-					var url = baseUrl + "/" + apiPath + "/Search?q=behaviour:folder&properties=RecordTypeName,RecordTypeContainerRule,RecordTypeUsualBehaviour&trimtype=RecordType"
+					var url = baseUrl + apiPath + "/Search?q=behaviour:folder&properties=RecordTypeName,RecordTypeContainerRule,RecordTypeUsualBehaviour&trimtype=RecordType"
 					$.ajax(
 						{
 						url: url,
@@ -520,7 +520,7 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 								{
 							   	(function(index)
 								 	{
-									var url = baseUrl + "/" + apiPath + "/Search?q=uri:" + parentNodeUri + ",recordType:" + intermediateFolderRecordTypeUris[i] + "&properties=ClassificationTitle&trimtype=Classification"
+									var url = baseUrl + apiPath + "/Search?q=uri:" + parentNodeUri + ",recordType:" + intermediateFolderRecordTypeUris[i] + "&properties=ClassificationTitle&trimtype=Classification"
 									$.ajax(
 										{
 										url: url,
@@ -547,7 +547,7 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 												{
 												if(onlyRecordTypeCount==0) // i.e. the selected classification does not have an Only Record Types rule configured.
 													{
-													var url = baseUrl + "/" + apiPath + "/Search?q=behaviour:folder&properties=RecordTypeName,RecordTypeContainerRule,RecordTypeUsualBehaviour,RecordTypeClassification,RecordTypeClassificationMandatory&trimtype=RecordType"
+													var url = baseUrl + apiPath + "/Search?q=behaviour:folder&properties=RecordTypeName,RecordTypeContainerRule,RecordTypeUsualBehaviour,RecordTypeClassification,RecordTypeClassificationMandatory&trimtype=RecordType"
 													$.ajax(  // return the properties of the record type.
 														{
 														url: url,
@@ -580,7 +580,7 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 																	   {
 																		var recordTypeClassification = result.Results[x].RecordTypeClassification.ClassificationTitle.Value
 																		var recordTypeName = result.Results[x].RecordTypeName.Value
-																		var url = baseUrl + "/" + apiPath + "/Search?q=uri:" + parentNodeUri + "&properties=ClassificationTitle&trimtype=Classification"
+																		var url = baseUrl + apiPath + "/Search?q=uri:" + parentNodeUri + "&properties=ClassificationTitle&trimtype=Classification"
 																		$.ajax(
 																			{
 																			url: url,
@@ -643,7 +643,7 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 				case "folder-intermediate":
 					if(config.ByListContainmentRules.UseApplicationConfig=="true")
 						{
-						var url = baseUrl + "/" + apiPath + "/Search?q=" + parentNodeUri + "&properties=RecordTtitle,RecordRecordType&trimtype=Record"
+						var url = baseUrl + apiPath + "/Search?q=" + parentNodeUri + "&properties=RecordTtitle,RecordRecordType&trimtype=Record"
 						$.ajax(
 							{
 							url: url,
@@ -679,7 +679,7 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 						}
 					else
 						{
-						var url = baseUrl + "/" + apiPath + "/Search?q=all&properties=RecordTypeName,RecordTypeContainerRule,RecordTypeUsualBehaviour&trimtype=RecordType"
+						var url = baseUrl + apiPath + "/Search?q=all&properties=RecordTypeName,RecordTypeContainerRule,RecordTypeUsualBehaviour&trimtype=RecordType"
 						$.ajax(
 							{
 							url: url,
@@ -721,7 +721,7 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 					$("#upload-form-record-type").html("")
 					if(config.ByListContainmentRules.UseApplicationConfig=="true")
 					   {
-						var url = baseUrl + "/" + apiPath + "/Search?q=" + parentNodeUri + "&properties=RecordTtitle,RecordRecordType&trimtype=Record"
+						var url = baseUrl + apiPath + "/Search?q=" + parentNodeUri + "&properties=RecordTtitle,RecordRecordType&trimtype=Record"
 						$.ajax(
 							{
 							url: url,
@@ -757,7 +757,7 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 					   }
 					else
 					   {
-					   	var url = baseUrl + "/" + apiPath + "/Search?q=usable&properties=RecordTypeName,RecordTypeUsualBehaviour,RecordTypeContainerRule&trimtype=RecordType"
+					   	var url = baseUrl + apiPath + "/Search?q=usable&properties=RecordTypeName,RecordTypeUsualBehaviour,RecordTypeContainerRule&trimtype=RecordType"
 						$.ajax(
 							{
 							url: url,
@@ -830,7 +830,7 @@ function populateAdditionalFields(parentNodeType)
 		if(isAuthenticated)
 			{
 			//var parentNodeType= "classification";
-			var url = baseUrl + "/" + apiPath + "/Search?q=all&properties=FieldDefinitionName, FieldDefinitionIsUsedByRecordTypes, 	FieldDefinitionFormat, FieldDefinitionSearchClause, FieldDefinitionLength&trimtype=FieldDefinition&pageSize=1000"
+			var url = baseUrl + apiPath + "/Search?q=all&properties=FieldDefinitionName, FieldDefinitionIsUsedByRecordTypes, 	FieldDefinitionFormat, FieldDefinitionSearchClause, FieldDefinitionLength&trimtype=FieldDefinition&pageSize=1000"
 			$.ajax(
 				{
 				url: url,
@@ -1082,7 +1082,7 @@ function getClassificationProperties(classificationUri)
 		{
 		if(isAuthenticated)
 			{
-			var url = baseUrl + "/" + apiPath + "/Search?q=" + classificationUri + "&properties=ClassificationName, ClassificationTitle, ClassificationIdNumber, AccessControl&trimtype=Classification"
+			var url = baseUrl + apiPath + "/Search?q=" + classificationUri + "&properties=ClassificationName, ClassificationTitle, ClassificationIdNumber, AccessControl&trimtype=Classification"
 			$.ajax(
 				{
 				url: url,
@@ -1144,7 +1144,7 @@ function getRecordProperties(type, recordUri)
 		{
 		if(isAuthenticated)
 			{
-			var url = baseUrl + "/" + apiPath + "/Search?q=" + recordUri + "&properties=RecordTitle, RecordNumber, Classification, RecordContainer, RecordType, DateRegistered, AccessControl, RecordDestructionDate&trimtype=Record"
+			var url = baseUrl + apiPath + "/Search?q=" + recordUri + "&properties=RecordTitle, RecordNumber, Classification, RecordContainer, RecordType, DateRegistered, AccessControl, RecordDestructionDate&trimtype=Record"
 			$.ajax(
 				{
 				url: url, 
@@ -1176,7 +1176,7 @@ function getRecordProperties(type, recordUri)
 								{
 								var recordUri = result.Results[0].Uri
 								var recordType = result.Results[0].RecordRecordType.RecordTypeName.Value
-								var url = baseUrl + "/" + apiPath + "/Search?q=all&properties=FieldDefinitionName, FieldDefinitionIsUsedByRecordTypes, FieldDefinitionFormat, FieldDefinitionSearchClause, FieldDefinitionLength&trimtype=FieldDefinition&pageSize=1000"	
+								var url = baseUrl + apiPath + "/Search?q=all&properties=FieldDefinitionName, FieldDefinitionIsUsedByRecordTypes, FieldDefinitionFormat, FieldDefinitionSearchClause, FieldDefinitionLength&trimtype=FieldDefinition&pageSize=1000"	
 								$.ajax(
 									{
 									url: url,
@@ -1250,7 +1250,7 @@ function getRecordProperties(type, recordUri)
 														}
 
 													var searchClause = result.Results[i].FieldDefinitionSearchClause.Value;
-													var url = baseUrl + "/" + apiPath + "/Search?q=" + recordUri + "&properties=" + searchClause + "&TrimType=Record"
+													var url = baseUrl + apiPath + "/Search?q=" + recordUri + "&properties=" + searchClause + "&TrimType=Record"
 													$.ajax(
 														{
 														url: url,
@@ -1332,7 +1332,7 @@ function getRecordProperties(type, recordUri)
 								{
 								var recordUri = result.Results[0].Uri
 								var recordType = result.Results[0].RecordRecordType.RecordTypeName.Value
-								var url = baseUrl + "/" + apiPath + "/Search?q=all&properties=FieldDefinitionName, FieldDefinitionIsUsedByRecordTypes, FieldDefinitionFormat, FieldDefinitionSearchClause, FieldDefinitionLength&trimtype=FieldDefinition&pageSize=1000"	
+								var url = baseUrl + apiPath + "/Search?q=all&properties=FieldDefinitionName, FieldDefinitionIsUsedByRecordTypes, FieldDefinitionFormat, FieldDefinitionSearchClause, FieldDefinitionLength&trimtype=FieldDefinition&pageSize=1000"	
 								$.ajax(
 									{
 									url: url,
@@ -1406,7 +1406,7 @@ function getRecordProperties(type, recordUri)
 														}
 
 													var searchClause = result.Results[i].FieldDefinitionSearchClause.Value;
-													var url = baseUrl + "/" + apiPath + "/Search?q=" + recordUri + "&properties=" + searchClause + "&TrimType=Record"
+													var url = baseUrl + apiPath + "/Search?q=" + recordUri + "&properties=" + searchClause + "&TrimType=Record"
 													$.ajax(
 														{
 														url: url,
@@ -1489,7 +1489,7 @@ function getRecordProperties(type, recordUri)
 								{
 								var recordUri = result.Results[0].Uri
 								var recordType = result.Results[0].RecordRecordType.RecordTypeName.Value
-								var url = baseUrl + "/" + apiPath + "/Search?q=all&properties=FieldDefinitionName, FieldDefinitionIsUsedByRecordTypes, FieldDefinitionFormat, FieldDefinitionSearchClause, FieldDefinitionLength&trimtype=FieldDefinition&pageSize=1000"	
+								var url = baseUrl + apiPath + "/Search?q=all&properties=FieldDefinitionName, FieldDefinitionIsUsedByRecordTypes, FieldDefinitionFormat, FieldDefinitionSearchClause, FieldDefinitionLength&trimtype=FieldDefinition&pageSize=1000"	
 								$.ajax(
 									{
 									url: url,
@@ -1563,7 +1563,7 @@ function getRecordProperties(type, recordUri)
 														}
 
 													var searchClause = result.Results[i].FieldDefinitionSearchClause.Value;
-													var url = baseUrl + "/" + apiPath + "/Search?q=" + recordUri + "&properties=" + searchClause + "&TrimType=Record"
+													var url = baseUrl + apiPath + "/Search?q=" + recordUri + "&properties=" + searchClause + "&TrimType=Record"
 													$.ajax(
 														{
 														url: url,
@@ -1652,7 +1652,7 @@ function createFolder(recordTitle, recordClassificationUri, recordContainerUri, 
 		{
 		if(isAuthenticated)
 			{
-			var url = baseUrl + "/" + apiPath + "/Record"
+			var url = baseUrl + apiPath + "/Record"
 			var data = {
 						"RecordTitle" : recordTitle,
 						"RecordRecordType" : recordType,
@@ -1770,7 +1770,7 @@ function createRecord(recordTitle, recordType, recordContainerUri, fileName, add
 		{
 		if(isAuthenticated)
 			{
-			var url = baseUrl + "/" + apiPath + "/Record"
+			var url = baseUrl + apiPath + "/Record"
 			var data = {
 						"RecordTitle" : recordTitle,
 						"RecordRecordType" : recordType,
@@ -1821,7 +1821,7 @@ function attachFileToRecord(recordUri, fileName, recordContainerUri)
 						"RecordFilePath": fileName,
 						"RecordFinalizeOnSave" : "true"
 						}
-			var url = baseUrl + "/" + apiPath + "/Record"
+			var url = baseUrl + apiPath + "/Record"
 			$.ajax(
 				{
 				url: url,
@@ -1905,7 +1905,7 @@ function downloadDocument(recordUri, recordTitle, recordExtension, recordMimeTyp
 		{
 		if(isAuthenticated)
 			{
-			var url = baseUrl + "/" + apiPath + "/Record/" + recordUri + "/File/Document?SuppressLastAction=false"
+			var url = baseUrl + apiPath + "/Record/" + recordUri + "/File/Document?SuppressLastAction=false"
 			$.ajax(
 				{
 				url: url,

@@ -11,20 +11,20 @@ var passport = require('passport'),
 
 var app = express();
 require('dotenv').config();
-//const idpLogoutURL = process.env['PASSPORT_SAML_LOGOUT_URL'];
-//console.log(idpLogoutURL);
-//console.log(process.env['IDENTITY_PROVIDER_DOMAIN'])
-//console.log("https://" + process.env['IDENTITY_PROVIDER_DOMAIN'] + "/adfs/ls/?wa=wsignout1.0")
-const idpLogoutURL = process.env['IDENTITY_PROVIDER_PROTOCOL'] + "://" + process.env['IDENTITY_PROVIDER_HOST'] + process.env['LOGOUT_RESOURCE'];
+
+const idpLogoutURL = process.env['IDENTITY_PROVIDER_PROTOCOL'] + "://" + process.env['IDENTITY_PROVIDER_HOST'] + process.env['LOGOUT_PATH'];
 const contentManagerDatasetId = process.env['CONTENT_MANAGER_DATASET_ID'];
 const contentManagerDatasetName = process.env['CONTENT_MANAGER_DATASET_NAME'];
 //const siteLogo = process.env['SITE_LOGO'];
-brandingName = process.env['BRANDING_NAME'];
+const brandingName = process.env['BRANDING_NAME'];
+const applicationBaseUrl = process.env['APPLICATION_PROTOCOL'] + "://" + process.env['APPLICATION_HOST']
+const apiPath = process.env['API_PATH']
 
 console.log(brandingName)
 
 //console.log("Config file: " + contentManagerDatasetId + "-" + contentManagerDatasetName.replace(/ /g, "_"))
 var config = fs.readFileSync("./config/" + contentManagerDatasetId + "-" + contentManagerDatasetName.replace(/ /g, "_") + ".json")
+
 
 //console.log(JSON.parse(config))
 //var str = JSON.stringify(config)
@@ -64,7 +64,7 @@ require('./modules/passport/passport.js');
 // Routes
 app.get('/', ensureAuthenticated, function(req, res)
 	{
-	res.render('index', { user: req.user, title: "GilbyIM Lite", config: JSON.stringify(JSON.parse(config)), brandingName: brandingName });
+	res.render('index', { user: req.user, title: "GilbyIM Lite", config: JSON.stringify(JSON.parse(config)), brandingName: brandingName, applicationBaseUrl: applicationBaseUrl, apiPath: apiPath });
 	});
 
 app.get('/login',

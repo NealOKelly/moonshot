@@ -24,10 +24,11 @@
 	<!-- Configuration variables -->  
 	<script>
 		var config = JSON.parse("<%=config%>".replace(/&#34;/g, '"'))
+		
 		var hasPreAuthenticated = false;
 		var isAuthenticated = false;
-		var baseUrl = config.Url.ApplicationBaseUrl
-		var apiPath = config.Url.APIPath
+		var baseUrl = "<%=applicationBaseUrl%>"
+		var apiPath = "<%=apiPath%>"
     </script>
 
   </head>
