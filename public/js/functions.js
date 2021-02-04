@@ -207,7 +207,7 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 						if(parentNodeType=="record")
 							{
 							parentNodeUri=parentNodeId.substr(11)
-							var url = baseUrl + piPath + "/Search?q=container:" + parentNodeUri + "&properties=" + includedProperties + "&trimtype=Record&pageSize=1000000"
+							var url = baseUrl + apiPath + "/Search?q=container:" + parentNodeUri + "&properties=" + includedProperties + "&trimtype=Record&pageSize=1000000"
 							}
 						}
 					$.ajax(
@@ -1185,6 +1185,7 @@ function getRecordProperties(type, recordUri)
 									xhrFields: { withCredentials: true},
 									success: function(result)
 										{
+
 										for(i=0; i<result.TotalResults; i++)
 											{
 											(function(index)
@@ -1259,6 +1260,8 @@ function getRecordProperties(type, recordUri)
 														xhrFields: { withCredentials: true},
 														success: function(result)
 															{
+															console.log("These are the results: ")
+															console.log(result)
 															switch(fieldFormat)
 																{
 																case "String":
@@ -1271,7 +1274,10 @@ function getRecordProperties(type, recordUri)
 																	console.log("Boolean inputs are not yet supported.")
 																	break;
 																case "Date":
-																	$("#" + additionalFieldId).html(formatDate(result.Results[0].Fields[searchClause].DateTime))
+																	if(!result.Results[0].Fields[searchClause].IsClear)
+																		{
+																		$("#" + additionalFieldId).html(formatDate(result.Results[0].Fields[searchClause].DateTime))	
+																		}
 																	break;
 																case "Datetime":
 																	console.log("Datetime inputs are not yet supported.")

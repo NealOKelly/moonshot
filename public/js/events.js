@@ -28,6 +28,7 @@ $(document).ready(function()
 				// sort	 this list.
 				sortClassificationTree(".classification-name")
 				hideLoadingSpinner()
+				expandAllFilesOnLoad()
 				}, 
 			error: function(result)
 				{
@@ -977,6 +978,16 @@ $(document).on("click", ".record-title>a", function()
 			}
 		}
 	})
+
+function expandAllFilesOnLoad()
+	{
+	$("#all-files ul").removeClass("classification-hidden")
+	$("#all-files > span.collapsed").addClass("expanded")
+	$("#all-files > span.collapsed").removeClass("collapsed")
+	$("#all-files > span.folder").addClass("folder-open")
+	$("#all-files > span.folder").removeClass("folder")	
+	}
+
 
 // Click on collpased caret
 $(document).on("click", ".collapsed", function()
