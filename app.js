@@ -11,7 +11,11 @@ var passport = require('passport'),
 
 var app = express();
 require('dotenv').config();
-const idpLogoutURL = process.env['PASSPORT_SAML_LOGOUT_URL'];
+//const idpLogoutURL = process.env['PASSPORT_SAML_LOGOUT_URL'];
+//console.log(idpLogoutURL);
+//console.log(process.env['IDENTITY_PROVIDER_DOMAIN'])
+//console.log("https://" + process.env['IDENTITY_PROVIDER_DOMAIN'] + "/adfs/ls/?wa=wsignout1.0")
+const idpLogoutURL = process.env['IDENTITY_PROVIDER_PROTOCOL'] + "://" + process.env['IDENTITY_PROVIDER_HOST'] + process.env['LOGOUT_RESOURCE'];
 const contentManagerDatasetId = process.env['CONTENT_MANAGER_DATASET_ID'];
 const contentManagerDatasetName = process.env['CONTENT_MANAGER_DATASET_NAME'];
 //const siteLogo = process.env['SITE_LOGO'];
