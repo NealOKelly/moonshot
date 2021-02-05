@@ -64,7 +64,7 @@
 			"RecordRecordType" : "true",
 			"RecordDateRegistered" : "false",
 			"RecordAccessControl" : "true",
-			"RecordDestructionDate" : "true"
+			"RecordDestructionDate" : "false"
 			},
 		"AdditionalFields" : "true"
 		},
@@ -77,7 +77,7 @@
 			"RecordRecordType" : "true",
 			"RecordDateRegistered" : "true",
 			"RecordAccessControl" : "true",
-			"RecordDestructionDate" : "true"
+			"RecordDestructionDate" : "false"
 			},
 		"AdditionalFields" : "true"
 		},
@@ -90,7 +90,7 @@
 			"RecordRecordType" : "true",
 			"RecordDateRegistered" : "false",
 			"RecordAccessControl" : "true",
-			"RecordDestructionDate" : "true"
+			"RecordDestructionDate" : "false"
 			},
 		"AdditionalFields" : "true"
 		}

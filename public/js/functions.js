@@ -107,11 +107,26 @@ function refreshClassificationNodes(parentNodeId)
 			// check for new classifications.
 			preauthenticateApi().then(function()
 				{
-				var q="parent:" + parentNodeId.substr(19);
-				var q="parent:" + parentNodeId.substr(19);
+				console.log("parentNodeId: " + parentNodeId)
+				if(parentNodeId=="all-files")
+					{
+					
+					q = "all";
+					}
+				else
+					{
+					q="parent:" + parentNodeId.substr(19);
+					}
+				var data = {
+							"q" : q,
+							"Properties" : "ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern, ClassificationIdNumber", 
+							"TrimType" : "Classification",
+							"PageSize" : "1000000"
+							};
 				$.ajax(
 					{
-					url: baseUrl + apiPath + "/Search?q=" + q + "&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern,ClassificationIdNumber&trimtype=Classification&pageSize=1000000",
+					url: baseUrl + apiPath + "/Search",
+					data: JSON.stringify(data),
 					type: "POST",
 					contentType: 'application/json',
 					xhrFields: { withCredentials: true},
@@ -128,7 +143,17 @@ function refreshClassificationNodes(parentNodeId)
 							{
 							if(!$("#classification-uri-" + result.Results[i].Uri).length)
 								{
-								addClassificationNode("#" + parentNodeId + " > ul", result.Results[i].Uri, result.Results[i].ClassificationName.Value, result.Results[i].ClassificationCanAttachRecords.Value, result.Results[i].ClassificationChildPattern.Value, result.Results[i].ClassificationIdNumber.Value)
+								if(parentNodeId=="all-files")
+									{
+									if(!result.Results[i].hasOwnProperty("ClassificationParentClassification"))
+										{
+										addClassificationNode("#" + parentNodeId + " > ul", result.Results[i].Uri, result.Results[i].ClassificationName.Value, result.Results[i].ClassificationCanAttachRecords.Value, result.Results[i].ClassificationChildPattern.Value, result.Results[i].ClassificationIdNumber.Value)	
+										}
+									}
+								else
+									{
+									addClassificationNode("#" + parentNodeId + " > ul", result.Results[i].Uri, result.Results[i].ClassificationName.Value, result.Results[i].ClassificationCanAttachRecords.Value, result.Results[i].ClassificationChildPattern.Value, result.Results[i].ClassificationIdNumber.Value)
+									}
 								}
 							}
 						for(i=0; i<$("#" + parentNodeId + " > ul > li").length; i++)  // for each <li>
@@ -137,9 +162,9 @@ function refreshClassificationNodes(parentNodeId)
 							for (x=0; x<result.TotalResults; x++)
 								{
 								if($("#" + parentNodeId + " > ul > li:nth-child(" + (i + 1) + ")").attr("id").substr(19)==result.Results[x].Uri)
-									{
-									nodeExistsInSearchResults = true;
-									}
+										{
+										nodeExistsInSearchResults = true;
+										}
 								}
 								if(!nodeExistsInSearchResults)
 									{
@@ -813,11 +838,8 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 
 function helperSelectRecordType(type)
 	{
-	console.log("Helper called.")
 	var deferredObject = $.Deferred();
 	$('select[id=new-folder-form-record-type] option:nth-child(1)').selected = true;
-	console.log("Length: " + $('select[id=new-folder-form-record-type] option').length)
-	console.log("Selected: " + $('select[id=new-folder-form-record-type] option:nth-child(1)').selected)
 	deferredObject.resolve();
 	return deferredObject.promise();
 	}
@@ -857,8 +879,6 @@ function populateAdditionalFields(parentNodeType)
 						
 						for(i=0; i<result.TotalResults; i++)
 							{
-							//console.log("The deferred object resolition is now with in the for loop.")
-							console.log("RecordType: " + $("#"+ formName + "-record-type").val())
 							if(result.Results[i].FieldDefinitionIsUsedByRecordTypes.Value.includes($("#"+ formName + "-record-type").val()))
 								{
 								switch(result.Results[i].FieldDefinitionFormat.Value)
@@ -908,7 +928,6 @@ function populateAdditionalFields(parentNodeType)
 								}
 						if(i==(result.TotalResults-1))
 							{
-							console.log("Resolving deferred object (populateAdditionalFields().")
 							deferredObject.resolve();	
 							}
 						}
@@ -1094,7 +1113,7 @@ function getClassificationProperties(classificationUri)
 					var details = JSON.stringify(result);
 					$("#properties-classification-title").html(result.Results[0].ClassificationTitle.Value)
 					$("#properties-classification-number").html(result.Results[0].ClassificationIdNumber.Value)
-					$("#properties-classification-access-control").html(result.Results[0].ClassificationAccessControl.Value)
+					$("#properties-classification-access-control").html( parseAccessControlString(result.Results[0].ClassificationAccessControl.Value, "classification").CanUse)
 					}, 
 				error: function(result)
 					{
@@ -1119,22 +1138,39 @@ function formatDate(dateTime, format)
 
 function parseAccessControlString(string, type)
 	{
-	var JSONObj = { "ViewDocument" : "", "ViewMetadata" : "", "UpdateDocument" : "", "UpdateRecordMetadata" : "", "ModifyRecordAccess" : "", "DestroyRecord" : "", "ContributeContents" : "" };
-	JSONObj.ViewDocument = string.substr(string.search(":")+2, string.search(";")-string.search(":")-2)
-	string = string.substr(string.search(";")+2)
-	JSONObj.ViewMetadata = string.substr(string.search(":")+2, string.search(";")-string.search(":")-2)
-	string = string.substr(string.search(";")+2)
-	//if(type=="document")
-	JSONObj.UpdateDocument = string.substr(string.search(":")+2, string.search(";")-string.search(":")-2)
+	switch(type)
+	{
+	case "classification":
+		var JSONObj = { "CanUse" : "", "CanUpdate" : "", "CanModifyAccess" : "", "CanDelete" : "" }
+		JSONObj.CanUse = string.substr(string.search(":")+2, string.search(";")-string.search(":")-2)
+		string = string.substr(string.search(";")+2)
+		JSONObj.CanUpdate = string.substr(string.search(":")+2, string.search(";")-string.search(":")-2)
+		string = string.substr(string.search(";")+2)
+		JSONObj.CanModifyAccess = string.substr(string.search(":")+2, string.search(";")-string.search(":")-2)
+		string = string.substr(string.search(";")+2)
+		JSONObj.Delete = string.substr(string.search(":")+2, string.search(";")-string.search(":")-2)
+		break;
+	case "record":
+		var JSONObj = { "ViewDocument" : "", "ViewMetadata" : "", "UpdateDocument" : "", "UpdateRecordMetadata" : "", "ModifyRecordAccess" : "", "DestroyRecord" : "", "ContributeContents" : "" };
+		JSONObj.ViewDocument = string.substr(string.search(":")+2, string.search(";")-string.search(":")-2)
+		string = string.substr(string.search(";")+2)
+		JSONObj.ViewMetadata = string.substr(string.search(":")+2, string.search(";")-string.search(":")-2)
+		string = string.substr(string.search(";")+2)
+		//if(type=="document")
+		JSONObj.UpdateDocument = string.substr(string.search(":")+2, string.search(";")-string.search(":")-2)
 		string = string.substr(string.search(";")+2)		
-	JSONObj.UpdateRecordMetadata = string.substr(string.search(":")+2, string.search(";")-string.search(":")-2)
-	string = string.substr(string.search(";")+2)
-	JSONObj.ModifyRecordAccess = string.substr(string.search(":")+2, string.search(";")-string.search(":")-2)
-	string = string.substr(string.search(";")+2)
-	JSONObj.DestroyRecord = string.substr(string.search(":")+2, string.search(";")-string.search(":")-2)
-	string = string.substr(string.search(";")+2)
-	JSONObj.ContributeContents = string.substr(string.search(":")+2)
-	return JSON.parse(JSON.stringify(JSONObj).replace(/<Unrestricted>/g, "Inherited"));
+		JSONObj.UpdateRecordMetadata = string.substr(string.search(":")+2, string.search(";")-string.search(":")-2)
+		string = string.substr(string.search(";")+2)
+		JSONObj.ModifyRecordAccess = string.substr(string.search(":")+2, string.search(";")-string.search(":")-2)
+		string = string.substr(string.search(";")+2)
+		JSONObj.DestroyRecord = string.substr(string.search(":")+2, string.search(";")-string.search(":")-2)
+		string = string.substr(string.search(";")+2)
+		JSONObj.ContributeContents = string.substr(string.search(":")+2)
+		break;
+		}
+		JSONObj = JSON.parse(JSON.stringify(JSONObj).replace(/<Unrestricted>/g, "<i>[Inherited]</i>"))
+		JSONObj = JSON.parse(JSON.stringify(JSONObj).replace(/[()]/g, ""))
+		return JSONObj;
 	}
 
 
@@ -1165,9 +1201,9 @@ function getRecordProperties(type, recordUri)
 							$("#properties-date-registered").html(dateRegistered)
 							
 							// access controls
-							var accessControlHTML = "<div>View Folder: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value).ViewMetadata + "</div>"
-							var accessControlHTML = accessControlHTML + "<div>Update Properties: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value).UpdateRecordMetadata + "</div>"
-							var accessControlHTML = accessControlHTML + "<div>Contribute: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value).ContributeContents + "</div>"
+							var accessControlHTML = "<div>View Folder & Contents: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value, "record").ViewMetadata + "</div>"
+							var accessControlHTML = accessControlHTML + "<div>Update Folder Properties: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value, "record").UpdateRecordMetadata + "</div>"
+							var accessControlHTML = accessControlHTML + "<div>Add Contents: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value, "record").ContributeContents + "</div>"
 							$("#properties-access-control").html(accessControlHTML)
 
 								// need to look at behaviour of date due for destruction
@@ -1260,8 +1296,6 @@ function getRecordProperties(type, recordUri)
 														xhrFields: { withCredentials: true},
 														success: function(result)
 															{
-															console.log("These are the results: ")
-															console.log(result)
 															switch(fieldFormat)
 																{
 																case "String":
@@ -1327,9 +1361,9 @@ function getRecordProperties(type, recordUri)
 							$("#properties-date-registered").html(dateRegistered)
 							
 							// access controls
-							var accessControlHTML = "<div>View Folder: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value).ViewMetadata + "</div>"
-							var accessControlHTML = accessControlHTML + "<div>Update Properties: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value).UpdateRecordMetadata + "</div>"
-							var accessControlHTML = accessControlHTML + "<div>Contribute: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value).ContributeContents + "</div>"
+							var accessControlHTML = "<div>View Folder & Contents: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value, "record").ViewMetadata + "</div>"
+							var accessControlHTML = accessControlHTML + "<div>Update Properties: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value, "record").UpdateRecordMetadata + "</div>"
+							var accessControlHTML = accessControlHTML + "<div>Add Contents: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value, "record").ContributeContents + "</div>"
 							$("#properties-access-control").html(accessControlHTML)
 								
 							// need to look at behaviour of date due for destruction
@@ -1484,9 +1518,9 @@ function getRecordProperties(type, recordUri)
 							$("#properties-date-registered").html(dateRegistered)
 							
 							// access controls
-							var accessControlHTML = "<div>View: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value).ViewMetadata + "</div>"
-							var accessControlHTML = accessControlHTML + "<div>Update Properties: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value).UpdateRecordMetadata + "</div>"
-							var accessControlHTML = accessControlHTML + "<div>Download: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value).ViewDocument + "</div>"
+							var accessControlHTML = "<div>View Document Properties: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value, "record").ViewMetadata + "</div>"
+							var accessControlHTML = accessControlHTML + "<div>Update Document Properties: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value, "record").UpdateRecordMetadata + "</div>"
+							var accessControlHTML = accessControlHTML + "<div>Download Document: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value, "record").ViewDocument + "</div>"
 							$("#properties-access-control").html(accessControlHTML)
 
 								

@@ -3,11 +3,18 @@ $(document).ready(function()
 	$('#loading').modal('show')
 	preauthenticateApi().then(function()
 		{
-  	   	// populate the #classification-data div
-		var url = baseUrl + apiPath + "/Search?q=all&properties=ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern&trimtype=Classification&pageSize=1000000"
+		var url = baseUrl + apiPath + "/Search";
+		var data = {
+					"q" : "all",
+					"Properties" : "ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern",
+					"TrimType" : "Classification",
+					"PageSize" : "1000000"
+					};
+							  
 		$.ajax(
 			{
 			url: url,
+			data: JSON.stringify(data),
 			type: "POST",
 			xhrFields: { withCredentials: true},
 			contentType: 'application/json', 
@@ -28,7 +35,12 @@ $(document).ready(function()
 				// sort	 this list.
 				sortClassificationTree(".classification-name")
 				hideLoadingSpinner()
-				expandAllFilesOnLoad()
+				// display top-level classifications
+				$("#all-files ul").removeClass("classification-hidden")
+				$("#all-files > span.collapsed").addClass("expanded")
+				$("#all-files > span.collapsed").removeClass("collapsed")
+				$("#all-files > span.folder").addClass("folder-open")
+				$("#all-files > span.folder").removeClass("folder")	
 				}, 
 			error: function(result)
 				{
@@ -82,7 +94,6 @@ $(document).on("click", "#upload-button", function()
 
 $(document).on("click", "#search-button", function()
 	{
-	//alert("cclicked")
 	if($("#search-input").val() != "")
 		{
 		showLoadingSpinner()
@@ -481,13 +492,11 @@ function highlightSelectedSearchResult(uri, level)
 		$("#search-results li").css("font-weight", "normal")
 		$("[id*='-search-result-download-uri-'] span").removeClass("download")
 		$("[id*='-search-result-download-uri-'] span").addClass("download-grey")
-		//$("#level-" + level + "-search-result-download-uri-" + uri + ">span").addClass("download-grey")
 		$("#level-" + level + "-search-result-recordNumber-uri-" + uri).css("font-weight", "bold")
 		$("#level-" + level + "-search-result-recordTitle-uri-" + uri).css("font-weight", "bold")
 		$("#level-" + level + "-search-result-recordType-uri-" + uri).css("font-weight", "bold")
 		if($("#level-" + level + "-search-result-recordNumber-uri-" + uri).hasClass("document"))
 			{
-			//alert("It's a document.")
 			$("#level-" + level + "-search-result-download-uri-" + uri + ">span").removeClass("download-grey")
 			$("#level-" + level + "-search-result-download-uri-" + uri + ">span").addClass("download")
 			}
@@ -504,9 +513,7 @@ $(document).on("click", ".search-result-caret-expanded", function()
 	$(event.target).parent().children().eq(1).removeClass("search-result-folder-open")
 	
 	var level = $(event.target).parent().attr("id").substr(6, 1)
-	//alert("level:" + level)
 	var uri = $(event.target).parent().attr("id").substr(31)
-	//alert(uri)
 	$("#level-" + level + "-search-result-type-uri-" + uri).next().addClass("remove-me")
 	$("#level-" + level + "-search-result-recordNumber-uri-" + uri).next().addClass("remove-me")
 	$("#level-" + level + "-search-result-recordTitle-uri-" + uri).next().addClass("remove-me")
@@ -514,16 +521,6 @@ $(document).on("click", ".search-result-caret-expanded", function()
 	$("#level-" + level + "-search-result-download-uri-" + uri).next().addClass("remove-me")
 	$(".remove-me").html("")
 	$(".remove-me").removeClass("remove-me")
-	
-	//$("#level-" + level + "-search-result-type-uri-" + uri).parent().find("ul").remove()
-	//$("#level-" + level + "-search-result-recordNumber-uri-" + uri).parent().find("ul").remove()
-	//$("#level-" + level + "-search-result-recordTitle-uri-" + uri).parent().find("ul").remove()
-	//$("#level-" + level + "-search-result-recordType-uri-" + uri).parent().find("ul").remove()
-	//$("#level-" + level + "-search-result-download-uri-" + uri).parent().find("ul").remove()
-	
-	//columns = $($(event.target).parent().parent().parent().parent()).children().length
-	//var level = $(event.target).parent().attr("id").substr(6, 1)
-
 	})
 
 function populateSearchResultPane(searchString, foldersOnly)
@@ -695,8 +692,6 @@ $(document).on("click", "#grid", function()
 		}
 	})
 
-
-
 function sortGrid(id, colNum, type, currentState)
 	{
 	let tbody = grid.querySelector('tbody');
@@ -745,11 +740,6 @@ function sortGrid(id, colNum, type, currentState)
 		
 		tbody.append(...rowsArray);
     }
-
-
-
-
-
 
 $(document).on("click", "#upload-status-ok-button", function()
 	{
@@ -979,54 +969,31 @@ $(document).on("click", ".record-title>a", function()
 		}
 	})
 
-function expandAllFilesOnLoad()
-	{
-	$("#all-files ul").removeClass("classification-hidden")
-	$("#all-files > span.collapsed").addClass("expanded")
-	$("#all-files > span.collapsed").removeClass("collapsed")
-	$("#all-files > span.folder").addClass("folder-open")
-	$("#all-files > span.folder").removeClass("folder")	
-	}
-
-
 // Click on collpased caret
 $(document).on("click", ".collapsed", function()
 	{
 	var parentNodeId = $(event.target).parent().attr("id");
-	
-	if(parentNodeId=="all-files")
+	$("#" + parentNodeId + " > span.collapsed").addClass("expanded")
+	$("#" + parentNodeId + " > span.collapsed").removeClass("collapsed")
+	$("#" + parentNodeId + " > span.folder").addClass("folder-open")
+	$("#" + parentNodeId + " > span.folder").removeClass("folder")
+	$("#" + parentNodeId + " > span.folder-fill").addClass("folder-open")
+	$("#" + parentNodeId + " > span.folder-fill").removeClass("folder-fill")
+	$("#" + parentNodeId).find(".expanded").each(function()
 		{
-		$("#all-files ul").removeClass("classification-hidden")
-		$("#" + parentNodeId + " > span.collapsed").addClass("expanded")
-		$("#" + parentNodeId + " > span.collapsed").removeClass("collapsed")
-		$("#" + parentNodeId + " > span.folder").addClass("folder-open")
-		$("#" + parentNodeId + " > span.folder").removeClass("folder")
-		}
-	else
-		{
-		$("#" + parentNodeId + " > span.collapsed").addClass("expanded")
-		$("#" + parentNodeId + " > span.collapsed").removeClass("collapsed")
-		$("#" + parentNodeId + " > span.folder").addClass("folder-open")
-		$("#" + parentNodeId + " > span.folder").removeClass("folder")
-		$("#" + parentNodeId + " > span.folder-fill").addClass("folder-open")
-		$("#" + parentNodeId + " > span.folder-fill").removeClass("folder-fill")
-			
-		$("#" + parentNodeId).find(".expanded").each(function()
+		if($(this).parent().hasClass("classification-can-have-children"))
 			{
-			if($(this).parent().hasClass("classification-can-have-children"))
-				{
-				refreshClassificationNodes($(this).parent().attr("id"))
-				}
-			if($(this).parent().hasClass("classification-can-attach-records"))
-				{
-				refreshFolderNodes("classification", $(this).parent().attr("id"))
-				}
-			if($(this).parent().hasClass("folder-intermediate"))
-				{
-				refreshFolderNodes("record", $(this).parent().attr("id"))
-				}
-			});
-		}
+			refreshClassificationNodes($(this).parent().attr("id"))
+			}
+		if($(this).parent().hasClass("classification-can-attach-records"))
+			{
+			refreshFolderNodes("classification", $(this).parent().attr("id"))
+			}
+		if($(this).parent().hasClass("folder-intermediate"))
+			{
+			refreshFolderNodes("record", $(this).parent().attr("id"))
+			}
+		});
 	})
 
 // File input
