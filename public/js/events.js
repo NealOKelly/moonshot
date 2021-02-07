@@ -34,13 +34,15 @@ $(document).ready(function()
 				}	
 				// sort	 this list.
 				sortClassificationTree(".classification-name")
-				hideLoadingSpinner()
+
+
 				// display top-level classifications
 				$("#all-files ul").removeClass("classification-hidden")
 				$("#all-files > span.collapsed").addClass("expanded")
 				$("#all-files > span.collapsed").removeClass("collapsed")
 				$("#all-files > span.folder").addClass("folder-open")
 				$("#all-files > span.folder").removeClass("folder")	
+				hideLoadingSpinner()
 				}, 
 			error: function(result)
 				{
@@ -249,7 +251,7 @@ $(document).on("click", ".search-result-caret-collapsed", function()
 										{
 										if(isDocument) // is a document
 											{
-											$("#level-" + level + "-search-result-type-uri-" + recordUri).after("<ul><li id='level-" + (level + 1) + "-search-result-type-uri-" + result.Results[i].Uri + "' style='padding-left:40px;' data-record-title='" + result.Results[i].RecordTitle.Value + "' data-record-extension='" + result.Results[i].RecordExtension.Value + "'  data-record-mime-type='" + result.Results[i].RecordMimeType.Value + "'><span class='fiv-viv fiv-icon-blank fiv-icon-" + result.Results[i].RecordExtension.Value.toLowerCase() + "'></span></li></ul>")
+											$("#level-" + level + "-search-result-type-uri-" + recordUri).after("<ul><li id='level-" + (level + 1) + "-search-result-type-uri-" + result.Results[i].Uri + "' style='padding-left:40px;' data-record-title='" + result.Results[i].RecordTitle.Value + "' data-record-extension='" + result.Results[i].RecordExtension.Value + "'  data-record-mime-type='" + result.Results[i].RecordMimeType.Value + "'><span class='fiv-viv fiv-icon-blank fiv-icon-" + result.Results[i].RecordExtension.Value.toLowerCase() + "' data-bs-toggle='tooltip' data-bs-original-title='" + result.Results[i].RecordExtension.Value.toUpperCase() + "' data-bs-placement='right'></span></li></ul>")
 
 											newTypeNodeId="#level-" + (level + 1) + "-search-result-type-uri-" + result.Results[i].Uri	
 											}
@@ -264,7 +266,7 @@ $(document).on("click", ".search-result-caret-collapsed", function()
 										{
 										if(isDocument) // is a document
 											{
-											$(newTypeNodeId).parent().append("<li id='level-" + (level + 1) + "-search-result-type-uri-" + result.Results[i].Uri + "' style='padding-left:40px;' data-record-title='" + result.Results[i].RecordTitle.Value + "' data-record-extension='" + result.Results[i].RecordExtension.Value + "'  data-record-mime-type='" + result.Results[i].RecordMimeType.Value + "'><span class='fiv-viv fiv-icon-blank fiv-icon-" + result.Results[i].RecordExtension.Value.toLowerCase() + "'></span></li>")	
+											$(newTypeNodeId).parent().append("<li id='level-" + (level + 1) + "-search-result-type-uri-" + result.Results[i].Uri + "' style='padding-left:40px;' data-record-title='" + result.Results[i].RecordTitle.Value + "' data-record-extension='" + result.Results[i].RecordExtension.Value + "'  data-record-mime-type='" + result.Results[i].RecordMimeType.Value + "'><span class='fiv-viv fiv-icon-blank fiv-icon-" + result.Results[i].RecordExtension.Value.toLowerCase() + "' data-bs-toggle='tooltip' data-bs-original-title='" + result.Results[i].RecordExtension.Value.toUpperCase() + "' data-bs-placement='right'></span></li>")	
 											}
 										else  // is a folder
 											{
@@ -337,6 +339,11 @@ $(document).on("click", ".search-result-caret-collapsed", function()
 										}
 
 									}	
+									var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+									var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) 
+										{
+										return new bootstrap.Tooltip(tooltipTriggerEl)
+										})
 								}
 							}, 
 						error: function(result)
@@ -650,7 +657,7 @@ function addSearchResult(record, type)
 		resultRowHTML = '<tr><td>'
 		resultRowHTML = resultRowHTML + '<ul><li id="level-0-search-result-type-uri-' + record.Uri + '" style="padding-left:45px;" data-record-title="' + record.RecordTitle.Value + '" data-record-extension="' + record.RecordExtension.Value + '" data-record-mime-type="' + record.RecordMimeType.Value + '">'
 		
-		resultRowHTML = resultRowHTML + '<span class="fiv-viv fiv-icon-blank fiv-icon-' + record.RecordExtension.Value.toLowerCase() + '" arial-label="' + record.RecordExtension.Value.toUpperCase() + '">'
+		resultRowHTML = resultRowHTML + '<span class="fiv-viv fiv-icon-blank fiv-icon-' + record.RecordExtension.Value.toLowerCase() + '" arial-label="' + record.RecordExtension.Value.toUpperCase() + '" data-bs-toggle="tooltip" data-bs-original-title="' + record.RecordExtension.Value.toUpperCase() + '" data-bs-placement="right">'
 			
 		resultRowHTML = resultRowHTML +	'</span></li></ul></td>'	
 		}
@@ -673,6 +680,11 @@ function addSearchResult(record, type)
 	
 	resultRowHTML = resultRowHTML + '</tr>'
 	$("#search-results").append(resultRowHTML)
+	var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+	var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) 
+		{
+  		return new bootstrap.Tooltip(tooltipTriggerEl)
+		})
 	}
 
 $(document).on("click", "#grid", function()

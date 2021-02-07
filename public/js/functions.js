@@ -45,13 +45,6 @@ function preauthenticateApi()
 	};
 
 
-$('#authentication-frame').on('load', function() {
-    // do stuff 
-	alert("I frame loaded.")
-});
-
-
-
 function getAuthenticationStatus()
 	{
 	var deferredObject = $.Deferred();
@@ -212,42 +205,57 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 		if(isAuthenticated)
 			{
 			$("#" + parentNodeId + " > ul").addClass("classification-hidden") // if already exists, hide.
-	
-			var includedProperties = "RecordTitle, RecordRecordType, RecordTypeContentsRule, RecordContainer";
+			var url = baseUrl + apiPath + "/RecordType"
+			var data = {
+						"q" : "all",
+						"Properties" : "RecordTypeLevel, RecordTypeContentsRule, RecordTypeName", 
+						"PageSize" : "1000000"
+						};
+			url = baseUrl + apiPath + "/RecordType?q=all&properties=RecordTypeLevel, RecordTypeContentsRule, RecordTypeName&pageSize=1000000"
 			$.ajax(
 				{
-				url: baseUrl + apiPath + "/RecordType?q=all&properties=RecordTypeLevel, RecordTypeContentsRule, RecordTypeName&pageSize=1000000",
+				url: url,
 				type: "GET",
-				contentType: 'application/json',
 				xhrFields: { withCredentials: true},
+				contentType: 'application/json', 
 				success: function(result)
 					{
 					var recordTypeDefinitions = result;
 					if(parentNodeType=="classification")
 						{
-						parentNodeUri=parentNodeId.substr(19)
-						var url = baseUrl + apiPath + "/Search?q=classification:" + parentNodeUri + "&properties=" + includedProperties + "&trimtype=Record&pageSize=1000000"
+						data = {
+								"q" : "classification:" + parentNodeId.substr(19),
+								"Properties" : "RecordTitle, RecordRecordType, RecordTypeContentsRule, RecordContainer", 
+								"TrimType" : "Record",
+								"PageSize" : "1000000"
+								};
 						}
 					else{
 						if(parentNodeType=="record")
 							{
-							parentNodeUri=parentNodeId.substr(11)
-							var url = baseUrl + apiPath + "/Search?q=container:" + parentNodeUri + "&properties=" + includedProperties + "&trimtype=Record&pageSize=1000000"
+							data = {
+								"q" : "container:" + parentNodeId.substr(11),
+								"Properties" : "RecordTitle, RecordRecordType, RecordTypeContentsRule, RecordContainer", 
+								"TrimType" : "Record",
+								"PageSize" : "1000000"
+								};
 							}
 						}
+					url = baseUrl + apiPath + "/Search"
 					$.ajax(
 						{
 						url: url,
+						data: JSON.stringify(data),
 						type: "POST",
 						contentType: 'application/json',
 						xhrFields: { withCredentials: true},
 						success: function(result)
 							{
+							console.log(result)
 							if(!$("#" + parentNodeId + " > ul").length)
 								{
 								if(result.TotalResults>0)
 									{
-									//$("#" + parentNodeId).append("<ul style='list-style-type:none;' class='classification-hidden'></ul>") // create hidden
 									$("#" + parentNodeId).append("<ul style='list-style-type:none;' class='classification-hidden'></ul>") // create hidden
 									}
 								}
@@ -275,7 +283,7 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 															{
 															if(recordTypeDefinitions.Results[x].RecordTypeLevel.Value<"5")
 																{
-																addTerminalFolderNode(parentNodeId, recordUri, recordTitle);		
+																addTerminalFolderNode(parentNodeId, recordUri, recordTitle)	
 																}
 															}
 														break;
@@ -334,6 +342,7 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 			}
 		else
 			{
+			console.log(result)
 			$("#session-expired").modal("show")
 			}
 		});
@@ -346,7 +355,6 @@ function addIntermediateFolderNode(parentNodeId, recordUri, recordTitle)
 
 function addTerminalFolderNode(parentNodeId, recordUri, recordTitle)
 	{
-//	$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + recordUri + "' class='folder-terminal'><span style='padding: 12px 20px;'></span><span class='folder-fill'></span><span class='record-title'><a>" + recordTitle + "</a></span></li>")
 	$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + recordUri + "' class='folder-terminal'><span class='collapsed'></span><span class='folder-fill'></span><span class='record-title'><a>" + recordTitle + "</a></span></li>")
 
 	}
@@ -390,7 +398,6 @@ function classificationTreeNodeSelected(node)
 			{
 			if($(node).hasClass("folder-intermediate"))
 				{
-				//$("#new-folder-form-container").addClass("new-folder-form-hidden")
 				drawPropertiesTable("folder-intermediate")
 				getRecordProperties("folder-intermediate", node.attr("id").substr(11))	
 				}
@@ -416,10 +423,16 @@ function getRecords(recordUri)
 		{
 		if(isAuthenticated)
 			{
-			var url = baseUrl + apiPath + "/Search?q=container:" + recordUri + "&properties=RecordTitle, RecordNumber, DateRegistered, RecordMimeType, RecordExtension&trimtype=Record&pageSize=1000000"
+			var data =  { "q" : "container:" + recordUri,
+						  "Properties" : "RecordTitle, RecordNumber, DateRegistered, RecordMimeType, RecordExtension",
+						  "TrimType" : "Record",
+						  "PageSize" : "100000"
+						}
+			var url = baseUrl + apiPath + "/Search";
 			$.ajax(
 				{
 				url: url,
+				data: JSON.stringify(data),
 				type: "POST",
 				contentType: 'application/json',
 				xhrFields: { withCredentials: true},
@@ -449,7 +462,7 @@ function getRecords(recordUri)
 							var recordNumber = result.Results[i].RecordNumber.Value;
 							var dateRegistered = result.Results[i].RecordDateRegistered;
 							tableHTML = tableHTML + '<tr id="record-uri-' + uri + '" class="record-row" data-record-title="' + title + '" data-record-extension="' + extension + '" data-record-mime-type="' + mimeType + '">'
-							tableHTML = tableHTML + '<td><span class="fiv-viv fiv-icon-blank fiv-icon-' + extension.toLowerCase() + '" arial-label="' + extension.toUpperCase() + ' Icon"></span></td>'
+							tableHTML = tableHTML + '<td><span class="fiv-viv fiv-icon-blank fiv-icon-' + extension.toLowerCase() + '" arial-label="' + extension.toUpperCase() + ' Icon" data-bs-toggle="tooltip" data-bs-original-title="' + extension.toUpperCase() + '" data-bs-placement="right"></span></td>'
 							tableHTML = tableHTML + '<td>' + recordNumber + '</td>'
 							tableHTML = tableHTML + '<td style="text-align:left;">' + title + '</td>'
 							tableHTML = tableHTML + '<td>' + dateRegistered.DateTime.substr(8, 2) + '/' + dateRegistered.DateTime.substr(5, 2) + '/' + dateRegistered.DateTime.substr(0, 4) + '</td>'
@@ -458,6 +471,11 @@ function getRecords(recordUri)
 						tableHTML = tableHTML + '</tbody></table'>
 
 						$("#records-list-pane").html(tableHTML)
+						var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+						var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) 
+							{
+  							return new bootstrap.Tooltip(tooltipTriggerEl)
+							})
 						}
 					}, 
 				error: function(result)
@@ -494,7 +512,6 @@ function populateContainerField(parentNodeType, parentNodeUri)
 					$("#new-sub-folder-form-record-container").data("recordUri", result.Results[0].Uri)	
 					break;
 				case "folder-terminal":
-					//alert("This is a terminal folder.")
 					$("#upload-form-record-container").val("")
 					$("#upload-form-record-container").val(result.Results[0].RecordNumber.Value + ": " + result.Results[0].RecordTitle.Value)
 					$("#upload-form-record-container").data("recordUri", result.Results[0].Uri)	
@@ -975,14 +992,6 @@ function hideNewRecordForms()
 	$("#upload-form-container").addClass("upload-form-hidden")
 	}
 
-
-
-function addOptionToDropdown(optionId, optionValue)
-	{
-	
-	}
-
-
 // END RIGHT PANEL //
 
 // 5. PROPERTIES PANEL //
@@ -1206,7 +1215,7 @@ function getRecordProperties(type, recordUri)
 							var accessControlHTML = accessControlHTML + "<div>Add Contents: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value, "record").ContributeContents + "</div>"
 							$("#properties-access-control").html(accessControlHTML)
 
-								// need to look at behaviour of date due for destruction
+							// need to look at behaviour of date due for destruction
 								
 							if(config.PropertiesPane.IntermediateFolder.AdditionalFields=="true")
 								{
@@ -1500,7 +1509,6 @@ function getRecordProperties(type, recordUri)
 															console.log("Oooops!")
 															}
 														})	
-														//}
 													}
 											})(i)}									
 										}, 
@@ -1685,7 +1693,6 @@ function getRecordProperties(type, recordUri)
 // END PROPERTIES PANEL //
 
 // 6. CREATE FOLDER //
-
 function createFolder(recordTitle, recordClassificationUri, recordContainerUri, recordType, additionalFieldKeys, additionalFieldValues)
 	{
 	getAuthenticationStatus().then(function () 
@@ -1758,7 +1765,6 @@ function createFolder(recordTitle, recordClassificationUri, recordContainerUri, 
 // END CREATE FOLDER //
 
 // 7. UPLOAD & REGISTER DOCUMENT //
-
 function uuidv4()
 	{
 	return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
@@ -1938,7 +1944,6 @@ function showCreateFolderError(trimError)
 
 
 // 8. DOWNLOAD DOCUMENT //
-
 function downloadDocument(recordUri, recordTitle, recordExtension, recordMimeType)
 	{
 	getAuthenticationStatus().then(function () 
