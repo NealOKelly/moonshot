@@ -535,18 +535,23 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 			switch(parentNodeType)
 				{
 				case "classification":
-					// Retirm as list of record type that are configure to behave like folders.
+					// Returm as list of record type that are configure to behave like folders.
 					var onlyRecordTypeCount = 0;
-					var url = baseUrl + apiPath + "/Search?q=behaviour:folder&properties=RecordTypeName,RecordTypeContainerRule,RecordTypeUsualBehaviour&trimtype=RecordType"
+					var url = baseUrl + apiPath + "/Search";
+					var data = 	{
+								"q" : "behaviour:folder",
+								"Properties" : "RecordTypeName, RecordTypeContainerRule, RecordTypeUsualBehaviour",
+								"TrimType" : "RecordType"
+								}
 					$.ajax(
 						{
 						url: url,
+						data: JSON.stringify(data),
 						type: "POST",
 						xhrFields: { withCredentials: true},
 						contentType: 'application/json',
 						success: function(result)
 							{
-							console.log("Get folders - success.")
 							var intermediateFolderRecordTypeUris = [];
 							var intermediateFolderRecordTypeNames = [];
 							for(i=0; i<result.Results.length; i++)
@@ -562,10 +567,16 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 								{
 							   	(function(index)
 								 	{
-									var url = baseUrl + apiPath + "/Search?q=uri:" + parentNodeUri + ",recordType:" + intermediateFolderRecordTypeUris[i] + "&properties=ClassificationTitle&trimtype=Classification"
+									url = baseUrl + apiPath + "/Search";
+									data = 	{
+											"q" : "uri:" + parentNodeUri + ",recordType:" + intermediateFolderRecordTypeUris[i],
+											"Properties" : "ClassificationTitle",
+											"TrimType" : "Classification"
+											}
 									$.ajax(
 										{
 										url: url,
+										data: JSON.stringify(data),
 										type: "POST",
 										xhrFields: { withCredentials: true},
 										contentType: 'application/json',
@@ -589,10 +600,16 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 												{
 												if(onlyRecordTypeCount==0) // i.e. the selected classification does not have an Only Record Types rule configured.
 													{
-													var url = baseUrl + apiPath + "/Search?q=behaviour:folder&properties=RecordTypeName,RecordTypeContainerRule,RecordTypeUsualBehaviour,RecordTypeClassification,RecordTypeClassificationMandatory&trimtype=RecordType"
+													url = baseUrl + apiPath + "/Search";
+													data = 	{
+															"q" : "behaviour:folder",
+															"Properties" : "RecordTypeName, RecordTypeContainerRule, RecordTypeUsualBehaviour, RecordTypeClassification, RecordTypeClassificationMandatory",
+															"TrimType" : "RecordType"
+															}
 													$.ajax(  // return the properties of the record type.
 														{
 														url: url,
+														data: JSON.stringify(data),
 														type: "POST",
 														xhrFields: { withCredentials: true},
 														contentType: 'application/json',
@@ -617,18 +634,24 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 																	}
 																else
 																	{
-																	console.log("The record type has a starting classification.")
 																	// if record type does have a Starting Classification AND it is mandatory, then we need to check whether the selected classification is the mandatory starting classification. 
-																	console.log("Mandatory: " + result.Results[x].RecordTypeClassificationMandatory.Value)
 																	var recordTypeName = result.Results[x].RecordTypeName.Value
 																	if(result.Results[x].RecordTypeClassificationMandatory.Value)
 																	   {
+																		console.log("THis has been called.")
 																		var recordTypeClassification = result.Results[x].RecordTypeClassification.ClassificationTitle.Value
 																		
-																		var url = baseUrl + apiPath + "/Search?q=uri:" + parentNodeUri + "&properties=ClassificationTitle&trimtype=Classification"
+																		//var url = baseUrl + apiPath + "/Search?q=uri:" + parentNodeUri + "&properties=ClassificationTitle&trimtype=Classification"
+																		url = baseUrl + apiPath + "/Search";
+																		data =	{
+																				"q" : "uri:" + parentNodeUri,
+																				"Properties" : "ClassificationTitle",
+																				"TrimType" : "Classification"
+																				}
 																		$.ajax(
 																			{
 																			url: url,
+																			data: JSON.stringify(data),
 																			type: "POST",
 																			xhrFields: { withCredentials: true},
 																			contentType: 'application/json',
