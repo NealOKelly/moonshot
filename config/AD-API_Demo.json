@@ -94,5 +94,13 @@
 			},
 		"AdditionalFields" : "true"
 		}
+	},
+"Analytics" :
+	{
+	"Google" : 
+		{
+		"Enabled" : "true",
+		"MeasurementId" : "G-NQKDG4KPSX"
+		}
 	}
 }

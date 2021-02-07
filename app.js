@@ -60,11 +60,11 @@ app.use('', router);
 
 require('./modules/passport/passport.js');
 
-
+console.log("GA: " + JSON.parse(config).Analytics.Google.Enabled)
 // Routes
 app.get('/', ensureAuthenticated, function(req, res)
 	{
-	res.render('index', { user: req.user, title: "GilbyIM Lite", config: JSON.stringify(JSON.parse(config)), brandingName: brandingName, applicationBaseUrl: applicationBaseUrl, apiPath: apiPath });
+	res.render('index', { user: req.user, title: "GilbyIM Lite", config: JSON.stringify(JSON.parse(config)), brandingName: brandingName, applicationBaseUrl: applicationBaseUrl, apiPath: apiPath, gtagEnabled: JSON.parse(config).Analytics.Google.Enabled, gtagMeasurementId: JSON.parse(config).Analytics.Google.MeasurementId });
 	});
 
 app.get('/login',

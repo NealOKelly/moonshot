@@ -24,13 +24,23 @@
 	<!-- Configuration variables -->  
 	<script>
 		var config = JSON.parse("<%=config%>".replace(/&#34;/g, '"'))
-		
 		var hasPreAuthenticated = false;
 		var isAuthenticated = false;
 		var baseUrl = "<%=applicationBaseUrl%>"
 		var apiPath = "<%=apiPath%>"
     </script>
-
+	
+	<% if(gtagEnabled=="true"){ %>
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=<%=gtagMeasurementId%>"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+		gtag('config', '<%=gtagMeasurementId%>');
+	</script>
+	<% } %> 
+	  
   </head>
   <body class="d-flex flex-column h-100" style="height:100%;">
 	<%- include('./partials/loading-spinner.ejs') %>
