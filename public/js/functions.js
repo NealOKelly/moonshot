@@ -617,11 +617,14 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 																	}
 																else
 																	{
+																	console.log("The record type has a starting classification.")
 																	// if record type does have a Starting Classification AND it is mandatory, then we need to check whether the selected classification is the mandatory starting classification. 
+																	console.log("Mandatory: " + result.Results[x].RecordTypeClassificationMandatory.Value)
+																	var recordTypeName = result.Results[x].RecordTypeName.Value
 																	if(result.Results[x].RecordTypeClassificationMandatory.Value)
 																	   {
 																		var recordTypeClassification = result.Results[x].RecordTypeClassification.ClassificationTitle.Value
-																		var recordTypeName = result.Results[x].RecordTypeName.Value
+																		
 																		var url = baseUrl + apiPath + "/Search?q=uri:" + parentNodeUri + "&properties=ClassificationTitle&trimtype=Classification"
 																		$.ajax(
 																			{
@@ -652,6 +655,19 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 																				}
 																			}); 
 																	   }
+																	else
+																		{
+																		$("#new-folder-form-record-type").append("<option>" + recordTypeName + "</option>")
+																		if($("#new-folder-form-record-type option").length<2)
+																			{
+																			$("#new-folder-form-record-type").attr("readonly", true)
+
+																			}
+																		else
+																			{
+																			$("#new-folder-form-record-type").attr("readonly", false)
+																			}	
+																		}
 																	}
 																}
 															}, 
