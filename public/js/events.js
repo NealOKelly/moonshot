@@ -46,6 +46,7 @@ $(document).ready(function()
 				}, 
 			error: function(result)
 				{
+				console.log(result)
 				console.log("Oooops!")
 				hideLoadingSpinner()
 				$('#connection-failed').modal('show')
@@ -857,13 +858,19 @@ $(document).on("click", ".folder", function()
 		}
 	if(node.hasClass("folder-intermediate"))
 		{
-		//alert(node.attr("id").substr(19))
-		populateContainerField("folder-intermediate", node.attr("id").substr(11))
-		populateRecordTypeField("folder-intermediate", node.attr("id").substr(11))
+		$("#records-list-pane").html("<div class='no-records display-4'>Browse or search to display records.</div>")
 		$("#new-sub-folder-form-record-title").val("")
 		$("#new-sub-folder-form-record-type").html("")
-		$("#new-sub-folder-form-container").removeClass("new-sub-folder-form-hidden")
-		populateAdditionalFields("folder-intermediate")
+		populateContainerField("folder-intermediate", node.attr("id").substr(11))
+		populateRecordTypeField("folder-intermediate", node.attr("id").substr(11)).then(function()
+			{
+			populateAdditionalFields("folder-intermediate").then(function()
+				{
+				$("#new-sub-folder-form-container").removeClass("new-sub-folder-form-hidden")				
+				})
+			})
+		drawPropertiesTable("folder-intermediate")
+		getRecordProperties("folder-intermediate", node.attr("id").substr(11))
 		}
 	})
 
@@ -888,12 +895,34 @@ $(document).on("click", ".folder-open", function()
 		}
 	if(node.hasClass("folder-intermediate"))
 		{
-		populateContainerField("folder-intermediate", node.attr("id").substr(11))
-		populateRecordTypeField("folder-intermediate", node.attr("id").substr(11))
+		$("#records-list-pane").html("<div class='no-records display-4'>Browse or search to display records.</div>")
 		$("#new-sub-folder-form-record-title").val("")
-		$("#new-sub-folder-form-record-type").val("")
-		$("#new-sub-folder-form-container").removeClass("new-sub-folder-form-hidden")
-		populateAdditionalFields("folder-intermediate")
+		$("#new-sub-folder-form-record-type").html("")
+		populateContainerField("folder-intermediate", node.attr("id").substr(11))
+		populateRecordTypeField("folder-intermediate", node.attr("id").substr(11)).then(function()
+			{
+			populateAdditionalFields("folder-intermediate").then(function()
+				{
+				$("#new-sub-folder-form-container").removeClass("new-sub-folder-form-hidden")				
+				})
+			})
+		drawPropertiesTable("folder-intermediate")
+		getRecordProperties("folder-intermediate", node.attr("id").substr(11))
+		}
+	if(node.hasClass("folder-terminal"))
+		{
+		getRecords(node.attr("id").substr(11))
+		populateContainerField("folder-terminal", node.attr("id").substr(11))
+		$("#upload-form-record-type").html("")
+		populateRecordTypeField("folder-terminal", node.attr("id").substr(11)).then(function()
+			{
+			populateAdditionalFields("folder-terminal").then(function()
+				{
+				$("#upload-form-container").removeClass("upload-form-hidden")					
+				})
+			})
+		drawPropertiesTable("folder-terminal")
+		getRecordProperties("folder-terminal", node.attr("id").substr(11))	
 		}
 	})
 
@@ -931,11 +960,14 @@ $(document).on("click", ".folder-fill", function()
 		{
 		getRecords(node.attr("id").substr(11))
 		populateContainerField("folder-terminal", node.attr("id").substr(11))
-		populateRecordTypeField("folder-terminal", node.attr("id").substr(11))
-		populateAdditionalFields("folder-terminal")
-		$("#new-folder-form-record-title").val("")
-		$("#new-folder-form-container").removeClass("upload-form-hidden")
-		$("#properties-pane").css("display", "block")
+		$("#upload-form-record-type").html("")
+		populateRecordTypeField("folder-terminal", node.attr("id").substr(11)).then(function()
+			{
+			populateAdditionalFields("folder-terminal").then(function()
+				{
+				$("#upload-form-container").removeClass("upload-form-hidden")					
+				})
+			})
 		drawPropertiesTable("folder-terminal")
 		getRecordProperties("folder-terminal", node.attr("id").substr(11))
 		}
@@ -955,26 +987,33 @@ $(document).on("click", ".record-title>a", function()
 	if($(node).hasClass("folder-intermediate"))
 		{
 		$("#records-list-pane").html("<div class='no-records display-4'>Browse or search to display records.</div>")
-		populateContainerField("folder-intermediate", node.attr("id").substr(11))
-		populateRecordTypeField("folder-intermediate", node.attr("id").substr(11))
-		drawPropertiesTable("folder-intermediate")
-		getRecordProperties("folder-intermediate", node.attr("id").substr(11))
 		$("#new-sub-folder-form-record-title").val("")
 		$("#new-sub-folder-form-record-type").html("")
-		$("#new-sub-folder-form-container").removeClass("new-sub-folder-form-hidden")
-		populateAdditionalFields("folder-intermediate")
+		populateContainerField("folder-intermediate", node.attr("id").substr(11))
+		populateRecordTypeField("folder-intermediate", node.attr("id").substr(11)).then(function()
+			{
+			populateAdditionalFields("folder-intermediate").then(function()
+				{
+				$("#new-sub-folder-form-container").removeClass("new-sub-folder-form-hidden")				
+				})
+			})
+		drawPropertiesTable("folder-intermediate")
+		getRecordProperties("folder-intermediate", node.attr("id").substr(11))
 		}
 	else
 		{
 		if($(node).hasClass("folder-terminal"))
 			{
-			//$("#records-list-pane").css("display", "block")
 			getRecords(node.attr("id").substr(11))
 			populateContainerField("folder-terminal", node.attr("id").substr(11))
-			populateRecordTypeField("folder-terminal", node.attr("id").substr(11))
-			populateAdditionalFields("folder-terminal")
 			$("#upload-form-record-type").html("")
-			$("#upload-form-container").removeClass("upload-form-hidden")
+			populateRecordTypeField("folder-terminal", node.attr("id").substr(11)).then(function()
+				{
+				populateAdditionalFields("folder-terminal").then(function()
+					{
+					$("#upload-form-container").removeClass("upload-form-hidden")					
+					})
+				})
 			drawPropertiesTable("folder-terminal")
 			getRecordProperties("folder-terminal", node.attr("id").substr(11))
 			}

@@ -4,6 +4,7 @@
 	"DatasetId" : "AD",
 	"DatasetName" : "API Demo"
 	},
+"DateFormat" : "dd-mmm-yyyy",
 "ExcludedRecordTypes" : [
 						"Folder",
 						"Document"
@@ -64,7 +65,7 @@
 			"RecordRecordType" : "true",
 			"RecordDateRegistered" : "false",
 			"RecordAccessControl" : "true",
-			"RecordDestructionDate" : "false"
+			"RecordDestructionDate" : "true"
 			},
 		"AdditionalFields" : "true"
 		},

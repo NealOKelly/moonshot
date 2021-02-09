@@ -205,12 +205,6 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 		if(isAuthenticated)
 			{
 			$("#" + parentNodeId + " > ul").addClass("classification-hidden") // if already exists, hide.
-			var url = baseUrl + apiPath + "/RecordType"
-			var data = {
-						"q" : "all",
-						"Properties" : "RecordTypeLevel, RecordTypeContentsRule, RecordTypeName", 
-						"PageSize" : "1000000"
-						};
 			url = baseUrl + apiPath + "/RecordType?q=all&properties=RecordTypeLevel, RecordTypeContentsRule, RecordTypeName&pageSize=1000000"
 			$.ajax(
 				{
@@ -251,7 +245,6 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 						xhrFields: { withCredentials: true},
 						success: function(result)
 							{
-							console.log(result)
 							if(!$("#" + parentNodeId + " > ul").length)
 								{
 								if(result.TotalResults>0)
@@ -387,7 +380,6 @@ function classificationTreeNodeSelected(node)
 			$("#new-folder-form-record-classification").val(classification)
 			$("#new-folder-form-record-classification").data("classificationUri", (node).attr("id").substr(19))
 			}
-
 		drawPropertiesTable("classification")
 		var classificationUri = node.attr("id").substr(19)
 		getClassificationProperties(classificationUri)
@@ -606,6 +598,7 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 															"Properties" : "RecordTypeName, RecordTypeContainerRule, RecordTypeUsualBehaviour, RecordTypeClassification, RecordTypeClassificationMandatory",
 															"TrimType" : "RecordType"
 															}
+													console.log(getRecordTypeProperties())
 													$.ajax(  // return the properties of the record type.
 														{
 														url: url,
@@ -640,8 +633,7 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 																	   {
 																		console.log("THis has been called.")
 																		var recordTypeClassification = result.Results[x].RecordTypeClassification.ClassificationTitle.Value
-																		
-																		//var url = baseUrl + apiPath + "/Search?q=uri:" + parentNodeUri + "&properties=ClassificationTitle&trimtype=Classification"
+
 																		url = baseUrl + apiPath + "/Search";
 																		data =	{
 																				"q" : "uri:" + parentNodeUri,
@@ -702,7 +694,6 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 													} // end of onlyRecordTypeCount==0; i.e. the selected classification does not have an Only Record Types rule configured.
 												helperSelectRecordType("classification").then(function()
 													{
-													console.log("Selected: " + $('select[id=new-folder-form-record-type] option:nth-child(1)').selected)
 													deferredObject.resolve();	
 													})
 												}
@@ -724,10 +715,16 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 				case "folder-intermediate":
 					if(config.ByListContainmentRules.UseApplicationConfig=="true")
 						{
-						var url = baseUrl + apiPath + "/Search?q=" + parentNodeUri + "&properties=RecordTtitle,RecordRecordType&trimtype=Record"
+						var url = baseUrl + apiPath + "/Search";
+						var data = 	{
+									"q" : parentNodeUri,
+									"Properties" : "RecordTitle, RecordRecordType",
+									"TrimType" : "Record"
+									}
 						$.ajax(
 							{
 							url: url,
+							data: JSON.stringify(data),
 							type: "POST",
 							xhrFields: { withCredentials: true},
 							contentType: 'application/json',
@@ -751,6 +748,10 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 									{
 									$("#new-sub-folder-form-record-type").attr("readonly", false)
 									}
+								helperSelectRecordType("folder-intermediate").then(function()
+									{
+									deferredObject.resolve();	
+									})
 								}, 
 							error: function(result)
 								{
@@ -760,10 +761,16 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 						}
 					else
 						{
-						var url = baseUrl + apiPath + "/Search?q=all&properties=RecordTypeName,RecordTypeContainerRule,RecordTypeUsualBehaviour&trimtype=RecordType"
+						var url = baseUrl + apiPath + "/Search"
+						var data = 	{
+									"q" : "all",
+									"Properties" : "RecordTypeName, RecordTypeContainerRule, RecordTypeUsualBehaviour",
+									"TrimType" : "RecordType"
+									}
 						$.ajax(
 							{
 							url: url,
+							data: JSON.stringify(data),
 							type: "POST",
 							xhrFields: { withCredentials: true},
 							contentType: 'application/json',
@@ -787,6 +794,10 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 											}
 										}
 									}
+									helperSelectRecordType("folder-intermediate").then(function()
+										{
+										deferredObject.resolve();	
+										})
 								}, 
 							error: function(result)
 								{
@@ -797,15 +808,19 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 					break;
 				case "folder-terminal":
 					$("#upload-form-record-title").val("")
-					$("#upload-form-container").removeClass("upload-form-hidden")
-					$("#upload-form-record-container").val("")
 					$("#upload-form-record-type").html("")
 					if(config.ByListContainmentRules.UseApplicationConfig=="true")
 					   {
-						var url = baseUrl + apiPath + "/Search?q=" + parentNodeUri + "&properties=RecordTtitle,RecordRecordType&trimtype=Record"
+						var url = baseUrl + apiPath + "/Search"
+						var data = 	{
+									"q" : parentNodeUri,
+									"Properties" : "RecordTitle, RecordRecordType",
+									"TrimType" : "Record" 
+									}
 						$.ajax(
 							{
 							url: url,
+							data: JSON.stringify(data),
 							type: "POST",
 							xhrFields: { withCredentials: true},
 							contentType: 'application/json',
@@ -829,6 +844,7 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 									{
 									$("#upload-form-record-type").attr("readonly", false)
 									}
+								deferredObject.resolve();
 								}, 
 							error: function(result)
 								{
@@ -838,10 +854,16 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 					   }
 					else
 					   {
-					   	var url = baseUrl + apiPath + "/Search?q=usable&properties=RecordTypeName,RecordTypeUsualBehaviour,RecordTypeContainerRule&trimtype=RecordType"
+						var url = baseUrl + apiPath + "/Search"
+						var data =	{
+									"q" : "usable",
+									"Properties" : "RecordTypeName, RecordTypeUsualBehaviour, RecordTypeContainerRule",
+									"TrimType" : "RecordType"
+									}
 						$.ajax(
 							{
 							url: url,
+							data: JSON.stringify(data),
 							type: "POST",
 							xhrFields: { withCredentials: true},
 							contentType: 'application/json',
@@ -892,10 +914,33 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 		return deferredObject.promise();
 	}
 
+function getRecordTypeProperties()
+	{
+	var deferredObject = $.Deferred();	
+	console.log("getRecordTypeProperties() has been called.")
+	deferredObject.resolve("Hello World.")
+	return deferredObject.promise();
+	}
+
+
+
 function helperSelectRecordType(type)
 	{
+	console.log("In the helper.")
 	var deferredObject = $.Deferred();
-	$('select[id=new-folder-form-record-type] option:nth-child(1)').selected = true;
+	switch(type)
+		{
+		case "classification":
+			$('select[id=new-folder-form-record-type] option:nth-child(1)').selected = true;			
+			break;
+		case "folder-intermediate":
+			console.log("In the case statement.")
+			$('select[id=new-sub-folder-form-record-type] option:nth-child(1)').selected = true;			
+			break;
+		case "folder-terminal":
+			console.log("Document")
+			break;
+		}
 	deferredObject.resolve();
 	return deferredObject.promise();
 	}
@@ -907,7 +952,6 @@ function populateAdditionalFields(parentNodeType)
 		{
 		if(isAuthenticated)
 			{
-			//var parentNodeType= "classification";
 			var url = baseUrl + apiPath + "/Search?q=all&properties=FieldDefinitionName, FieldDefinitionIsUsedByRecordTypes, 	FieldDefinitionFormat, FieldDefinitionSearchClause, FieldDefinitionLength&trimtype=FieldDefinition&pageSize=1000"
 			$.ajax(
 				{
@@ -917,6 +961,8 @@ function populateAdditionalFields(parentNodeType)
 				xhrFields: { withCredentials: true},
 				success: function(result)
 					{
+					console.log(result)
+					console.log($("#"+ formName + "-record-type").val())
 					switch(parentNodeType)
 						{
 						case "classification":
@@ -924,6 +970,7 @@ function populateAdditionalFields(parentNodeType)
 							$("#" + formName + " .additional-field").remove()
 							break;
 						case "folder-intermediate":
+							console.log("populateAdditionalFields - folder intermediate, has been called.")
 							var formName = "new-sub-folder-form";
 							$("#" + formName + " .additional-field").remove()
 							break;
@@ -1149,16 +1196,21 @@ function getClassificationProperties(classificationUri)
 		{
 		if(isAuthenticated)
 			{
-			var url = baseUrl + apiPath + "/Search?q=" + classificationUri + "&properties=ClassificationName, ClassificationTitle, ClassificationIdNumber, AccessControl&trimtype=Classification"
+			var url = baseUrl + apiPath + "/Search"
+			var data =	{
+						"q" : classificationUri,
+						"Properties" : "ClassificationName, ClassificationTitle, ClassificationIdNumber, AccessControl",
+						"TrimType" : "Classification"
+						}
 			$.ajax(
 				{
 				url: url,
+				data: JSON.stringify(data),
 				type: "POST",
 				xhrFields: { withCredentials: true},
 				contentType: 'application/json',
 				success: function(result)
 					{
-					var details = JSON.stringify(result);
 					$("#properties-classification-title").html(result.Results[0].ClassificationTitle.Value)
 					$("#properties-classification-number").html(result.Results[0].ClassificationIdNumber.Value)
 					$("#properties-classification-access-control").html( parseAccessControlString(result.Results[0].ClassificationAccessControl.Value, "classification").CanUse)
@@ -1178,10 +1230,58 @@ function getClassificationProperties(classificationUri)
 
 function formatDate(dateTime, format)
 	{
-	formattedDate = dateTime.substr(8, 2) + '-'
-	formattedDate = formattedDate + dateTime.substr(5, 2) + '-'
-	formattedDate = formattedDate + dateTime.substr(0, 4)
-	return formattedDate;
+	day = dateTime.substr(8, 2)
+	month = dateTime.substr(5, 2)
+	year = dateTime.substr(0, 4)
+	switch(format) 
+		{
+		case "dd-mm-yyyy":
+			// do something
+			break;
+		case "dd-mmm-yyyy":
+			switch(month)
+				{
+				case "01":
+					month = "Jan"
+					break;
+				case "02":
+					month = "Feb"
+					break;
+				case "03":
+					month = "Mar"
+					break;
+				case "04":
+					month = "Apr"
+					break;
+				case "05":
+					month = "May"
+					break;
+				case "06":
+					month = "Jun"
+					break;
+				case "07":
+					month = "Jul"
+					break;
+				case "08":
+					month = "Aug"
+					break;
+				case "09":
+					month = "Sep"
+					break;
+				case "10":
+					month = "Oct"
+					break;
+				case "11":
+					month = "Nov"
+					break;
+				case "12":
+					month = "Nov"
+					break;
+				}
+			break;
+		}
+		formattedDate = day + "-" + month + "-" + year
+		return formattedDate;	
 	}
 
 function parseAccessControlString(string, type)
@@ -1228,17 +1328,23 @@ function getRecordProperties(type, recordUri)
 		{
 		if(isAuthenticated)
 			{
-			var url = baseUrl + apiPath + "/Search?q=" + recordUri + "&properties=RecordTitle, RecordNumber, Classification, RecordContainer, RecordType, DateRegistered, AccessControl, RecordDestructionDate&trimtype=Record"
+			var url = baseUrl + apiPath + "/Search";
+			var data = 	{
+						"q" : recordUri,
+						"Properties" : "RecordTitle, RecordNumber, Classification, RecordContainer, RecordType, DateRegistered, AccessControl, RecordDestructionDate",
+						"TrimType" : "Record"
+						}
 			$.ajax(
 				{
 				url: url, 
 				type: "POST",
+				data: JSON.stringify(data),
 				contentType: 'application/json',
 				xhrFields: { withCredentials: true},
 				success: function(result)
 					{
 					var details = JSON.stringify(result);
-					var dateRegistered = formatDate(result.Results[0].RecordDateRegistered.DateTime,"dd-mm-yyyy") + " at "
+					var dateRegistered = formatDate(result.Results[0].RecordDateRegistered.DateTime, config.DateFormat) + " at "
 					dateRegistered= dateRegistered + result.Results[0].RecordDateRegistered.DateTime.substr(11, 8)
 					switch(type)
 						{
@@ -1253,23 +1359,30 @@ function getRecordProperties(type, recordUri)
 							var accessControlHTML = accessControlHTML + "<div>Update Folder Properties: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value, "record").UpdateRecordMetadata + "</div>"
 							var accessControlHTML = accessControlHTML + "<div>Add Contents: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value, "record").ContributeContents + "</div>"
 							$("#properties-access-control").html(accessControlHTML)
-
-							// need to look at behaviour of date due for destruction
-								
+							if(result.Results[0].RecordDestructionDate.IsClear==false)
+								{
+								$("#properties-date-due-for-destruction").html(formatDate(result.Results[0].RecordDestructionDate.DateTime, config.DateFormat))
+								}
 							if(config.PropertiesPane.IntermediateFolder.AdditionalFields=="true")
 								{
 								var recordUri = result.Results[0].Uri
 								var recordType = result.Results[0].RecordRecordType.RecordTypeName.Value
-								var url = baseUrl + apiPath + "/Search?q=all&properties=FieldDefinitionName, FieldDefinitionIsUsedByRecordTypes, FieldDefinitionFormat, FieldDefinitionSearchClause, FieldDefinitionLength&trimtype=FieldDefinition&pageSize=1000"	
+								var url = baseUrl + apiPath + "/Search"
+								var data = 	{
+											"q" : "all",
+											"Properties" : "FieldDefinitionName, FieldDefinitionIsUsedByRecordTypes, FieldDefinitionFormat, FieldDefinitionSearchClause, FieldDefinitionLength",
+											"TrimType" : "FieldDefinition",
+											"PageSize" : "1000"
+											}
 								$.ajax(
 									{
 									url: url,
+									data: JSON.stringify(data),
 									type: "POST",
 									contentType: 'application/json',
 									xhrFields: { withCredentials: true},
 									success: function(result)
 										{
-
 										for(i=0; i<result.TotalResults; i++)
 											{
 											(function(index)
@@ -1358,7 +1471,7 @@ function getRecordProperties(type, recordUri)
 																case "Date":
 																	if(!result.Results[0].Fields[searchClause].IsClear)
 																		{
-																		$("#" + additionalFieldId).html(formatDate(result.Results[0].Fields[searchClause].DateTime))	
+																		$("#" + additionalFieldId).html(formatDate(result.Results[0].Fields[searchClause].DateTime, config.DateFormat))	
 																		}
 																	break;
 																case "Datetime":
@@ -1414,16 +1527,26 @@ function getRecordProperties(type, recordUri)
 							var accessControlHTML = accessControlHTML + "<div>Add Contents: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value, "record").ContributeContents + "</div>"
 							$("#properties-access-control").html(accessControlHTML)
 								
-							// need to look at behaviour of date due for destruction
+							if(result.Results[0].RecordDestructionDate.IsClear==false)
+								{
+								$("#properties-date-due-for-destruction").html(formatDate(result.Results[0].RecordDestructionDate.DateTime, config.DateFormat))
+								}
 								
 							if(config.PropertiesPane.IntermediateFolder.AdditionalFields=="true")
 								{
 								var recordUri = result.Results[0].Uri
 								var recordType = result.Results[0].RecordRecordType.RecordTypeName.Value
-								var url = baseUrl + apiPath + "/Search?q=all&properties=FieldDefinitionName, FieldDefinitionIsUsedByRecordTypes, FieldDefinitionFormat, FieldDefinitionSearchClause, FieldDefinitionLength&trimtype=FieldDefinition&pageSize=1000"	
+								var url = baseUrl + apiPath + "/Search"
+								var data = 	{
+											"q" : "all",
+											"Properties" : "FieldDefinitionName, FieldDefinitionIsUsedByRecordTypes, FieldDefinitionFormat, FieldDefinitionSearchClause, FieldDefinitionLength",
+											"TrimType" : "FieldDefinition",
+											"PageSize" : "1000"
+											}
 								$.ajax(
 									{
 									url: url,
+									data: JSON.stringify(data),
 									type: "POST",
 									contentType: 'application/json',
 									xhrFields: { withCredentials: true},
@@ -1494,10 +1617,17 @@ function getRecordProperties(type, recordUri)
 														}
 
 													var searchClause = result.Results[i].FieldDefinitionSearchClause.Value;
-													var url = baseUrl + apiPath + "/Search?q=" + recordUri + "&properties=" + searchClause + "&TrimType=Record"
+													//var url = baseUrl + apiPath + "/Search?q=" + recordUri + "&properties=" + searchClause + "&TrimType=Record"
+													var url = baseUrl + apiPath + "/Search"
+													var data =	{
+																"q" : recordUri,
+																"Properties" : searchClause,
+																"TrimType" : "Record"
+																}
 													$.ajax(
 														{
 														url: url,
+														data: JSON.stringify(data),
 														type: "POST",
 														contentType: 'application/json',
 														xhrFields: { withCredentials: true},
@@ -1515,7 +1645,10 @@ function getRecordProperties(type, recordUri)
 																	console.log("Boolean inputs are not yet supported.")
 																	break;
 																case "Date":
-																	$("#" + additionalFieldId).html(formatDate(result.Results[0].Fields[searchClause].DateTime))
+																	if(!result.Results[0].Fields[searchClause].IsClear)
+																		{
+																		$("#" + additionalFieldId).html(formatDate(result.Results[0].Fields[searchClause].DateTime, config.DateFormat))	
+																		}
 																	break;
 																case "Datetime":
 																	console.log("Datetime inputs are not yet supported.")
@@ -1571,15 +1704,25 @@ function getRecordProperties(type, recordUri)
 							$("#properties-access-control").html(accessControlHTML)
 
 								
-							// need to look at behaviour of date due for destruction
+							if(result.Results[0].RecordDestructionDate.IsClear==false)
+								{
+								$("#properties-date-due-for-destruction").html(formatDate(result.Results[0].RecordDestructionDate.DateTime, config.DateFormat))
+								}
 							if(config.PropertiesPane.IntermediateFolder.AdditionalFields=="true")
 								{
 								var recordUri = result.Results[0].Uri
 								var recordType = result.Results[0].RecordRecordType.RecordTypeName.Value
-								var url = baseUrl + apiPath + "/Search?q=all&properties=FieldDefinitionName, FieldDefinitionIsUsedByRecordTypes, FieldDefinitionFormat, FieldDefinitionSearchClause, FieldDefinitionLength&trimtype=FieldDefinition&pageSize=1000"	
+								var url = baseUrl + apiPath + "/Search"
+								var data = 	{
+											"q" : "all",
+											"Properties" : "FieldDefinitionName, FieldDefinitionIsUsedByRecordTypes, FieldDefinitionFormat, FieldDefinitionSearchClause, FieldDefinitionLength",
+											"TrimType" : "FieldDefinition",
+											"PageSize" : "1000"
+											}
 								$.ajax(
 									{
 									url: url,
+									data: JSON.stringify(data),
 									type: "POST",
 									contentType: 'application/json',
 									xhrFields: { withCredentials: true},
@@ -1671,7 +1814,7 @@ function getRecordProperties(type, recordUri)
 																	console.log("Boolean inputs are not yet supported.")
 																	break;
 																case "Date":
-																	$("#" + additionalFieldId).html(formatDate(result.Results[0].Fields[searchClause].DateTime))
+																	$("#" + additionalFieldId).html(formatDate(result.Results[0].Fields[searchClause].DateTime, config.DateFormat))
 																	break;
 																case "Datetime":
 																	console.log("Datetime inputs are not yet supported.")
