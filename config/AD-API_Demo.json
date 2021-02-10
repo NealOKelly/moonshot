@@ -11,7 +11,7 @@
 						],
 "ByListContainmentRules" : 
 	{
-	"UseApplicationConfig" : "true",
+	"UseApplicationConfig" : "false",
 	"Mappings" : 
 		[
 			{

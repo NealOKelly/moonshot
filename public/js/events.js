@@ -3,39 +3,30 @@ $(document).ready(function()
 	$('#loading').modal('show')
 	preauthenticateApi().then(function()
 		{
-		var url = baseUrl + apiPath + "/Search";
+		//var url = baseUrl + apiPath + "/Search";
 		var data = {
 					"q" : "all",
 					"Properties" : "ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern",
 					"TrimType" : "Classification",
 					"PageSize" : "1000000"
 					};
-							  
-		$.ajax(
-			{
-			url: url,
-			data: JSON.stringify(data),
-			type: "POST",
-			xhrFields: { withCredentials: true},
-			contentType: 'application/json', 
-			success: function(result)
-			{
-			var classifications = result;
-			for(var i=0; i<classifications.TotalResults; i++)  // populate top level classifications.
+		var result = searchAPI(data)
+			.then(function(result)
 				{
-				if(!classifications.Results[i].hasOwnProperty("ClassificationParentClassification"))
+				var classifications = result;
+				for(var i=0; i<classifications.TotalResults; i++)  // populate top level classifications.
 					{
-					if(!$("#classification-uri-" + classifications.Results[i].Uri).length)
+					if(!classifications.Results[i].hasOwnProperty("ClassificationParentClassification"))
 						{
-						addClassificationNode("#all-files > ul", classifications.Results[i].Uri, classifications.Results[i].ClassificationName.Value, classifications.Results[i].ClassificationCanAttachRecords.Value, classifications.Results[i].ClassificationChildPattern.Value)
+						if(!$("#classification-uri-" + classifications.Results[i].Uri).length)
+							{
+							addClassificationNode("#all-files > ul", classifications.Results[i].Uri, classifications.Results[i].ClassificationName.Value, classifications.Results[i].ClassificationCanAttachRecords.Value, classifications.Results[i].ClassificationChildPattern.Value)
+							}
+							$("#all-files > ul").addClass("classification-hidden")
 						}
-						$("#all-files > ul").addClass("classification-hidden")
-					}
-				}	
+					}	
 				// sort	 this list.
 				sortClassificationTree(".classification-name")
-
-
 				// display top-level classifications
 				$("#all-files ul").removeClass("classification-hidden")
 				$("#all-files > span.collapsed").addClass("expanded")
@@ -43,14 +34,12 @@ $(document).ready(function()
 				$("#all-files > span.folder").addClass("folder-open")
 				$("#all-files > span.folder").removeClass("folder")	
 				hideLoadingSpinner()
-				}, 
-			error: function(result)
+				})
+			.fail(function(result)
 				{
-				console.log("Oooops!")
 				hideLoadingSpinner()
 				$('#connection-failed').modal('show')
-				}
-			});
+				})
 		})
 	});
 
@@ -398,8 +387,6 @@ $(document).on("click", ".search-result-caret-collapsed", function()
 
 $(document).on("click", "#search-results li", function()
 	{
-	//alert($(event.target).attr("id"))
-	
 	if(!$(event.target).hasClass("search-result-caret-expanded"))
 		{
 		if(!$(event.target).hasClass("search-result-caret-collapsed"))
@@ -431,10 +418,7 @@ $(document).on("click", "#search-results li", function()
 								{
 								if($(event.target).hasClass("download"))
 									{
-									// Do the download.
-							
-										
-									var level = $(event.target).parent().attr("id").substr(6, 1)
+										var level = $(event.target).parent().attr("id").substr(6, 1)
 									var recordUri = $(event.target).parent().attr("id").substr(35)
 									var recordTitle = $("#level-" + level + "-search-result-type-uri-"+ recordUri).data("record-title")
 									var recordExtension = $("#level-" + level + "-search-result-type-uri-"+ recordUri).data("record-extension")
@@ -453,7 +437,6 @@ $(document).on("click", "#search-results li", function()
 										$("#level-" + level + "-search-result-recordType-uri-"+ recordUri).toggleClass("search-result-green")
 										},
 										1000);
-										
 
 									downloadDocument(recordUri, recordTitle, recordExtension, recordMimeType)
 									}
@@ -577,6 +560,23 @@ function populateSearchResultPane(searchString, foldersOnly)
 		if(isAuthenticated)
 			{
 			url = baseUrl + apiPath + "/RecordType?q=all&properties=RecordTypeLevel, RecordTypeContentsRule, RecordTypeName&pageSize=1000000"
+			var data = 	{
+						"q" : "all",
+						"Properties" : "RecordTypeLevel, RecordTypeContentsRule, RecordTypeName",
+						"TrimType" : "RecordType",
+						"PageSize" : "111"
+						}
+			var result = searchAPI(data)
+				.then(function(result)
+					{
+					console.log("then")
+					console.log(result)	
+					})
+				.fail(function(result)
+					{
+					console.log("Failed!!!")
+					})
+				
 			$.ajax(
 				{
 				url: url,
@@ -585,21 +585,21 @@ function populateSearchResultPane(searchString, foldersOnly)
 				xhrFields: { withCredentials: true},
 				success: function(recordTypeDefinitions)
 					{
-					var q = 'content:"'+ searchString +'" Or anyWord:' + searchString;
-					var url = baseUrl + apiPath + "/Search?q=" + q + "&properties=RecordNumber,RecordTitle,RecordRecordType,RecordMimeType,RecordExtension&trimtype=Record&pageSize=1000&sortBy=typedTitle"
-					$.ajax(
-						{
-						url: url,
-						type: "POST",
-						contentType: 'application/json',
-						xhrFields: { withCredentials: true},
-						success: function(result)
+					console.log("ajax")
+					console.log(recordTypeDefinitions)
+					data = 	{
+								"q" : 'content:"'+ searchString +'" Or anyWord:' + searchString,
+								"Properties" : "RecordNumber, RecordTitle, RecordRecordType, RecordMimeType, RecordExtension",
+								"TrimType" : "Record",
+								"PageSize" : "1000",
+								"SortBy" : "typedTitle"
+								}
+					var result = searchAPI(data)
+						.then(function(result)
 							{
 							if(result.TotalResults==0)
 								{
 								$("#search-results-pane").html("<div class='no-records display-4'>Your search did not return any records.</div>")
-								//Browse or search to display records.
-								//<div class='no-records display-4'>Browse or search to display records.</div>
 								hideLoadingSpinner()	
 								}
 							else
@@ -630,11 +630,11 @@ function populateSearchResultPane(searchString, foldersOnly)
 															}
 														else
 															{
-																if(recordTypeDefinitions.Results[i].RecordTypeLevel.Value<"5")
+															if(recordTypeDefinitions.Results[i].RecordTypeLevel.Value<"5")
 																{
 																if(foldersOnly=="false")
 																	{
-																	addSearchResult(result.Results[x], "folder-terminal")				
+																	addSearchResult(result.Results[x], "folder-terminal")	
 																	}
 																}
 															}
@@ -647,12 +647,11 @@ function populateSearchResultPane(searchString, foldersOnly)
 															{
 															addSearchResult(result.Results[x], "folder-terminal")		
 															}
-														
 														break;
 													case "ByList":
 														if(recordTypeDefinitions.Results[i].RecordTypeLevel.Value>="4")
 															{
-																addSearchResult(result.Results[x], "folder-intermediate")
+															addSearchResult(result.Results[x], "folder-intermediate")
 															}
 														break;
 													case "Prevented":
@@ -669,17 +668,16 @@ function populateSearchResultPane(searchString, foldersOnly)
 								var endHTML = '</tbody></table>'
 								$("#search-results-pane > tbody").append(thHTML)
 								hideLoadingSpinner()	
-								}
-							}, 
-						error: function(result)
+								}	
+							})
+						.fail(function(result)
 							{
 							console.log("Oooops!")
-							}
-						});
+							})
 					}, 
 				error: function(recordTypeDefinitions)
 					{
-					console.log("Oooops!")
+					console.log()
 					}
 				});
 			}
@@ -1147,10 +1145,6 @@ $(document).on("click", "#create-folder-button", function()
 		}
 	})
 
-
-
-
-
 $(document).on("change", "#new-folder-form-record-type", function()
 	{
 	populateAdditionalFields("classification")
@@ -1165,7 +1159,21 @@ $(document).on("change", "#new-sub-folder-form-record-type", function()
 $(document).on("click", "#test-button", function()
 	{
 	//console.log("Frame Title: " + $("#authentication-frame").contents().find("title").html())
-	alert("Length: " + $('select[id=new-folder-form-record-type] option').length)
+	var data = {
+			"q" : "all",
+			"Properties" : "ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern",
+			"TrimType" : "Classification",
+			"PageSize" : "1000000"
+			};
+	var result = searchAPI(data)
+		.then(function(result)
+			{
+			console.log(result)	
+			})
+		.fail(function(result)
+			{
+			console.log("Failed!!!")
+			})
 	})
 
 
