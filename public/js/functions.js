@@ -512,20 +512,14 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 								"Properties" : "RecordTypeName, RecordTypeContainerRule, RecordTypeUsualBehaviour",
 								"TrimType" : "RecordType"
 								}
-					$.ajax(
-						{
-						url: url,
-						data: JSON.stringify(data),
-						type: "POST",
-						xhrFields: { withCredentials: true},
-						contentType: 'application/json',
-						success: function(result)
+					var result = searchAPI(data)
+						.then(function(result)
 							{
 							var intermediateFolderRecordTypeUris = [];
 							var intermediateFolderRecordTypeNames = [];
 							for(i=0; i<result.Results.length; i++)
 								{
-								// The GilbyIM Lite application require folders (that can attach to classifications) to configured so they cannot be contained other records.
+								// The GilbyIM Lite application requires folders (that can attach to classifications) to configured so they cannot be contained by other records.
 								if(result.Results[i].RecordTypeContainerRule.Value=="Prevented")
 								   	{
 									intermediateFolderRecordTypeUris.push(result.Results[i].Uri)
@@ -536,7 +530,6 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 								{
 							   	(function(index)
 								 	{
-									//url = baseUrl + apiPath + "/Search";
 									data = 	{
 											"q" : "uri:" + parentNodeUri + ",recordType:" + intermediateFolderRecordTypeUris[i],
 											"Properties" : "ClassificationTitle",
@@ -603,14 +596,9 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 																				"Properties" : "ClassificationTitle",
 																				"TrimType" : "Classification"
 																				}
-																		$.ajax(
-																			{
-																			url: url,
-																			data: JSON.stringify(data),
-																			type: "POST",
-																			xhrFields: { withCredentials: true},
-																			contentType: 'application/json',
-																			success: function(result)
+																		   
+																		var result = searchAPI(data)
+																			.then(function(result)
 																				{
 																				if(result.Results[0].ClassificationTitle.Value==recordTypeClassification)
 																					{
@@ -619,19 +607,17 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 																					if($("#new-folder-form-record-type option").length<2)
 																						{
 																						$("#new-folder-form-record-type").attr("readonly", true)
-																						
 																						}
 																					else
 																						{
 																						$("#new-folder-form-record-type").attr("readonly", false)
 																						}
-																					}
-																				}, 
-																			error: function(result)
+																					}										
+																				})
+																			.fail(function(result)
 																				{
-																				console.log("Oooops!")
-																				}
-																			}); 
+																				// Do something
+																				})
 																	   }
 																	else
 																		{
@@ -664,33 +650,24 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 											{
 											// Do something
 											})
-
 							   		})(i);
-								} // end of outer for loop
-							}, 
-						error: function(result)
+								} // end of outer for loop							
+							})
+						.fail(function(result)
 							{
 							// Do something
-							}
-						});	
+							})
 					break;
 				case "folder-intermediate":
 					if(config.ByListContainmentRules.UseApplicationConfig=="true")
 						{
-						var url = baseUrl + apiPath + "/Search";
 						var data = 	{
 									"q" : parentNodeUri,
 									"Properties" : "RecordTitle, RecordRecordType",
 									"TrimType" : "Record"
 									}
-						$.ajax(
-							{
-							url: url,
-							data: JSON.stringify(data),
-							type: "POST",
-							xhrFields: { withCredentials: true},
-							contentType: 'application/json',
-							success: function(result)
+						var result = searchAPI(data)
+							.then(function(result)
 								{
 								for(i=0; i<config.ByListContainmentRules.Mappings.length; i++)
 									{
@@ -713,13 +690,12 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 								helperSelectRecordType("folder-intermediate").then(function()
 									{
 									deferredObject.resolve();	
-									})
-								}, 
-							error: function(result)
+									})	
+								})
+							.fail(function(result)
 								{
-								console.log("Oooops!")
-								}
-							});
+								// Do something
+								})
 						}
 					else
 						{
@@ -729,14 +705,8 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 									"Properties" : "RecordTypeName, RecordTypeContainerRule, RecordTypeUsualBehaviour",
 									"TrimType" : "RecordType"
 									}
-						$.ajax(
-							{
-							url: url,
-							data: JSON.stringify(data),
-							type: "POST",
-							xhrFields: { withCredentials: true},
-							contentType: 'application/json',
-							success: function(result)
+						var result = searchAPI(data)
+							.then(function(result)
 								{
 								for(i=0; i<result.Results.length; i++)
 									{
@@ -760,12 +730,11 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 										{
 										deferredObject.resolve();	
 										})
-								}, 
-							error: function(result)
+								})
+							.fail(function(result)
 								{
-								console.log("Oooops!")
-								}
-							});
+								// Do something
+								})
 						}
 					break;
 				case "folder-terminal":
@@ -779,14 +748,8 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 									"Properties" : "RecordTitle, RecordRecordType",
 									"TrimType" : "Record" 
 									}
-						$.ajax(
-							{
-							url: url,
-							data: JSON.stringify(data),
-							type: "POST",
-							xhrFields: { withCredentials: true},
-							contentType: 'application/json',
-							success: function(result)
+						var result = searchAPI(data)
+							.then(function(result)
 								{
 								for(i=0; i<config.ByListContainmentRules.Mappings.length; i++)
 									{
@@ -807,29 +770,22 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 									$("#upload-form-record-type").attr("readonly", false)
 									}
 								deferredObject.resolve();
-								}, 
-							error: function(result)
+								})
+							.fail(function(result)
 								{
-								console.log("Oooops!")
-								}
-							});
+								// Do something
+								})
+
 					   }
 					else
 					   {
-						var url = baseUrl + apiPath + "/Search"
 						var data =	{
 									"q" : "usable",
 									"Properties" : "RecordTypeName, RecordTypeUsualBehaviour, RecordTypeContainerRule",
 									"TrimType" : "RecordType"
 									}
-						$.ajax(
-							{
-							url: url,
-							data: JSON.stringify(data),
-							type: "POST",
-							xhrFields: { withCredentials: true},
-							contentType: 'application/json',
-							success: function(result)
+						var result = searchAPI(data)
+							.then(function(result)
 								{
 								for(i=0; i<result.Results.length;i++)
 									{
@@ -857,12 +813,12 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 									{
 									$("#upload-form-record-type").attr("readonly", false)
 									}
-								}, 
-							error: function(result)
+								deferredObject.resolve();
+								})
+							.fail(function(result)
 								{
-								console.log("Oooops!")
-								}
-							});
+								// Do something
+								})
 					   }
 						break;
 					}
@@ -1330,14 +1286,8 @@ function getRecordProperties(type, recordUri)
 											"TrimType" : "FieldDefinition",
 											"PageSize" : "1000"
 											}
-								$.ajax(
-									{
-									url: url,
-									data: JSON.stringify(data),
-									type: "POST",
-									contentType: 'application/json',
-									xhrFields: { withCredentials: true},
-									success: function(result)
+								var result = searchAPI(data)
+									.then(function(result)
 										{
 										for(i=0; i<result.TotalResults; i++)
 											{
@@ -1462,13 +1412,12 @@ function getRecordProperties(type, recordUri)
 															}
 														})	
 													}
-											})(i)}									
-										}, 
-									error: function(result)
+											})(i)}
+										})
+									.fail(function(result)
 										{
-										console.log("Oooops!")
-										}
-									});
+										// Do something
+										})
 								}
 							break;
 						case "folder-terminal":
