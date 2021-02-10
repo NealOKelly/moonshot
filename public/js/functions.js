@@ -72,6 +72,17 @@ function getAuthenticationStatus()
 		return deferredObject.promise();
 	}
 
+function displaySessionExpiredModal()
+	{
+	$("#loading").modal("hide")		
+	$("#connection-failed").modal("hide")
+	$("#create-folder-status").modal("hide")
+	$("#upload-form-container").modal("hide")
+	$("#session-expired").modal("show")		
+	}
+
+
+
 function removeAppSessionCookies()
 	{
 	//$.cookie("FedAuth", null, { expires: -1, path: "/CMServiceAPI/"} )
@@ -100,10 +111,8 @@ function refreshClassificationNodes(parentNodeId)
 			// check for new classifications.
 			preauthenticateApi().then(function()
 				{
-				console.log("parentNodeId: " + parentNodeId)
 				if(parentNodeId=="all-files")
 					{
-					
 					q = "all";
 					}
 				else
@@ -178,7 +187,7 @@ function refreshClassificationNodes(parentNodeId)
 			}
 		else
 			{
-			$("#session-expired").modal("show")
+			displaySessionExpiredModal()
 			}
 		});
 	}
@@ -335,8 +344,7 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 			}
 		else
 			{
-			console.log(result)
-			$("#session-expired").modal("show")
+			displaySessionExpiredModal()
 			}
 		});
 	}
@@ -401,6 +409,7 @@ function highlightSelectedNode(node)
 	{
 	$(".record-row").removeClass("row-selected")
 	$("#classification-treeview li").removeClass("node-selected")
+	$("#all-files>span>a").css("font-weight", "normal")
 	$("#" + node.attr("id")).addClass("node-selected")
 	}
 
@@ -478,7 +487,7 @@ function getRecords(recordUri)
 			}
 		else
 			{
-			$("#session-expired").modal("show")
+			displaySessionExpiredModal()
 			}
 		});
 	}
@@ -598,7 +607,6 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 															"Properties" : "RecordTypeName, RecordTypeContainerRule, RecordTypeUsualBehaviour, RecordTypeClassification, RecordTypeClassificationMandatory",
 															"TrimType" : "RecordType"
 															}
-													console.log(getRecordTypeProperties())
 													$.ajax(  // return the properties of the record type.
 														{
 														url: url,
@@ -631,7 +639,6 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 																	var recordTypeName = result.Results[x].RecordTypeName.Value
 																	if(result.Results[x].RecordTypeClassificationMandatory.Value)
 																	   {
-																		console.log("THis has been called.")
 																		var recordTypeClassification = result.Results[x].RecordTypeClassification.ClassificationTitle.Value
 
 																		url = baseUrl + apiPath + "/Search";
@@ -907,7 +914,7 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 				}
 			else
 				{
-				$("#session-expired").modal("show")
+				displaySessionExpiredModal()
 				deferredObject.resolve();
 				}
 		})
@@ -917,7 +924,6 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 function getRecordTypeProperties()
 	{
 	var deferredObject = $.Deferred();	
-	console.log("getRecordTypeProperties() has been called.")
 	deferredObject.resolve("Hello World.")
 	return deferredObject.promise();
 	}
@@ -926,7 +932,6 @@ function getRecordTypeProperties()
 
 function helperSelectRecordType(type)
 	{
-	console.log("In the helper.")
 	var deferredObject = $.Deferred();
 	switch(type)
 		{
@@ -934,7 +939,6 @@ function helperSelectRecordType(type)
 			$('select[id=new-folder-form-record-type] option:nth-child(1)').selected = true;			
 			break;
 		case "folder-intermediate":
-			console.log("In the case statement.")
 			$('select[id=new-sub-folder-form-record-type] option:nth-child(1)').selected = true;			
 			break;
 		case "folder-terminal":
@@ -961,8 +965,6 @@ function populateAdditionalFields(parentNodeType)
 				xhrFields: { withCredentials: true},
 				success: function(result)
 					{
-					console.log(result)
-					console.log($("#"+ formName + "-record-type").val())
 					switch(parentNodeType)
 						{
 						case "classification":
@@ -970,7 +972,6 @@ function populateAdditionalFields(parentNodeType)
 							$("#" + formName + " .additional-field").remove()
 							break;
 						case "folder-intermediate":
-							console.log("populateAdditionalFields - folder intermediate, has been called.")
 							var formName = "new-sub-folder-form";
 							$("#" + formName + " .additional-field").remove()
 							break;
@@ -1043,7 +1044,7 @@ function populateAdditionalFields(parentNodeType)
 			}
 		else
 			{
-			$("#session-expired").modal("show")
+			displaySessionExpiredModal()
 			deferredObject.resolve();
 			}
 		});
@@ -1223,7 +1224,7 @@ function getClassificationProperties(classificationUri)
 			}
 		else
 			{
-			$("#session-expired").modal("show")
+			displaySessionExpiredModal()
 			}
 		});
 	}
@@ -1867,7 +1868,7 @@ function getRecordProperties(type, recordUri)
 			}
 		else
 			{
-			$("#session-expired").modal("show")
+			displaySessionExpiredModal()
 			}
 		});
 	}
@@ -1939,7 +1940,7 @@ function createFolder(recordTitle, recordClassificationUri, recordContainerUri, 
 			}
 		else
 			{
-			$("#session-expired").modal("show")
+			displaySessionExpiredModal()
 			}
 		});
 	}
@@ -1986,7 +1987,7 @@ function uploadFile(fileName, extension, file)
 			}
 		else
 			{
-			$("#session-expired").modal("show")
+			displaySessionExpiredModal()
 			}
 		});
 	return deferredObject.promise();
@@ -2033,7 +2034,7 @@ function createRecord(recordTitle, recordType, recordContainerUri, fileName, add
 			}
 		else
 			{
-			$("#session-expired").modal("show")
+			displaySessionExpiredModal()
 			}
 		});
 	}
@@ -2081,7 +2082,7 @@ function attachFileToRecord(recordUri, fileName, recordContainerUri)
 			}
 		else
 			{
-			$("#session-expired").modal("show")
+			displaySessionExpiredModal()
 			}
 		});
 	}
@@ -2157,7 +2158,7 @@ function downloadDocument(recordUri, recordTitle, recordExtension, recordMimeTyp
 			}
 		else
 			{
-			$("#session-expired").modal("show")
+			displaySessionExpiredModal()
 			}
 		});
 	}
