@@ -153,6 +153,7 @@ $(document).on("click", "#search-button", function()
 			//if($("#folders-only").val())
 		
 		$("#search-input").val("")
+		$("#folders-only").prop("checked", true)
 		}
 	})
 

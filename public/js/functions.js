@@ -229,7 +229,6 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 								};
 							}
 						}
-					url = baseUrl + apiPath + "/Search"
 					var result = searchAPI(data)
 						.then(function(result)
 							{
@@ -306,8 +305,8 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 									$(".for-deletion").remove() // remove the <li> once the for loop has completed.
 								}
 								sortClassificationTree(".record-title")
-								$("#" + parentNodeId + " > ul").removeClass("classification-hidden")
-								$("#" + parentNodeId).parents("ul").removeClass("classification-hidden")
+							$("#" + parentNodeId + " > ul").removeClass("classification-hidden")
+
 							})
 						.fail(function(result)
 							{
@@ -1230,7 +1229,7 @@ function getRecordProperties(type, recordUri)
 		{
 		if(isAuthenticated)
 			{
-			//var url = baseUrl + apiPath + "/Search";
+			var url = baseUrl + apiPath + "/Search";
 			var data = 	{
 						"q" : recordUri,
 						"Properties" : "RecordTitle, RecordNumber, Classification, RecordContainer, RecordType, DateRegistered, AccessControl, RecordDestructionDate",
@@ -1810,13 +1809,20 @@ function createFolder(recordTitle, recordClassificationUri, recordContainerUri, 
 					$("#create-folder-caption").html("Folder created successfully.")
 					if(recordClassificationUri != null)
 						{
-						clearForm("new-folder-form")
-						refreshFolderNodes("classification", "classification-uri-" + recordClassificationUri)
+						if($("#classification-uri-" + recordClassificationUri + " > span:nth-child(1)").hasClass("expanded"))
+							{
+							clearForm("new-folder-form")
+							refreshFolderNodes("classification", "classification-uri-" + recordClassificationUri)			
+							}
 						}
 					if(recordContainerUri != null)
 						{
-						clearForm("new-sub-folder-form")
-						refreshFolderNodes("record", "record-uri-" + recordContainerUri)
+						if($("#record-uri-" + recordContainerUri + " > span:nth-child(1)").hasClass("expanded"))
+							{
+							clearForm("new-sub-folder-form")
+							refreshFolderNodes("record", "record-uri-" + recordContainerUri)								
+							}
+
 						}
 					setTimeout(function()
 						{
