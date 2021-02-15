@@ -831,15 +831,6 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 		return deferredObject.promise();
 	}
 
-function getRecordTypeProperties()
-	{
-	var deferredObject = $.Deferred();	
-	deferredObject.resolve("Hello World.")
-	return deferredObject.promise();
-	}
-
-
-
 function helperSelectRecordType(type)
 	{
 	var deferredObject = $.Deferred();
@@ -998,14 +989,14 @@ function drawPropertiesTable(type)
 	switch(type)
 		{
 		case "classification":
-			var tableHTML = '<table class="table table-dark table-sm"><thead><tr><th>Classification Properties</th><th></th></tr></thead><tbody>'
+			var tableHTML = '<table class="table table-dark table-sm"><thead><tr><th colspan="3">Classification Properties</th></tr></thead><tbody>'
 			if(config.PropertiesPane.Classification.Core.ClassificationIdNumber=="true")
 				{
-				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Number</td><td id="properties-classification-number"></td></tr>'
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Number</td><td id="properties-classification-number"></td><td></td></tr>'
 				}
 			if(config.PropertiesPane.Classification.Core.ClassificationTitle=="true")
 				{
-				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Classification Title</td><td id="properties-classification-title"></td></tr>'
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Classification Title</td><td id="properties-classification-title"></td><td></td></tr>'
 				}
 			if(config.PropertiesPane.Classification.Core.ClassificationAccessControl=="true")
 				{
@@ -1013,18 +1004,24 @@ function drawPropertiesTable(type)
 				}
 			break;
 		case "folder-intermediate":
-			var tableHTML = '<table class="table table-dark table-sm"><thead><tr><th>Folder Properties</th><th></th></tr></thead><tbody>'
+			var tableHTML = '<table class="table table-dark table-sm"><thead><tr><th colspan="3">Folder Properties</th></tr></thead><tbody>'
 			if(config.PropertiesPane.IntermediateFolder.Core.RecordNumber=="true")
 				{
-				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Record Number</td><td id="properties-record-number"></td></tr>'
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Record Number</td><td id="properties-record-number"></td><td></td></tr>'
+				}
+			console.log("Value: " + config.PropertiesPane.IntermediateFolder.Core.RecordTitle)
+			if(config.PropertiesPane.IntermediateFolder.Core.RecordTitle=="true")
+				{
+				console.log("This has been called.")
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Record Title</td><td id="properties-record-title"></td><td id="properties-edit-record-title" class="edit-properties-link"><a href="#">Edit</a></td></tr>'
 				}
 			if(config.PropertiesPane.IntermediateFolder.Core.RecordClassification=="true")
 				{
-				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Classification</td><td id="properties-classification"></td></tr>'	
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Classification</td><td id="properties-classification"></td><td></td></tr>'	
 				}
 			if(config.PropertiesPane.IntermediateFolder.Core.RecordRecordType=="true")
 				{
-				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Record Type</td><td id="properties-record-type"></td></tr>'
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Record Type</td><td id="properties-record-type"></td><td></td></tr>'
 				}
 			if(config.PropertiesPane.IntermediateFolder.Core.RecordDateRegistered=="true")
 				{
@@ -1032,53 +1029,61 @@ function drawPropertiesTable(type)
 				}
 			if(config.PropertiesPane.IntermediateFolder.Core.RecordAccessControl=="true")
 				{
-				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Access Control</td><td id="properties-access-control"></td></tr>'	
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Access Control</td><td id="properties-access-control"></td><td></td></tr>'	
 				}
 			if(config.PropertiesPane.IntermediateFolder.Core.RecordDestructionDate=="true")
 				{
-				tableHTML = tableHTML + '<tr><td scope="row" style="width:20%;padding-left:30px;">Date Due for Destruction</td><td id="properties-date-due-for-destruction"></td></tr><tr>'
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:20%;padding-left:30px;">Date Due for Destruction</td><td id="properties-date-due-for-destruction"></td><td></td></tr><tr>'
 				}
 			break;
 		case "folder-terminal":
-			var tableHTML = '<table class="table table-dark table-sm"><thead><tr><th>Folder Properties</th><th></th></tr></thead><tbody>'
+			var tableHTML = '<table class="table table-dark table-sm"><thead><tr><th colspan="3">Folder Properties</th></tr></thead><tbody>'
 			if(config.PropertiesPane.TerminalFolder.Core.RecordNumber=="true")
 				{
-				tableHTML = tableHTML +	'<tr><td scope="row" style="width:25%;padding-left:30px;">Record Number</td><td id="properties-record-number"></td></tr>'
+				tableHTML = tableHTML +	'<tr><td scope="row" style="width:25%;padding-left:30px;">Record Number</td><td id="properties-record-number"></td><td></td></tr>'
 				}
-			if(config.PropertiesPane.TerminalFolder.Core.RecordContainer=="true")
+			if(config.PropertiesPane.TerminalFolder.Core.RecordTitle=="true")
 				{
-				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Container</td><td id="properties-container"></td></tr>'
+				tableHTML = tableHTML +	'<tr><td scope="row" style="width:25%;padding-left:30px;">Record Title</td><td id="properties-record-title"></td><td id="properties-edit-record-title" class="edit-properties-link"><a href="#">Edit</a></td></tr>'
+				}
+		if(config.PropertiesPane.TerminalFolder.Core.RecordContainer=="true")
+				{
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Container</td><td id="properties-container"></td><td></td></tr>'
 				}
 			if(config.PropertiesPane.TerminalFolder.Core.RecordRecordType=="true")
 				{
-				tableHTML = tableHTML +	'<tr><td scope="row" style="width:25%;padding-left:30px;">Record Type</td><td id="properties-record-type"></td></tr>'
+				tableHTML = tableHTML +	'<tr><td scope="row" style="width:25%;padding-left:30px;">Record Type</td><td id="properties-record-type"></td><td></td></tr>'
 				}
 			if(config.PropertiesPane.TerminalFolder.Core.RecordDateRegistered=="true")
 				{
-				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Date Registered</td><td id="properties-date-registered"></td></tr>'
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Date Registered</td><td id="properties-date-registered"></td><td></td></tr>'
 				}
 			if(config.PropertiesPane.TerminalFolder.Core.RecordAccessControl=="true")
 				{
-				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Access Control</td><td id="properties-access-control"></td></tr>'
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Access Control</td><td id="properties-access-control"></td><td></td></tr>'
 				}
 			if(config.PropertiesPane.TerminalFolder.Core.RecordDestructionDate=="true")
 				{
-				tableHTML = tableHTML + '<tr><td scope="row" style="width:20%;padding-left:30px;">Date Due for Destruction</td><td id="properties-date-due-for-destruction"></td></tr><tr>'	
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:20%;padding-left:30px;">Date Due for Destruction</td><td id="properties-date-due-for-destruction"></td><td></td></tr><tr>'	
 				}
 			break;
 		case "document":
-			var tableHTML = '<table class="table table-dark table-sm"><thead><tr><th>Document Properties</th><th></th></tr></thead><tbody>'
+			var tableHTML = '<table class="table table-dark table-sm"><thead><tr><th colspan="3">Document Properties</th></tr></thead><tbody>'
 			if(config.PropertiesPane.Document.Core.RecordNumber=="true")
 				{
-				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Record Number</td><td id="properties-record-number"></td></tr>'
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Record Number</td><td id="properties-record-number"></td><td></td></tr>'
+				}
+			if(config.PropertiesPane.Document.Core.RecordTitle=="true")
+				{
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Record Title</td><td id="properties-record-title"></td><td id="properties-edit-record-title" class="edit-properties-link"><a href="#">Edit</a></td></tr>'
 				}
 			if(config.PropertiesPane.Document.Core.RecordContainer=="true")
 				{
-				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Container</td><td id="properties-container"></td></tr>'		
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Container</td><td id="properties-container"></td><td></td></tr>'		
 				}
 			if(config.PropertiesPane.Document.Core.RecordRecordType=="true")
 				{
-				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Record Type</td><td id="properties-record-type"></td></tr>'
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Record Type</td><td id="properties-record-type"></td><td></td></tr>'
 				}
 			if(config.PropertiesPane.Document.Core.RecordDateRegistered=="true")
 				{
@@ -1086,11 +1091,11 @@ function drawPropertiesTable(type)
 				}
 			if(config.PropertiesPane.Document.Core.RecordAccessControl=="true")
 				{
-				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Access Control</td><td id="properties-access-control"></td></tr>'	
+				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Access Control</td><td id="properties-access-control"></td><td></td></tr>'	
 				}
 			if(config.PropertiesPane.Document.Core.RecordDestructionDate=="true")
 				{
-				tableHTML = tableHTML +	'<tr><td scope="row" style="width:20%;padding-left:30px;">Date Due for Destruction</td><td id="properties-date-due-for-destruction"></td></tr><tr>'
+				tableHTML = tableHTML +	'<tr><td scope="row" style="width:20%;padding-left:30px;">Date Due for Destruction</td><td id="properties-date-due-for-destruction"></td><td></td></tr><tr>'
 				}
 			break;
 		}
@@ -1261,6 +1266,9 @@ function getRecordProperties(type, recordUri)
 						{
 						case "folder-intermediate":
 							$("#properties-record-number").html(result.Results[0].RecordNumber.Value)
+							$("#properties-record-title").html(result.Results[0].RecordTitle.Value)
+							$("#properties-record-title").data("record-uri", result.Results[0].Uri)
+							$("#properties-record-title").data("record-record-type", result.Results[0].RecordRecordType.RecordTypeName.Value)
 							$("#properties-classification").html(result.Results[0].RecordClassification.ClassificationTitle.Value)
 							$("#properties-record-type").html(result.Results[0].RecordRecordType.RecordTypeName.Value)
 							$("#properties-date-registered").html(dateRegistered)
@@ -1305,7 +1313,7 @@ function getRecordProperties(type, recordUri)
 
 															additionalPropertyHTML = additionalPropertyHTML + result.Results[i].FieldDefinitionName.Value
 
-															additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td></tr><tr>'
+															additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td><td></td></tr>'
 
 															$("#properties-pane > table > tbody").append(additionalPropertyHTML)
 															break;
@@ -1322,7 +1330,7 @@ function getRecordProperties(type, recordUri)
 
 															additionalPropertyHTML = additionalPropertyHTML + result.Results[i].FieldDefinitionName.Value
 
-															additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td></tr><tr>'
+															additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td><td></td></tr>'
 
 															$("#properties-pane > table > tbody").append(additionalPropertyHTML)
 															break;
@@ -1421,6 +1429,9 @@ function getRecordProperties(type, recordUri)
 							break;
 						case "folder-terminal":
 							$("#properties-record-number").html(result.Results[0].RecordNumber.Value)
+							$("#properties-record-title").html(result.Results[0].RecordTitle.Value)
+							$("#properties-record-title").data("record-uri", result.Results[0].Uri)
+							$("#properties-record-title").data("record-record-type", result.Results[0].RecordRecordType.RecordTypeName.Value)
 							$("#properties-container").html(result.Results[0].RecordContainer.RecordNumber.Value + ": " + result.Results[0].RecordContainer.RecordTitle.Value)
 							$("#properties-record-type").html(result.Results[0].RecordRecordType.RecordTypeName.Value)
 							$("#properties-date-registered").html(dateRegistered)
@@ -1473,7 +1484,7 @@ function getRecordProperties(type, recordUri)
 
 															additionalPropertyHTML = additionalPropertyHTML + result.Results[i].FieldDefinitionName.Value
 
-															additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td></tr><tr>'
+															additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td><td></td></tr>'
 
 															$("#properties-pane > table > tbody").append(additionalPropertyHTML)
 															break;
@@ -1490,7 +1501,7 @@ function getRecordProperties(type, recordUri)
 
 															additionalPropertyHTML = additionalPropertyHTML + result.Results[i].FieldDefinitionName.Value
 
-															additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td></tr><tr>'
+															additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td><td></td></tr>'
 
 															$("#properties-pane > table > tbody").append(additionalPropertyHTML)
 															break;
@@ -1596,6 +1607,9 @@ function getRecordProperties(type, recordUri)
 							break;
 						case "document":
 							$("#properties-record-number").html(result.Results[0].RecordNumber.Value)
+							$("#properties-record-title").html(result.Results[0].RecordTitle.Value)
+							$("#properties-record-title").data("record-uri", result.Results[0].Uri)
+							$("#properties-record-title").data("record-record-type", result.Results[0].RecordRecordType.RecordTypeName.Value)
 							$("#properties-container").html(result.Results[0].RecordContainer.RecordNumber.Value + ": " + result.Results[0].RecordContainer.RecordTitle.Value)
 							$("#properties-record-type").html(result.Results[0].RecordRecordType.RecordTypeName.Value)
 							$("#properties-date-registered").html(dateRegistered)
@@ -1648,7 +1662,7 @@ function getRecordProperties(type, recordUri)
 
 															additionalPropertyHTML = additionalPropertyHTML + result.Results[i].FieldDefinitionName.Value
 
-															additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td></tr><tr>'
+															additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td></tr><td></td></tr>'
 
 															$("#properties-pane > table > tbody").append(additionalPropertyHTML)
 															break;
@@ -1665,7 +1679,7 @@ function getRecordProperties(type, recordUri)
 
 															additionalPropertyHTML = additionalPropertyHTML + result.Results[i].FieldDefinitionName.Value
 
-															additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td></tr><tr>'
+															additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td><td></td></tr>'
 
 															$("#properties-pane > table > tbody").append(additionalPropertyHTML)
 															break;
@@ -1774,6 +1788,19 @@ function getRecordProperties(type, recordUri)
 			}
 		});
 	}
+
+function showEditPropertiesError(trimError)
+	{
+	$("#edit-properties-caption").html(trimError)
+	$("#edit-properties-ok-button").css("display", "block")
+	$("#edit-properties-error").modal("show")
+	}
+
+function dismissEditPropertiesError()
+	{
+	$("#edit-properties-error").modal("show")
+	}
+
 
 // END PROPERTIES PANEL //
 

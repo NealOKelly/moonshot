@@ -61,6 +61,7 @@
 		"Core" :
 			{
 			"RecordNumber" : "true",
+			"RecordTitle" : "true",
 			"RecordClassification" : "false",
 			"RecordRecordType" : "true",
 			"RecordDateRegistered" : "false",
@@ -74,6 +75,7 @@
 		"Core" :
 			{
 			"RecordNumber" : "true",
+			"RecordTitle" : "true",	
 			"RecordContainer" : "true",
 			"RecordRecordType" : "true",
 			"RecordDateRegistered" : "true",
@@ -87,6 +89,7 @@
 		"Core" :
 			{
 			"RecordNumber" : "false",
+			"RecordTitle" : "true",
 			"RecordContainer" : "true",
 			"RecordRecordType" : "true",
 			"RecordDateRegistered" : "false",

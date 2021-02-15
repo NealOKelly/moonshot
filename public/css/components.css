@@ -480,4 +480,17 @@ th.sorted-up::after{
 	border-color: white;
 }
 
+.properties-edit-record-title{
+
+}
    
+.edit-properties-link{
+	text-align: right !important;
+	padding-right: 30px !important;
+	width: 10%;
+}
+
+.edit-properties-link>a{
+	color: #FFF;
+	text-decoration: underline;
+}

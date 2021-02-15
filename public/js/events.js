@@ -45,6 +45,103 @@ $(document).ready(function()
 
 
 //////// Handle User-Initiated Events  /////////
+
+$(document).on("click", ".edit-properties-link", function()
+	{
+	console.log($(event.target).parent().attr("id"))
+	var editableCellId = $("#" + $(event.target).parent().attr("id")).parent().find("td:nth-child(2)").attr("id")
+	var linkElement = event.target
+	switch($(event.target).html())
+		{
+		case "Edit":
+			
+			$("#" + editableCellId).parent().find("td:nth-child(3)").addClass("editing")
+			$("#" + editableCellId).html('<form><input id="editRecordPropertiesInput" type="text" style="width:100%;" value="' + $("#" + editableCellId).html().replace('"', '&quot;') + '"></form>')
+			//alert($("#" + editableCellId).data("record-uri"))
+			$(".edit-properties-link:not(.editing) > a").css("display", "none")
+			$(linkElement).html("Save")
+			if($("#record-uri-" + $("#" + editableCellId).data("record-uri")).hasClass("folder-intermediate"))
+				{
+				$("#new-sub-folder-form-container").hide()
+				}
+			if($("#record-uri-" + $("#" + editableCellId).data("record-uri")).hasClass("folder-terminal"))
+				{
+				$("#upload-form-container").hide()
+				}	
+			if($("#record-uri-" + $("#" + editableCellId).data("record-uri")).hasClass("record-row"))
+				{
+				$("#upload-form-container").hide()
+				}
+			break;
+		case "Save":
+
+			var url = baseUrl + apiPath + "/Record";
+			var data = 	{
+						"Uri" : $("#" + editableCellId).data("record-uri"),
+						"RecordTitle" : $("#editRecordPropertiesInput").val(),
+						"RecordRecordType" : $("#" + editableCellId).data("record-record-type")
+						}
+			$.ajax(
+				{
+				url: url,
+				data: JSON.stringify(data),
+				type: "POST",
+				contentType: 'application/json',
+				xhrFields: { withCredentials: true},
+				success: function(result)
+					{
+					var data = 	{
+								"q" : $("#" + editableCellId).data("record-uri"),
+								"Properties" : "RecordTitle, RecordNumber",
+								"TrimType" : "Record"
+								}
+					var result = searchAPI(data)
+						.then(function(result)
+							{
+							console.log("Passed")
+							$("#" + editableCellId).html(result.Results[0].RecordTitle.Value)
+							
+							$(".edit-properties-link:not(.editing) > a").css("display", "block")
+							console.log("Uri: " + $("#" + editableCellId).data("record-uri"))
+							$("#record-uri-" + $("#" + editableCellId).data("record-uri") + " >span:nth-child(3)>a").html(result.Results[0].RecordTitle.Value)
+							$("#record-uri-" + $("#" + editableCellId).data("record-uri") + " >td:nth-child(3)").html(result.Results[0].RecordTitle.Value)
+							sortClassificationTree(".record-title")							
+							$(linkElement).html("Edit")
+							if($("#record-uri-" + $("#" + editableCellId).data("record-uri")).hasClass("folder-intermediate"))
+								{
+								$("#new-sub-folder-form-record-container").val(result.Results[0].RecordNumber.Value + ": " + result.Results[0].RecordTitle.Value)
+								$("#new-sub-folder-form-container").show()
+								}
+							if($("#record-uri-" + $("#" + editableCellId).data("record-uri")).hasClass("folder-terminal"))
+								{
+								$("#upload-form-record-container").val(result.Results[0].RecordNumber.Value + ": " + result.Results[0].RecordTitle.Value)
+								$("#upload-form-container").show()
+								}
+							if($("#record-uri-" + $("#" + editableCellId).data("record-uri")).hasClass("record-row"))
+								{
+								$("#upload-form-container").show()
+								}
+							})
+						.fail(function(result)
+							{
+							console.log("Failed!!!")
+							})
+						
+					}, 
+				error: function(result)
+					{
+					console.log("Oooops!")
+					console.log(result.responseJSON.ResponseStatus.Message)
+					showEditPropertiesError(result.responseJSON.ResponseStatus.Message)
+					}
+				});
+
+			break;
+		}
+	})
+
+
+
 $(document).on("click", "#all-files>span>a", function()
 	{
 	hideNewRecordForms()
