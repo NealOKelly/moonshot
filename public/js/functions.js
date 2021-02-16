@@ -72,7 +72,8 @@ function displaySessionExpiredModal()
 	$("#connection-failed").modal("hide")
 	$("#create-folder-status").modal("hide")
 	$("#upload-form-container").modal("hide")
-	$("#session-expired").modal("show")		
+	$("#edit-properties-error").modal("hide")
+	$("#session-expired").modal("show")
 	}
 
 function removeAppSessionCookies()
