@@ -1012,7 +1012,7 @@ function drawPropertiesTable(type)
 			console.log("Value: " + config.PropertiesPane.IntermediateFolder.Core.RecordTitle)
 			if(config.PropertiesPane.IntermediateFolder.Core.RecordTitle=="true")
 				{
-				console.log("This has been called.")
+				//console.log("This has been called.")
 				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Record Title</td><td id="properties-record-title"></td><td id="properties-edit-record-title" class="edit-properties-link"><a href="#">Edit</a></td></tr>'
 				}
 			if(config.PropertiesPane.IntermediateFolder.Core.RecordClassification=="true")
@@ -1285,6 +1285,7 @@ function getRecordProperties(type, recordUri)
 							if(config.PropertiesPane.IntermediateFolder.AdditionalFields=="true")
 								{
 								var recordUri = result.Results[0].Uri
+								var recordTitle = result.Results[0].RecordTitle.Value
 								var recordType = result.Results[0].RecordRecordType.RecordTypeName.Value
 								var url = baseUrl + apiPath + "/Search"
 								var data = 	{
@@ -1307,15 +1308,25 @@ function getRecordProperties(type, recordUri)
 													switch(fieldFormat)
 														{
 														case "String":
+															
 															var additionalFieldId = "properties-additional-fields-" + result.Results[i].FieldDefinitionSearchClause.Value;
 												
 															var additionalPropertyHTML = '<tr><td scope="row" style="width:20%;text-align:left;padding-left:30px;">'
 
 															additionalPropertyHTML = additionalPropertyHTML + result.Results[i].FieldDefinitionName.Value
 
-															additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td><td></td></tr>'
+															additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td>'
+																
+															additionalPropertyHTML = additionalPropertyHTML + '<td  id="properties-edit-additional-field-' + result.Results[i].FieldDefinitionSearchClause.Value + '" class="edit-properties-link"><a href="#">Edit</a></td></tr>'
 
 															$("#properties-pane > table > tbody").append(additionalPropertyHTML)
+																
+															$("#" + additionalFieldId).data("record-title", recordTitle)
+															$("#" + additionalFieldId).data("record-record-type", recordType)
+															$("#" + additionalFieldId).data("record-uri", recordUri)
+															$("#" + additionalFieldId).data("field-name", result.Results[i].FieldDefinitionSearchClause.Value)
+															$("#" + additionalFieldId).data("field-length", result.Results[i].FieldDefinitionLength.Value)
+																
 															break;
 														case "Number":
 															console.log("Number inputs are not yet supported.")
@@ -1478,15 +1489,25 @@ function getRecordProperties(type, recordUri)
 													switch(fieldFormat)
 														{
 														case "String":
+																
 															var additionalFieldId = "properties-additional-fields-" + result.Results[i].FieldDefinitionSearchClause.Value;
 												
 															var additionalPropertyHTML = '<tr><td scope="row" style="width:20%;text-align:left;padding-left:30px;">'
 
 															additionalPropertyHTML = additionalPropertyHTML + result.Results[i].FieldDefinitionName.Value
 
-															additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td><td></td></tr>'
+															additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td>'
+																
+															additionalPropertyHTML = additionalPropertyHTML + '<td  id="properties-edit-additional-field-' + result.Results[i].FieldDefinitionSearchClause.Value + '" class="edit-properties-link"><a href="#">Edit</a></td></tr>'
 
 															$("#properties-pane > table > tbody").append(additionalPropertyHTML)
+																
+															$("#" + additionalFieldId).data("record-title", recordTitle)
+															$("#" + additionalFieldId).data("record-record-type", recordType)
+															$("#" + additionalFieldId).data("record-uri", recordUri)
+															$("#" + additionalFieldId).data("field-name", result.Results[i].FieldDefinitionSearchClause.Value)
+															$("#" + additionalFieldId).data("field-length", result.Results[i].FieldDefinitionLength.Value)
+																
 															break;
 														case "Number":
 															console.log("Number inputs are not yet supported.")
@@ -1656,15 +1677,25 @@ function getRecordProperties(type, recordUri)
 													switch(fieldFormat)
 														{
 														case "String":
+																
 															var additionalFieldId = "properties-additional-fields-" + result.Results[i].FieldDefinitionSearchClause.Value;
 												
 															var additionalPropertyHTML = '<tr><td scope="row" style="width:20%;text-align:left;padding-left:30px;">'
 
 															additionalPropertyHTML = additionalPropertyHTML + result.Results[i].FieldDefinitionName.Value
 
-															additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td></tr><td></td></tr>'
+															additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td>'
+																
+															additionalPropertyHTML = additionalPropertyHTML + '<td  id="properties-edit-additional-field-' + result.Results[i].FieldDefinitionSearchClause.Value + '" class="edit-properties-link"><a href="#">Edit</a></td></tr>'
 
 															$("#properties-pane > table > tbody").append(additionalPropertyHTML)
+																
+															$("#" + additionalFieldId).data("record-title", recordTitle)
+															$("#" + additionalFieldId).data("record-record-type", recordType)
+															$("#" + additionalFieldId).data("record-uri", recordUri)
+															$("#" + additionalFieldId).data("field-name", result.Results[i].FieldDefinitionSearchClause.Value)
+															$("#" + additionalFieldId).data("field-length", result.Results[i].FieldDefinitionLength.Value)
+																
 															break;
 														case "Number":
 															console.log("Number inputs are not yet supported.")
@@ -1814,14 +1845,7 @@ function dismissEditPropertiesError()
 		$("#upload-form-record-title").val("")
 		$("#upload-form-container").show()
 		}
-	if($(".editing").parent().find("td:nth-child(2)").data("record-type")=="document")
-		{
-		$("#upload-form-file").remove()
-		$("#upload-form-file-label").remove()
-		$("#upload-form-file-container").append('<input id="upload-form-file" name="upload" type="file" class="custom-file-input" id="validatedCustomFile"><label id="upload-form-file-label" class="custom-file-label" for="upload-form-file">Choose file...</label>')
-		$("#upload-form-record-title").val("")
-		$("#upload-form-container").show()
-		}		
+	$(".edit-properties-link > a").css("display", "block")
 	}
 
 
@@ -1870,6 +1894,16 @@ function createFolder(recordTitle, recordClassificationUri, recordContainerUri, 
 						if($("#record-uri-" + recordContainerUri + " > span:nth-child(1)").hasClass("expanded"))
 							{
 							refreshFolderNodes("record", "record-uri-" + recordContainerUri)								
+							}
+							
+						if($("#level-0-search-result-type-uri-" + recordContainerUri).length)
+							{
+							$("#level-0-search-result-type-uri-" + recordContainerUri).parent().find("ul").remove()
+							$("#level-0-search-result-recordNumber-uri-" + recordContainerUri).parent().find("ul").remove()
+							$("#level-0-search-result-recordTitle-uri-" + recordContainerUri).parent().find("ul").remove()
+							$("#level-0-search-result-recordType-uri-" + recordContainerUri).parent().find("ul").remove()
+							$("#level-0-search-result-download-uri-" + recordContainerUri).parent().find("ul").remove()
+							expandCollapsedSearchResult(recordContainerUri, parseInt("0"))	
 							}
 						clearForm("new-sub-folder-form")
 						}
@@ -2024,6 +2058,29 @@ function attachFileToRecord(recordUri, fileName, recordContainerUri)
 					getRecords(recordContainerUri)
 					$("#upload-progress-bar").css("width", "100%")
 					$("#upload-status-caption").html("Upload completed successfully.")
+						
+					// Clear search results under folder.
+					//recordContainerUri
+					console.log("recordContainerUri: " + recordContainerUri)
+					if($("#level-0-search-result-type-uri-" + recordContainerUri).length)
+						{
+						$("#level-0-search-result-type-uri-" + recordContainerUri).parent().find("ul").remove()
+						$("#level-0-search-result-recordNumber-uri-" + recordContainerUri).parent().find("ul").remove()
+						$("#level-0-search-result-recordTitle-uri-" + recordContainerUri).parent().find("ul").remove()
+						$("#level-0-search-result-recordType-uri-" + recordContainerUri).parent().find("ul").remove()
+						$("#level-0-search-result-download-uri-" + recordContainerUri).parent().find("ul").remove()
+						expandCollapsedSearchResult(recordContainerUri, parseInt("0"))	
+						}
+					
+					if($("#level-1-search-result-type-uri-" + recordContainerUri).length)
+						{
+						$("#level-1-search-result-type-uri-" + recordContainerUri).parent().find("ul").remove()
+						$("#level-1-search-result-recordNumber-uri-" + recordContainerUri).parent().find("ul").remove()
+						$("#level-1-search-result-recordTitle-uri-" + recordContainerUri).parent().find("ul").remove()
+						$("#level-1-search-result-recordType-uri-" + recordContainerUri).parent().find("ul").remove()
+						$("#level-1-search-result-download-uri-" + recordContainerUri).parent().find("ul").remove()
+						expandCollapsedSearchResult(recordContainerUri, parseInt("1"))
+						}
 					setTimeout(function()
 						{
 						$("#upload-status").modal("hide")

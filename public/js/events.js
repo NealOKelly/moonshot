@@ -50,6 +50,7 @@ $(document).on("click", ".edit-properties-link", function()
 	{
 	var linkElement = event.target
 	var editableCellId = $("#" + $(linkElement).parent().attr("id")).parent().find("td:nth-child(2)").attr("id")
+	console.log("editableCellId: " + editableCellId)
 	switch($(event.target).html())
 		{
 		case "Edit":
@@ -66,7 +67,6 @@ $(document).on("click", ".edit-properties-link", function()
 				}	
 			if($("#record-uri-" + $("#" + editableCellId).data("record-uri")).hasClass("record-row"))
 				{
-				console.log("It's a document.")
 				$("#" + editableCellId).data("record-type", "document")
 				$("#upload-form-container").hide()
 				}
@@ -80,29 +80,64 @@ $(document).on("click", ".edit-properties-link", function()
 				$("#" + editableCellId).data("record-type", "folder-terminal")
 				$("#upload-form-container").hide()					
 				}
+			if($("#level-0-search-result-recordNumber-uri-" + $("#" + editableCellId).data("record-uri")).hasClass("document"))
+				{
+				$("#" + editableCellId).data("record-type", "document")
+				$("#upload-form-container").hide()					
+				}
 			if($("#level-1-search-result-recordNumber-uri-" + $("#" + editableCellId).data("record-uri")).hasClass("folder-terminal"))
 				{
 				$("#" + editableCellId).data("record-type", "folder-terminal")
 				$("#upload-form-container").hide()					
-				}				
+				}	
+			if($("#level-2-search-result-recordNumber-uri-" + $("#" + editableCellId).data("record-uri")).hasClass("document"))
+				{
+				$("#" + editableCellId).data("record-type", "document")
+				$("#upload-form-container").hide()					
+				}
 				
 			$("#" + editableCellId).parent().find("td:nth-child(3)").addClass("editing")
 			// capture original value to be used to reset the table in an error scenario.
 			$("#" + editableCellId).data("original-value", $("#" + editableCellId).html())
 			// create the input box
-			$("#" + editableCellId).html('<form autocomplete="off"><input id="editRecordPropertiesInput" type="text" style="width:100%;" value="' + $("#" + editableCellId).html().replace('"', '&quot;') + '"></form>')
+				
+			
+			if(editableCellId.includes("properties-additional-fields"))
+				{
+				$("#" + editableCellId).html('<form autocomplete="off"><input id="editRecordPropertiesInput" type="text" style="width:100%;" value="' + $("#" + editableCellId).html().replace('"', '&quot;') + '" maxlength="' + $("#" + editableCellId).data("field-length") + '"></form>')
+				}
+			else // it's a record title
+				{
+				$("#" + editableCellId).html('<form autocomplete="off"><input id="editRecordPropertiesInput" type="text" style="width:100%;" value="' + $("#" + editableCellId).html().replace('"', '&quot;') + '"></form>')
+				}
+
 			// hide all other Edit links
 			$(".edit-properties-link:not(.editing) > a").css("display", "none")
 			$(linkElement).html("Save")
 			break;
 		case "Save":
-
 			var url = baseUrl + apiPath + "/Record";
-			var data = 	{
-						"Uri" : $("#" + editableCellId).data("record-uri"),
-						"RecordTitle" : $("#editRecordPropertiesInput").val(),
-						"RecordRecordType" : $("#" + editableCellId).data("record-record-type")
-						}
+			if(editableCellId.includes("properties-additional-fields"))
+				{
+				console.log("Saving Additional Field")
+				var data = 	{
+							"Uri" : $("#" + editableCellId).data("record-uri"),
+							"RecordTitle" : $("#" + editableCellId).data("record-title"),
+							"RecordRecordType" : $("#" + editableCellId).data("record-record-type"),
+							"AdditionalFields" : {}	 
+							}
+				data.AdditionalFields[$("#" + editableCellId).data("field-name")] = $("#editRecordPropertiesInput").val()
+				console.log(data)
+				}
+			else
+				{
+				console.log("Saving Record Title")
+				var data = 	{
+							"Uri" : $("#" + editableCellId).data("record-uri"),
+							"RecordTitle" : $("#editRecordPropertiesInput").val(),
+							"RecordRecordType" : $("#" + editableCellId).data("record-record-type")
+							}					
+				}
 			$.ajax(
 				{
 				url: url,
@@ -120,7 +155,7 @@ $(document).on("click", ".edit-properties-link", function()
 					var result = searchAPI(data)
 						.then(function(result)
 							{
-							$("#" + editableCellId).html(result.Results[0].RecordTitle.Value)
+							$("#" + editableCellId).html($("#editRecordPropertiesInput").val())
 							$(".edit-properties-link:not(.editing) > a").css("display", "block")
 							
 							// update the classification tree with the new title.
@@ -345,10 +380,8 @@ $('#search-input').keydown(function (e){
     }
 })
 
-$(document).on("click", ".search-result-caret-collapsed", function()
+function expandCollapsedSearchResult(recordUri, level)
 	{
-	var recordUri = $(event.target).parent().attr("id").substr(31)
-	var level = parseInt($(event.target).parent().attr("id").substr(6, 1), 10)
 	var newTypeNodeId;
 	var newRecordNumberNodeId;
 	var newRecordTitleNodeId;
@@ -564,6 +597,15 @@ $(document).on("click", ".search-result-caret-collapsed", function()
 			$("#session-expired").modal("show")
 			}
 		});
+	}
+
+
+
+$(document).on("click", ".search-result-caret-collapsed", function()
+	{
+	var recordUri = $(event.target).parent().attr("id").substr(31)
+	var level = parseInt($(event.target).parent().attr("id").substr(6, 1), 10)
+	expandCollapsedSearchResult(recordUri, level)
 	})
 
 $(document).on("click", "#search-results li", function()
