@@ -48,30 +48,52 @@ $(document).ready(function()
 
 $(document).on("click", ".edit-properties-link", function()
 	{
-	console.log($(event.target).parent().attr("id"))
-	var editableCellId = $("#" + $(event.target).parent().attr("id")).parent().find("td:nth-child(2)").attr("id")
 	var linkElement = event.target
+	var editableCellId = $("#" + $(linkElement).parent().attr("id")).parent().find("td:nth-child(2)").attr("id")
 	switch($(event.target).html())
 		{
 		case "Edit":
-			
-			$("#" + editableCellId).parent().find("td:nth-child(3)").addClass("editing")
-			$("#" + editableCellId).html('<form><input id="editRecordPropertiesInput" type="text" style="width:100%;" value="' + $("#" + editableCellId).html().replace('"', '&quot;') + '"></form>')
-			//alert($("#" + editableCellId).data("record-uri"))
-			$(".edit-properties-link:not(.editing) > a").css("display", "none")
-			$(linkElement).html("Save")
+			// hide form on action panel
 			if($("#record-uri-" + $("#" + editableCellId).data("record-uri")).hasClass("folder-intermediate"))
 				{
+				$("#" + editableCellId).data("record-type", "folder-intermediate")
 				$("#new-sub-folder-form-container").hide()
 				}
 			if($("#record-uri-" + $("#" + editableCellId).data("record-uri")).hasClass("folder-terminal"))
 				{
+				$("#" + editableCellId).data("record-type", "folder-terminal")
 				$("#upload-form-container").hide()
 				}	
 			if($("#record-uri-" + $("#" + editableCellId).data("record-uri")).hasClass("record-row"))
 				{
+				console.log("It's a document.")
+				$("#" + editableCellId).data("record-type", "document")
 				$("#upload-form-container").hide()
 				}
+			if($("#level-0-search-result-recordNumber-uri-" + $("#" + editableCellId).data("record-uri")).hasClass("folder-intermediate"))	
+				{
+				$("#" + editableCellId).data("record-type", "folder-intermediate")
+				$("#new-sub-folder-form-container").hide()					
+				}
+			if($("#level-0-search-result-recordNumber-uri-" + $("#" + editableCellId).data("record-uri")).hasClass("folder-terminal"))
+				{
+				$("#" + editableCellId).data("record-type", "folder-terminal")
+				$("#upload-form-container").hide()					
+				}
+			if($("#level-1-search-result-recordNumber-uri-" + $("#" + editableCellId).data("record-uri")).hasClass("folder-terminal"))
+				{
+				$("#" + editableCellId).data("record-type", "folder-terminal")
+				$("#upload-form-container").hide()					
+				}				
+				
+			$("#" + editableCellId).parent().find("td:nth-child(3)").addClass("editing")
+			// capture original value to be used to reset the table in an error scenario.
+			$("#" + editableCellId).data("original-value", $("#" + editableCellId).html())
+			// create the input box
+			$("#" + editableCellId).html('<form autocomplete="off"><input id="editRecordPropertiesInput" type="text" style="width:100%;" value="' + $("#" + editableCellId).html().replace('"', '&quot;') + '"></form>')
+			// hide all other Edit links
+			$(".edit-properties-link:not(.editing) > a").css("display", "none")
+			$(linkElement).html("Save")
 			break;
 		case "Save":
 
@@ -87,7 +109,7 @@ $(document).on("click", ".edit-properties-link", function()
 				data: JSON.stringify(data),
 				type: "POST",
 				contentType: 'application/json',
-				xhrFields: { withCredentials: true},
+				xhrFields: { withCredentials: true },
 				success: function(result)
 					{
 					var data = 	{
@@ -98,49 +120,110 @@ $(document).on("click", ".edit-properties-link", function()
 					var result = searchAPI(data)
 						.then(function(result)
 							{
-							console.log("Passed")
 							$("#" + editableCellId).html(result.Results[0].RecordTitle.Value)
-							
 							$(".edit-properties-link:not(.editing) > a").css("display", "block")
-							console.log("Uri: " + $("#" + editableCellId).data("record-uri"))
+							
+							// update the classification tree with the new title.
 							$("#record-uri-" + $("#" + editableCellId).data("record-uri") + " >span:nth-child(3)>a").html(result.Results[0].RecordTitle.Value)
+							sortClassificationTree(".record-title")
+							// update the records list pane
 							$("#record-uri-" + $("#" + editableCellId).data("record-uri") + " >td:nth-child(3)").html(result.Results[0].RecordTitle.Value)
-							sortClassificationTree(".record-title")							
-							$(linkElement).html("Edit")
+							
+							// update the search results pane
+							$('[id*="search-result-recordTitle-uri-' + $("#" + editableCellId).data("record-uri") + '"]').html(result.Results[0].RecordTitle.Value)
+							
+							
+							// change save link back to edit link
+							$(linkElement).html("Edit")							
+							$("#" + editableCellId).parent().find("td:nth-child(3)").removeClass("editing")
+							
+							// show hidden edit links
+							$(".edit-properties-link > a").css("display", "block")
+							
+							// show the form on the action panel
 							if($("#record-uri-" + $("#" + editableCellId).data("record-uri")).hasClass("folder-intermediate"))
 								{
+								$("#new-sub-folder-form-record-title").val("")
 								$("#new-sub-folder-form-record-container").val(result.Results[0].RecordNumber.Value + ": " + result.Results[0].RecordTitle.Value)
 								$("#new-sub-folder-form-container").show()
 								}
 							if($("#record-uri-" + $("#" + editableCellId).data("record-uri")).hasClass("folder-terminal"))
 								{
+								// remove and re-add file upload input control in order to clear it.
+								$("#upload-form-file").remove()
+								$("#upload-form-file-label").remove()
+								$("#upload-form-file-container").append('<input id="upload-form-file" name="upload" type="file" class="custom-file-input" id="validatedCustomFile"><label id="upload-form-file-label" class="custom-file-label" for="upload-form-file">Choose file...</label>')
+								// clear record title field
+								$("#upload-form-record-title").val("")
+								// update container field with new container title.
 								$("#upload-form-record-container").val(result.Results[0].RecordNumber.Value + ": " + result.Results[0].RecordTitle.Value)
+								// show upload form
 								$("#upload-form-container").show()
 								}
 							if($("#record-uri-" + $("#" + editableCellId).data("record-uri")).hasClass("record-row"))
 								{
+								// remove and re-add file upload input control in order to clear it.
+								$("#upload-form-file").remove()
+								$("#upload-form-file-label").remove()
+								$("#upload-form-file-container").append('<input id="upload-form-file" name="upload" type="file" class="custom-file-input" id="validatedCustomFile"><label id="upload-form-file-label" class="custom-file-label" for="upload-form-file">Choose file...</label>')
+								// clear record title field
+								$("#upload-form-record-title").val("")
+								// update container field with new container title.
+								$("#upload-form-record-container").val(result.Results[0].RecordNumber.Value + ": " + result.Results[0].RecordTitle.Value)
+								// show upload form
 								$("#upload-form-container").show()
+								}
+							if($("#level-0-search-result-recordNumber-uri-" + $("#" + editableCellId).data("record-uri")).hasClass("folder-intermediate"))
+								{
+								$("#new-sub-folder-form-record-title").val("")
+								$("#new-sub-folder-form-record-container").val(result.Results[0].RecordNumber.Value + ": " + result.Results[0].RecordTitle.Value)
+								$("#new-sub-folder-form-container").show()									
+								}
+							if($("#level-0-search-result-recordNumber-uri-" + $("#" + editableCellId).data("record-uri")).hasClass("folder-terminal"))
+								{
+								// remove and re-add file upload input control in order to clear it.
+								$("#upload-form-file").remove()
+								$("#upload-form-file-label").remove()
+								$("#upload-form-file-container").append('<input id="upload-form-file" name="upload" type="file" class="custom-file-input" id="validatedCustomFile"><label id="upload-form-file-label" class="custom-file-label" for="upload-form-file">Choose file...</label>')
+								// clear record title field
+								$("#upload-form-record-title").val("")
+								// update container field with new container title.
+								$("#upload-form-record-container").val(result.Results[0].RecordNumber.Value + ": " + result.Results[0].RecordTitle.Value)
+								// show upload form
+								$("#upload-form-container").show()									
+								}
+							if($("#level-1-search-result-recordNumber-uri-" + $("#" + editableCellId).data("record-uri")).hasClass("folder-terminal"))
+								{
+								// remove and re-add file upload input control in order to clear it.
+								$("#upload-form-file").remove()
+								$("#upload-form-file-label").remove()
+								$("#upload-form-file-container").append('<input id="upload-form-file" name="upload" type="file" class="custom-file-input" id="validatedCustomFile"><label id="upload-form-file-label" class="custom-file-label" for="upload-form-file">Choose file...</label>')
+								// clear record title field
+								$("#upload-form-record-title").val("")
+								// update container field with new container title.
+								$("#upload-form-record-container").val(result.Results[0].RecordNumber.Value + ": " + result.Results[0].RecordTitle.Value)
+								// show upload form
+								$("#upload-form-container").show()									
 								}
 							})
 						.fail(function(result)
 							{
-							console.log("Failed!!!")
+							// do something
 							})
-						
 					}, 
 				error: function(result)
 					{
-					console.log("Oooops!")
-					console.log(result.responseJSON.ResponseStatus.Message)
 					showEditPropertiesError(result.responseJSON.ResponseStatus.Message)
 					}
 				});
-
 			break;
 		}
 	})
 
-
+$(document).on("click", "#edit-properties-error-ok-button", function()
+	{
+	dismissEditPropertiesError()
+	})
 
 $(document).on("click", "#all-files>span>a", function()
 	{

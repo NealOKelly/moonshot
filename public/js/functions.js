@@ -1798,7 +1798,30 @@ function showEditPropertiesError(trimError)
 
 function dismissEditPropertiesError()
 	{
-	$("#edit-properties-error").modal("show")
+	$("#edit-properties-error").modal("hide")
+	$(".editing").parent().find("td:nth-child(2)").html($(".editing").parent().find("td:nth-child(2)").data("original-value"))
+	$(".editing").parent().find("td:nth-child(3)").html('<a href="#">Edit</a>')
+	if($(".editing").parent().find("td:nth-child(2)").data("record-type")=="folder-intermediate")
+		{
+		$("#new-sub-folder-form-record-title").val("")
+		$("#new-sub-folder-form-container").show()
+		}
+	if($(".editing").parent().find("td:nth-child(2)").data("record-type")=="folder-terminal")
+		{
+		$("#upload-form-file").remove()
+		$("#upload-form-file-label").remove()
+		$("#upload-form-file-container").append('<input id="upload-form-file" name="upload" type="file" class="custom-file-input" id="validatedCustomFile"><label id="upload-form-file-label" class="custom-file-label" for="upload-form-file">Choose file...</label>')
+		$("#upload-form-record-title").val("")
+		$("#upload-form-container").show()
+		}
+	if($(".editing").parent().find("td:nth-child(2)").data("record-type")=="document")
+		{
+		$("#upload-form-file").remove()
+		$("#upload-form-file-label").remove()
+		$("#upload-form-file-container").append('<input id="upload-form-file" name="upload" type="file" class="custom-file-input" id="validatedCustomFile"><label id="upload-form-file-label" class="custom-file-label" for="upload-form-file">Choose file...</label>')
+		$("#upload-form-record-title").val("")
+		$("#upload-form-container").show()
+		}		
 	}
 
 
@@ -1838,18 +1861,17 @@ function createFolder(recordTitle, recordClassificationUri, recordContainerUri, 
 						{
 						if($("#classification-uri-" + recordClassificationUri + " > span:nth-child(1)").hasClass("expanded"))
 							{
-							clearForm("new-folder-form")
 							refreshFolderNodes("classification", "classification-uri-" + recordClassificationUri)			
 							}
+						clearForm("new-folder-form")
 						}
 					if(recordContainerUri != null)
 						{
 						if($("#record-uri-" + recordContainerUri + " > span:nth-child(1)").hasClass("expanded"))
 							{
-							clearForm("new-sub-folder-form")
 							refreshFolderNodes("record", "record-uri-" + recordContainerUri)								
 							}
-
+						clearForm("new-sub-folder-form")
 						}
 					setTimeout(function()
 						{
