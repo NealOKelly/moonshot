@@ -1381,23 +1381,153 @@ $(document).on("change", "#new-sub-folder-form-record-type", function()
 // Click re-athentication button
 $(document).on("click", "#test-button", function()
 	{
-	//console.log("Frame Title: " + $("#authentication-frame").contents().find("title").html())
-	var data = {
-			"q" : "all",
-			"Properties" : "ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern",
-			"TrimType" : "Classification",
-			"PageSize" : "1000000"
-			};
-	var result = searchAPI(data)
-		.then(function(result)
-			{
-			console.log(result)	
-			})
-		.fail(function(result)
-			{
-			console.log("Failed!!!")
-			})
+	alert($("#additional-field-").val())
+	alert($("#additional-field-").value)
 	})
+
+
+
+
+$(".date-input").keyup(function(event){
+    var keycode = (event.keyCode ? event.keyCode : event.which);
+    if(keycode == '13'){
+        //alert('You pressed a "enter" key in textbox');  
+
+		
+    }
+});
+
+
+$(".date-input").focus(function(event)
+	{
+//	oldValue = $(event.target).val()
+//	$(event.target).val("").trigger("change")
+//	$(event.target).val(isValidDate(oldValue)).trigger("change")
+	})
+
+
+
+function isValidDate(dateString)
+	{
+		// First check for the pattern
+		if(!/^(\d{2}|\d{1})[\-\s\/](\d{2}|\d{1})[\-\s\/](\d{4}|\d{2})$/.test(dateString))
+			{
+			console.log("Called.")
+			return false;				
+			}
+		// Parse the date parts to integers
+		if(dateString.includes("/"))
+			{
+			var parts = dateString.split("/");				
+			}
+		if(dateString.includes("-"))
+			{
+			var parts = dateString.split("-");				
+			}
+		if(dateString.includes(" "))
+			{
+			var parts = dateString.split(" ");				
+			}
+		if(parts.length!=3)
+			{
+			return false;
+			}
+		
+		var day = parseInt(parts[0], 10);
+		var month = parseInt(parts[1], 10);
+		//var year = parseInt(parts[2], 10);
+		var year = parts[2];
+
+		if(year<100)
+			{
+			var today = new Date();
+			var nearbyDateThisCentury = parseInt(today.getFullYear().toString().substr(0, 2) + year)
+			console.log("nearbyDateThisCentury:" + nearbyDateThisCentury)
+			var nearbyDateLastCentury = parseInt((today.getFullYear()-100).toString().substr(0, 2) + year)
+			console.log("nearbyDateLastCentury:" + nearbyDateLastCentury)
+			var nearbyDateNextCentury = parseInt((today.getFullYear()+100).toString().substr(0, 2) + year)
+			console.log("nearbyDateNextCentury:" + nearbyDateNextCentury)	
+			deltaLastCentury = today.getFullYear() - nearbyDateLastCentury
+			console.log("deltaLastCentury: " + deltaLastCentury)
+			deltaNextCentury = nearbyDateNextCentury - today.getFullYear()
+			console.log("deltaNextCentury: " + deltaNextCentury)
+			if(nearbyDateThisCentury>today.getFullYear()) // it's in the future
+				{
+				deltaThisCentury = nearbyDateThisCentury - today.getFullYear()
+				}
+			else
+				{
+				deltaThisCentury = today.getFullYear() - nearbyDateThisCentury
+				}
+			if(deltaLastCentury<deltaNextCentury && deltaLastCentury<deltaThisCentury)
+				{
+				year = nearbyDateLastCentury
+				}
+			else if(deltaNextCentury<deltaLastCentury && deltaNextCentury<deltaThisCentury)
+				{
+				year = nearbyDateNextCentury
+				}
+			else if(deltaThisCentury<deltaLastCentury && deltaThisCentury<deltaLastCentury)
+				{
+				year = nearbyDateThisCentury
+				}
+			else if(deltaThisCentury==deltaLastCentury)
+				{
+				year = nearbyDateLastCentury
+				}
+			else if(deltaThisCentury==deltaNextCentury)
+				{
+				year = nearbyDateThisCentury
+				}			
+			console.log("deltaThisCentury: " + deltaThisCentury)
+			}
+		else
+			{
+			var year = parseInt(parts[2], 10)	
+			}
+
+		
+
+
+		
+			console.log("year: " + year)
+		
+		// Check the ranges of month and year
+		if(year < 1000 || year > 3000 || month == 0 || month > 12)
+			{
+			console.log("Returning false because of year range validation failure.")
+			return false;
+			}
+
+		var monthLength = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
+
+
+			
+			
+		//console.log("Current MIlennium: "  + today.getFullYear().toString().substr(0, 2))
+		
+		// Adjust for leap years
+		if(year % 400 == 0 || (year % 100 != 0 && year % 4 == 0))
+			monthLength[1] = 29;
+
+		// Check the range of the day
+		if(day > 0 && day <= monthLength[month - 1])
+			{
+			if(day<10)
+				{
+				day = "0" + day
+				console.log(day)
+				}
+			if(month<10)
+				{
+				month = "0" + month
+				console.log(month)
+				}
+			console.log("year.length:" + year.length)
+			return day + "-" + month + "-" + year;					
+			}
+	};
+
 
 
 

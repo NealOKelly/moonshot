@@ -5,6 +5,13 @@
 	"DatasetName" : "API Demo"
 	},
 "DateFormat" : "dd-mmm-yyyy",
+"DatePicker" : 
+	{
+	"DateFormat" : "dd-mm-yyyy",
+	"AutoClose" : "true",
+	"Placeholder" : "01/01/1901",
+	"AssumeNearbyYear" : "true"
+	},
 "ExcludedRecordTypes" : [
 						"Folder",
 						"Document"

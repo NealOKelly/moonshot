@@ -10,18 +10,15 @@
 	</div>
 	<div class="col-6" style="background-color: #fff;height:100%; padding:0;overflow:hidden;">
 		<div id="records-list-pane" style="height:75%;text-align:center;overflow:auto;overflow-x:hidden;">
-
 			<div class='no-records display-4'>Browse or search to display records.</div>
 		</div>
-		<div id="search-results-pane" style="height:75%;text-align:center;overflow:auto;overflow-x:hidden;display:none;width: 100%;">
-
-		</div>
-		<div id="properties-pane" style="height:26%;text-align:center;overflow:auto;overflow-x:hidden;background-color:#343a40;position:relative;display:none;">
-		</div>
+		
+		<div id="search-results-pane" style="height:75%;text-align:center;overflow:auto;overflow-x:hidden;display:none;width: 100%;"></div>
+		
+		<div id="properties-pane" style="height:26%;text-align:center;overflow:auto;overflow-x:hidden;background-color:#343a40;position:relative;display:none;"></div>
+		
 		<div id="properties-pane-placeholder" style="height:26%;text-align:center;overflow:hidden;background-color:#343a40;position:relative;padding:30px;">
-			
 			<img id="properties-pane-logo" src="img/gilbyim-logo-inline-white-2.png">
-			
 		</div>
 	</div>
 	<div class="col-3" id="right-panel">
@@ -30,9 +27,9 @@
 				<a class="twitter-timeline" href="https://twitter.com/RT_GilbyIM?ref_src=twsrc%5Etfw">Tweets by GilbyIM</a>
 				<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 			</div>-->
-			<%- include('./partials/upload-form.ejs') %>
-			<%- include('./partials/new-folder-form.ejs') %>
-			<%- include('./partials/new-sub-folder-form.ejs') %>
 		<!--</div>-->
+		<%- include('./partials/upload-form.ejs') %>
+		<%- include('./partials/new-folder-form.ejs') %>
+		<%- include('./partials/new-sub-folder-form.ejs') %>
 	</div>
 </div>

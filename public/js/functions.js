@@ -51,12 +51,14 @@ function getAuthenticationStatus()
 			if(result==true)
 				{
 				isAuthenticated=true;
+				deferredObject.resolve();	
 				}
 			else
 				{
 				isAuthenticated=false;
+				removeAPISessionCookies()
+				deferredObject.resolve();	
 				}
-			deferredObject.resolve();		
 			}, 
 		error: function(result)
 			{
@@ -85,8 +87,8 @@ function removeAppSessionCookies()
 
 function removeAPISessionCookies()
 	{
-	$.cookie("FedAuth", null, { expires: -1, path: "/CMServiceAPI/"} )
-	$.cookie("FedAuth", null, { expires: -1, path: "/CMServiceAPI/"} )
+	$.cookie("FedAuth", null, { expires: -1, path: "/CMServiceAPI/" } )
+	//$.cookie("FedAuth", null, { expires: -1, path: "/CMServiceAPI/"} )
 	}
 
 // END AUTHENTICATION & SESSION MANAGEMENT //
@@ -904,7 +906,12 @@ function populateAdditionalFields(parentNodeType)
 										console.log("Boolean inputs are not yet supported.")
 										break;
 									case "Date":
-										console.log("Date inputs are not yet supported.")
+										var inputHTML = '<div class="form-group additional-field" data-search-clause-name="' + result.Results[i].FieldDefinitionSearchClause.Value + '">'
+										inputHTML = inputHTML + '<label for="' + formName + 'additional-field-' + result.Results[i].FieldDefinitionSearchClause.Value + '" class="display-4" style="color:#000033;font-size:1.25rem;"><span>' + result.Results[i].FieldDefinitionName.Value + ' </span><span style="font-size:1rem">(optional)</span></label>'
+											
+										inputHTML = inputHTML + '<input type="text" id="additional-field-' + formName + 'additional-field-' + result.Results[i].FieldDefinitionSearchClause.Value + '" class="form-control date-input" data-provide="datepicker" data-date-format="dd-mm-yyyy" data-date-autoclose="true" placeholder="dd-mm-yyyy" data-date-start-date="01/01/1801" data-date-assume-nearby-year="true" maxlength="10"></div>'
+										
+										$("#" + formName).append(inputHTML)											
 										break;
 									case "Datetime":
 										console.log("Datetime inputs are not yet supported.")
