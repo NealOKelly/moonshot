@@ -9,7 +9,8 @@
 	{
 	"DateFormat" : "dd-mm-yyyy",
 	"AutoClose" : "true",
-	"Placeholder" : "01/01/1901",
+	"Placeholder" : "dd-mm-yyyy",
+	"StartDate" : "01/01/1901",
 	"AssumeNearbyYear" : "true"
 	},
 "ExcludedRecordTypes" : [
@@ -89,7 +90,7 @@
 			"RecordAccessControl" : "true",
 			"RecordDestructionDate" : "false"
 			},
-		"AdditionalFields" : "true"
+		"AdditionalFields" : "false"
 		},
 	"Document" : 
 		{

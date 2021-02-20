@@ -169,7 +169,7 @@ function refreshClassificationNodes(parentNodeId)
 						})
 					.fail(function(result)
 						{
-						console.log("Oooops!")
+						// Do something
 						})
 				});
 			}
@@ -318,7 +318,7 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 					}, 
 				error: function(result)
 					{
-					console.log("Oooops!")
+					// Do something
 					}
 				});
 			}
@@ -846,7 +846,7 @@ function helperSelectRecordType(type)
 			$('select[id=new-sub-folder-form-record-type] option:nth-child(1)').selected = true;			
 			break;
 		case "folder-terminal":
-			console.log("Document")
+			// Do something
 			break;
 		}
 	deferredObject.resolve();
@@ -909,7 +909,7 @@ function populateAdditionalFields(parentNodeType)
 										var inputHTML = '<div class="form-group additional-field" data-search-clause-name="' + result.Results[i].FieldDefinitionSearchClause.Value + '">'
 										inputHTML = inputHTML + '<label for="' + formName + 'additional-field-' + result.Results[i].FieldDefinitionSearchClause.Value + '" class="display-4" style="color:#000033;font-size:1.25rem;"><span>' + result.Results[i].FieldDefinitionName.Value + ' </span><span style="font-size:1rem">(optional)</span></label>'
 											
-										inputHTML = inputHTML + '<input type="text" id="additional-field-' + formName + 'additional-field-' + result.Results[i].FieldDefinitionSearchClause.Value + '" class="form-control date-input" data-provide="datepicker" data-date-format="dd-mm-yyyy" data-date-autoclose="true" placeholder="dd-mm-yyyy" data-date-start-date="01/01/1801" data-date-assume-nearby-year="true" maxlength="10"></div>'
+										inputHTML = inputHTML + '<input type="text" id="additional-field-' + formName + 'additional-field-' + result.Results[i].FieldDefinitionSearchClause.Value + '" class="form-control date-input" data-provide="datepicker" data-date-format="' + config.DatePicker.DateFormat + '" data-date-autoclose="' + config.DatePicker.AutoClose + '" placeholder="' + config.DatePicker.Placeholder + '" data-date-start-date="' + config.DatePicker.StartDate + '" data-date-assume-nearby-year="' + config.DatePicker.AssumeNearbyYear + '" maxlength="10"></div>'
 										
 										$("#" + formName).append(inputHTML)											
 										break;
@@ -1020,7 +1020,6 @@ function drawPropertiesTable(type)
 			console.log("Value: " + config.PropertiesPane.IntermediateFolder.Core.RecordTitle)
 			if(config.PropertiesPane.IntermediateFolder.Core.RecordTitle=="true")
 				{
-				//console.log("This has been called.")
 				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Record Title</td><td id="properties-record-title"></td><td id="properties-edit-record-title" class="edit-properties-link"><a href="#">Edit</a></td></tr>'
 				}
 			if(config.PropertiesPane.IntermediateFolder.Core.RecordClassification=="true")
@@ -1143,60 +1142,88 @@ function getClassificationProperties(classificationUri)
 		});
 	}
 
-function formatDate(dateTime, format)
+function formatDate(dateTime, inputFormat, outputFormat)
 	{
-	day = dateTime.substr(8, 2)
-	month = dateTime.substr(5, 2)
-	year = dateTime.substr(0, 4)
-	switch(format) 
+	if(!dateTime.length)
 		{
-		case "dd-mm-yyyy":
-			// do something
-			break;
-		case "dd-mmm-yyyy":
-			switch(month)
-				{
-				case "01":
-					month = "Jan"
-					break;
-				case "02":
-					month = "Feb"
-					break;
-				case "03":
-					month = "Mar"
-					break;
-				case "04":
-					month = "Apr"
-					break;
-				case "05":
-					month = "May"
-					break;
-				case "06":
-					month = "Jun"
-					break;
-				case "07":
-					month = "Jul"
-					break;
-				case "08":
-					month = "Aug"
-					break;
-				case "09":
-					month = "Sep"
-					break;
-				case "10":
-					month = "Oct"
-					break;
-				case "11":
-					month = "Nov"
-					break;
-				case "12":
-					month = "Nov"
-					break;
-				}
-			break;
+		return "";
 		}
-		formattedDate = day + "-" + month + "-" + year
-		return formattedDate;	
+	else
+		{
+		switch(inputFormat)
+			{
+			case "trimDate":
+				day = dateTime.substr(8, 2)
+				month = dateTime.substr(5, 2)
+				year = dateTime.substr(0, 4)
+				break;
+			case "tenDigit":
+				day = dateTime.substr(0, 2)
+				month = dateTime.substr(3, 2)
+				year = dateTime.substr(6, 4)
+				break;
+				case "dd-mmm-yyyy":
+				day = dateTime.substr(0, 2)
+				month = dateTime.substr(3, 3)
+				year = dateTime.substr(7, 4)	
+				break;	
+			}
+
+		switch(outputFormat) 
+			{
+			case "dd-mm-yyyy":
+				formattedDate = day + "-" + month + "-" + year
+				return formattedDate;
+				break;
+			case "dd-mmm-yyyy":
+				switch(month)
+					{
+					case "01":
+						month = "Jan"
+						break;
+					case "02":
+						month = "Feb"
+						break;
+					case "03":
+						month = "Mar"
+						break;
+					case "04":
+						month = "Apr"
+						break;
+					case "05":
+						month = "May"
+						break;
+					case "06":
+						month = "Jun"
+						break;
+					case "07":
+						month = "Jul"
+						break;
+					case "08":
+						month = "Aug"
+						break;
+					case "09":
+						month = "Sep"
+						break;
+					case "10":
+						month = "Oct"
+						break;
+					case "11":
+						month = "Nov"
+						break;
+					case "12":
+						month = "Dec"
+						break;
+					}
+				formattedDate = day + "-" + month + "-" + year
+				return formattedDate;
+				break;
+			case "trimDate":
+				formattedDate = year + "-" + month + "-" + day + "T00:00:00.0000000Z"
+				return formattedDate;
+				break;
+			}
+		}
 	}
 
 function parseAccessControlString(string, type)
@@ -1236,6 +1263,181 @@ function parseAccessControlString(string, type)
 	}
 
 
+function showRecordCoreFieldValue(record)
+	{
+	// Record Number
+	$("#properties-record-number").html(record.RecordNumber.Value)
+
+	// Record Title
+	$("#properties-record-title").html(record.RecordTitle.Value)
+	$("#properties-record-title").data("record-uri", record.Uri)
+	$("#properties-record-title").data("record-record-type", record.RecordRecordType.RecordTypeName.Value)
+	
+	// Classification
+	if(record.hasOwnProperty("RecordClassification"))
+		{
+		$("#properties-classification").html(record.RecordClassification.ClassificationTitle.Value)		
+		}
+		
+	// Container
+	if(record.hasOwnProperty("RecordContainer"))
+		{
+		$("#properties-container").html(record.RecordContainer.RecordNumber.Value + ": " + record.RecordContainer.RecordTitle.Value)
+		}
+		
+	// Record Type
+	$("#properties-record-type").html(record.RecordRecordType.RecordTypeName.Value)
+
+	// Date Registered
+	var dateRegistered = formatDate(record.RecordDateRegistered.DateTime, "trimDate", config.DateFormat) + " at "
+	dateRegistered = dateRegistered + record.RecordDateRegistered.DateTime.substr(11, 8)
+	$("#properties-date-registered").html(dateRegistered)
+
+	// Access Control
+	var accessControlHTML = "<div>View Folder & Contents: " + parseAccessControlString(record.RecordAccessControl.Value, "record").ViewMetadata + "</div>"
+	var accessControlHTML = accessControlHTML + "<div>Update Folder Properties: " + parseAccessControlString(record.RecordAccessControl.Value, "record").UpdateRecordMetadata + "</div>"
+	var accessControlHTML = accessControlHTML + "<div>Add Contents: " + parseAccessControlString(record.RecordAccessControl.Value, "record").ContributeContents + "</div>"
+	$("#properties-access-control").html(accessControlHTML)
+	$("#properties-access-control").html(accessControlHTML)
+	
+	// Date Due for Destruction	
+	if(record.RecordDestructionDate.IsClear==false)
+		{
+		$("#properties-date-due-for-destruction").html(formatDate(record.RecordDestructionDate.DateTime, "trimDate", config.DateFormat))
+		}
+	}
+
+
+
+
+function showRecordAdditionalFieldName(field, recordTitle, recordType, recordUri)
+	{
+	switch(field.FieldDefinitionFormat.Value)
+		{
+		case "String":
+
+			var additionalFieldId = "properties-additional-fields-" + field.FieldDefinitionSearchClause.Value;
+
+			var additionalPropertyHTML = '<tr><td scope="row" style="width:20%;text-align:left;padding-left:30px;">'
+
+			additionalPropertyHTML = additionalPropertyHTML + field.FieldDefinitionName.Value
+
+			additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td>'
+
+			additionalPropertyHTML = additionalPropertyHTML + '<td  id="properties-edit-additional-field-' + field.FieldDefinitionSearchClause.Value + '" class="edit-properties-link"><a href="#">Edit</a></td></tr>'
+
+			$("#properties-pane > table > tbody").append(additionalPropertyHTML)
+
+			$("#" + additionalFieldId).data("record-title", recordTitle)
+			$("#" + additionalFieldId).data("record-record-type", recordType)
+			$("#" + additionalFieldId).data("record-uri", recordUri)
+			$("#" + additionalFieldId).data("field-name", field.FieldDefinitionSearchClause.Value)
+			$("#" + additionalFieldId).data("field-length", field.FieldDefinitionLength.Value)
+			$("#" + additionalFieldId).data("field-definition-format", field.FieldDefinitionFormat.Value)
+
+			break;
+		case "Number":
+			console.log("Number inputs are not yet supported.")
+			break;
+		case "Boolean":
+			console.log("Boolean inputs are not yet supported.")
+			break;
+		case "Date":
+			var additionalFieldId = "properties-additional-fields-" + field.FieldDefinitionSearchClause.Value;
+
+			var additionalPropertyHTML = '<tr><td scope="row" style="width:20%;text-align:left;padding-left:30px;">'
+
+			additionalPropertyHTML = additionalPropertyHTML + field.FieldDefinitionName.Value
+
+			additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td>'
+
+			additionalPropertyHTML = additionalPropertyHTML + '<td  id="properties-edit-additional-field-' + field.FieldDefinitionSearchClause.Value + '" class="edit-properties-link"><a href="#">Edit</a></td></tr>'
+
+			$("#properties-pane > table > tbody").append(additionalPropertyHTML)
+
+			$("#" + additionalFieldId).data("record-title", recordTitle)
+			$("#" + additionalFieldId).data("record-record-type", recordType)
+			$("#" + additionalFieldId).data("record-uri", recordUri)
+			$("#" + additionalFieldId).data("field-name", field.FieldDefinitionSearchClause.Value)
+			$("#" + additionalFieldId).data("field-length", field.FieldDefinitionLength.Value)
+			$("#" + additionalFieldId).data("field-definition-format", field.FieldDefinitionFormat.Value)
+
+			break;
+		case "Datetime":
+			console.log("Datetime inputs are not yet supported.")
+			break;
+		case "Decimal":
+			console.log("Decimal inputs are not yet supported.")
+			break;
+		case "Text":
+			console.log("Text inputs are not yet supported.")
+			break;
+		case "Currency":
+			console.log("Currency inputs are not yet supported.")
+			break;
+		case "Object":
+			console.log("Object inputs are not yet supported.")
+			break;
+		case "BigNumber":
+			console.log("BigNumber inputs are not yet supported.")
+			break;
+		case "Xml":
+			console.log("Xml inputs are not yet supported.")
+			break;
+		case "Geography":
+			console.log("Geography inputs are not yet supported.")
+			break;
+		}	
+	}
+
+function showRecordAdditionalFieldValue(result, fieldFormat, additionalFieldId, searchClause)
+	{
+	switch(fieldFormat)
+		{
+		case "String":
+			$("#" + additionalFieldId).html(result.Results[0].Fields[searchClause].Value)
+			break;
+		case "Number":
+			console.log("Number inputs are not yet supported.")
+			break;
+		case "Boolean":
+			console.log("Boolean inputs are not yet supported.")
+			break;
+		case "Date":
+			if(!result.Results[0].Fields[searchClause].IsClear)
+				{
+				$("#" + additionalFieldId).html(formatDate(result.Results[0].Fields[searchClause].DateTime, "trimDate", config.DateFormat))	
+				}
+			break;
+		case "Datetime":
+			console.log("Datetime inputs are not yet supported.")
+			break;
+		case "Decimal":
+			console.log("Decimal inputs are not yet supported.")
+			break;
+		case "Text":
+			console.log("Text inputs are not yet supported.")
+			break;
+		case "Currency":
+			console.log("Currency inputs are not yet supported.")
+			break;
+		case "Object":
+			console.log("Object inputs are not yet supported.")
+			break;
+		case "BigNumber":
+			console.log("BigNumber inputs are not yet supported.")
+			break;
+		case "Xml":
+			console.log("Xml inputs are not yet supported.")
+			break;
+		case "Geography":
+			console.log("Geography inputs are not yet supported.")
+			break;
+		}	
+	}
+
+
+
 function getRecordProperties(type, recordUri)
 	{
 	getAuthenticationStatus().then(function () 
@@ -1245,579 +1447,106 @@ function getRecordProperties(type, recordUri)
 			var url = baseUrl + apiPath + "/Search";
 			var data = 	{
 						"q" : recordUri,
-						"Properties" : "RecordTitle, RecordNumber, Classification, RecordContainer, RecordType, DateRegistered, AccessControl, RecordDestructionDate",
+						"Properties" : "RecordTitle, RecordNumber, RecordClassification, RecordContainer, RecordType, DateRegistered, AccessControl, RecordDestructionDate",
 						"TrimType" : "Record"
 						}
-			var result = searchAPI(data)
-				.then(function(result)
-					{
-					
-					
-					})
-				.fail(function(result)
-					{
-					// Do something
-					})
 			$.ajax(
 				{
 				url: url, 
 				type: "POST",
 				data: JSON.stringify(data),
 				contentType: 'application/json',
-				xhrFields: { withCredentials: true},
+				xhrFields: { withCredentials: true },
 				success: function(result)
 					{
-					var details = JSON.stringify(result);
-					var dateRegistered = formatDate(result.Results[0].RecordDateRegistered.DateTime, config.DateFormat) + " at "
-					dateRegistered= dateRegistered + result.Results[0].RecordDateRegistered.DateTime.substr(11, 8)
+					// Core Fields
+					showRecordCoreFieldValue(result.Results[0])
+					
 					switch(type)
 						{
 						case "folder-intermediate":
-							$("#properties-record-number").html(result.Results[0].RecordNumber.Value)
-							$("#properties-record-title").html(result.Results[0].RecordTitle.Value)
-							$("#properties-record-title").data("record-uri", result.Results[0].Uri)
-							$("#properties-record-title").data("record-record-type", result.Results[0].RecordRecordType.RecordTypeName.Value)
-							$("#properties-classification").html(result.Results[0].RecordClassification.ClassificationTitle.Value)
-							$("#properties-record-type").html(result.Results[0].RecordRecordType.RecordTypeName.Value)
-							$("#properties-date-registered").html(dateRegistered)
-							
-							// access controls
-							var accessControlHTML = "<div>View Folder & Contents: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value, "record").ViewMetadata + "</div>"
-							var accessControlHTML = accessControlHTML + "<div>Update Folder Properties: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value, "record").UpdateRecordMetadata + "</div>"
-							var accessControlHTML = accessControlHTML + "<div>Add Contents: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value, "record").ContributeContents + "</div>"
-							$("#properties-access-control").html(accessControlHTML)
-							if(result.Results[0].RecordDestructionDate.IsClear==false)
-								{
-								$("#properties-date-due-for-destruction").html(formatDate(result.Results[0].RecordDestructionDate.DateTime, config.DateFormat))
-								}
-							if(config.PropertiesPane.IntermediateFolder.AdditionalFields=="true")
-								{
-								var recordUri = result.Results[0].Uri
-								var recordTitle = result.Results[0].RecordTitle.Value
-								var recordType = result.Results[0].RecordRecordType.RecordTypeName.Value
-								var url = baseUrl + apiPath + "/Search"
-								var data = 	{
-											"q" : "all",
-											"Properties" : "FieldDefinitionName, FieldDefinitionIsUsedByRecordTypes, FieldDefinitionFormat, FieldDefinitionSearchClause, FieldDefinitionLength",
-											"TrimType" : "FieldDefinition",
-											"PageSize" : "1000"
-											}
-								var result = searchAPI(data)
-									.then(function(result)
-										{
-										for(i=0; i<result.TotalResults; i++)
-											{
-											(function(index)
-												{
-												if(result.Results[i].FieldDefinitionIsUsedByRecordTypes.Value.includes(recordType))
-													{
-													var fieldFormat = result.Results[i].FieldDefinitionFormat.Value
-													
-													switch(fieldFormat)
-														{
-														case "String":
-															
-															var additionalFieldId = "properties-additional-fields-" + result.Results[i].FieldDefinitionSearchClause.Value;
-												
-															var additionalPropertyHTML = '<tr><td scope="row" style="width:20%;text-align:left;padding-left:30px;">'
-
-															additionalPropertyHTML = additionalPropertyHTML + result.Results[i].FieldDefinitionName.Value
-
-															additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td>'
-																
-															additionalPropertyHTML = additionalPropertyHTML + '<td  id="properties-edit-additional-field-' + result.Results[i].FieldDefinitionSearchClause.Value + '" class="edit-properties-link"><a href="#">Edit</a></td></tr>'
-
-															$("#properties-pane > table > tbody").append(additionalPropertyHTML)
-																
-															$("#" + additionalFieldId).data("record-title", recordTitle)
-															$("#" + additionalFieldId).data("record-record-type", recordType)
-															$("#" + additionalFieldId).data("record-uri", recordUri)
-															$("#" + additionalFieldId).data("field-name", result.Results[i].FieldDefinitionSearchClause.Value)
-															$("#" + additionalFieldId).data("field-length", result.Results[i].FieldDefinitionLength.Value)
-																
-															break;
-														case "Number":
-															console.log("Number inputs are not yet supported.")
-															break;
-														case "Boolean":
-															console.log("Boolean inputs are not yet supported.")
-															break;
-														case "Date":
-															var additionalFieldId = "properties-additional-fields-" + result.Results[i].FieldDefinitionSearchClause.Value;
-												
-															var additionalPropertyHTML = '<tr><td scope="row" style="width:20%;text-align:left;padding-left:30px;">'
-
-															additionalPropertyHTML = additionalPropertyHTML + result.Results[i].FieldDefinitionName.Value
-
-															additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td><td></td></tr>'
-
-															$("#properties-pane > table > tbody").append(additionalPropertyHTML)
-															break;
-														case "Datetime":
-															console.log("Datetime inputs are not yet supported.")
-															break;
-														case "Decimal":
-															console.log("Decimal inputs are not yet supported.")
-															break;
-														case "Text":
-															console.log("Text inputs are not yet supported.")
-															break;
-														case "Currency":
-															console.log("Currency inputs are not yet supported.")
-															break;
-														case "Object":
-															console.log("Object inputs are not yet supported.")
-															break;
-														case "BigNumber":
-															console.log("BigNumber inputs are not yet supported.")
-															break;
-														case "Xml":
-															console.log("Xml inputs are not yet supported.")
-															break;
-														case "Geography":
-															console.log("Geography inputs are not yet supported.")
-															break;
-														}
-
-													var searchClause = result.Results[i].FieldDefinitionSearchClause.Value;
-													var url = baseUrl + apiPath + "/Search?q=" + recordUri + "&properties=" + searchClause + "&TrimType=Record"
-													$.ajax(
-														{
-														url: url,
-														type: "POST",
-														contentType: 'application/json',
-														xhrFields: { withCredentials: true},
-														success: function(result)
-															{
-															switch(fieldFormat)
-																{
-																case "String":
-																	$("#" + additionalFieldId).html(result.Results[0].Fields[searchClause].Value)
-																	break;
-																case "Number":
-																	console.log("Number inputs are not yet supported.")
-																	break;
-																case "Boolean":
-																	console.log("Boolean inputs are not yet supported.")
-																	break;
-																case "Date":
-																	if(!result.Results[0].Fields[searchClause].IsClear)
-																		{
-																		$("#" + additionalFieldId).html(formatDate(result.Results[0].Fields[searchClause].DateTime, config.DateFormat))	
-																		}
-																	break;
-																case "Datetime":
-																	console.log("Datetime inputs are not yet supported.")
-																	break;
-																case "Decimal":
-																	console.log("Decimal inputs are not yet supported.")
-																	break;
-																case "Text":
-																	console.log("Text inputs are not yet supported.")
-																	break;
-																case "Currency":
-																	console.log("Currency inputs are not yet supported.")
-																	break;
-																case "Object":
-																	console.log("Object inputs are not yet supported.")
-																	break;
-																case "BigNumber":
-																	console.log("BigNumber inputs are not yet supported.")
-																	break;
-																case "Xml":
-																	console.log("Xml inputs are not yet supported.")
-																	break;
-																case "Geography":
-																	console.log("Geography inputs are not yet supported.")
-																	break;
-																}
-															}, 
-														error: function(result)
-															{
-															console.log("Oooops!")
-															}
-														})	
-													}
-											})(i)}
-										})
-									.fail(function(result)
-										{
-										// Do something
-										})
-								}
+							var additionalFieldsEnabled = config.PropertiesPane.IntermediateFolder.AdditionalFields
 							break;
 						case "folder-terminal":
-							$("#properties-record-number").html(result.Results[0].RecordNumber.Value)
-							$("#properties-record-title").html(result.Results[0].RecordTitle.Value)
-							$("#properties-record-title").data("record-uri", result.Results[0].Uri)
-							$("#properties-record-title").data("record-record-type", result.Results[0].RecordRecordType.RecordTypeName.Value)
-							$("#properties-container").html(result.Results[0].RecordContainer.RecordNumber.Value + ": " + result.Results[0].RecordContainer.RecordTitle.Value)
-							$("#properties-record-type").html(result.Results[0].RecordRecordType.RecordTypeName.Value)
-							$("#properties-date-registered").html(dateRegistered)
-							
-							// access controls
-							var accessControlHTML = "<div>View Folder & Contents: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value, "record").ViewMetadata + "</div>"
-							var accessControlHTML = accessControlHTML + "<div>Update Properties: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value, "record").UpdateRecordMetadata + "</div>"
-							var accessControlHTML = accessControlHTML + "<div>Add Contents: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value, "record").ContributeContents + "</div>"
-							$("#properties-access-control").html(accessControlHTML)
-								
-							if(result.Results[0].RecordDestructionDate.IsClear==false)
-								{
-								$("#properties-date-due-for-destruction").html(formatDate(result.Results[0].RecordDestructionDate.DateTime, config.DateFormat))
-								}
-								
-							if(config.PropertiesPane.IntermediateFolder.AdditionalFields=="true")
-								{
-								var recordUri = result.Results[0].Uri
-								var recordType = result.Results[0].RecordRecordType.RecordTypeName.Value
-								var url = baseUrl + apiPath + "/Search"
-								var data = 	{
-											"q" : "all",
-											"Properties" : "FieldDefinitionName, FieldDefinitionIsUsedByRecordTypes, FieldDefinitionFormat, FieldDefinitionSearchClause, FieldDefinitionLength",
-											"TrimType" : "FieldDefinition",
-											"PageSize" : "1000"
-											}
-								$.ajax(
-									{
-									url: url,
-									data: JSON.stringify(data),
-									type: "POST",
-									contentType: 'application/json',
-									xhrFields: { withCredentials: true},
-									success: function(result)
-										{
-										for(i=0; i<result.TotalResults; i++)
-											{
-											(function(index)
-												{
-												if(result.Results[i].FieldDefinitionIsUsedByRecordTypes.Value.includes(recordType))
-													{
-													var fieldFormat = result.Results[i].FieldDefinitionFormat.Value
-													
-													switch(fieldFormat)
-														{
-														case "String":
-																
-															var additionalFieldId = "properties-additional-fields-" + result.Results[i].FieldDefinitionSearchClause.Value;
-												
-															var additionalPropertyHTML = '<tr><td scope="row" style="width:20%;text-align:left;padding-left:30px;">'
-
-															additionalPropertyHTML = additionalPropertyHTML + result.Results[i].FieldDefinitionName.Value
-
-															additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td>'
-																
-															additionalPropertyHTML = additionalPropertyHTML + '<td  id="properties-edit-additional-field-' + result.Results[i].FieldDefinitionSearchClause.Value + '" class="edit-properties-link"><a href="#">Edit</a></td></tr>'
-
-															$("#properties-pane > table > tbody").append(additionalPropertyHTML)
-																
-															$("#" + additionalFieldId).data("record-title", recordTitle)
-															$("#" + additionalFieldId).data("record-record-type", recordType)
-															$("#" + additionalFieldId).data("record-uri", recordUri)
-															$("#" + additionalFieldId).data("field-name", result.Results[i].FieldDefinitionSearchClause.Value)
-															$("#" + additionalFieldId).data("field-length", result.Results[i].FieldDefinitionLength.Value)
-																
-															break;
-														case "Number":
-															console.log("Number inputs are not yet supported.")
-															break;
-														case "Boolean":
-															console.log("Boolean inputs are not yet supported.")
-															break;
-														case "Date":
-															var additionalFieldId = "properties-additional-fields-" + result.Results[i].FieldDefinitionSearchClause.Value;
-												
-															var additionalPropertyHTML = '<tr><td scope="row" style="width:20%;text-align:left;padding-left:30px;">'
-
-															additionalPropertyHTML = additionalPropertyHTML + result.Results[i].FieldDefinitionName.Value
-
-															additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td><td></td></tr>'
-
-															$("#properties-pane > table > tbody").append(additionalPropertyHTML)
-															break;
-														case "Datetime":
-															console.log("Datetime inputs are not yet supported.")
-															break;
-														case "Decimal":
-															console.log("Decimal inputs are not yet supported.")
-															break;
-														case "Text":
-															console.log("Text inputs are not yet supported.")
-															break;
-														case "Currency":
-															console.log("Currency inputs are not yet supported.")
-															break;
-														case "Object":
-															console.log("Object inputs are not yet supported.")
-															break;
-														case "BigNumber":
-															console.log("BigNumber inputs are not yet supported.")
-															break;
-														case "Xml":
-															console.log("Xml inputs are not yet supported.")
-															break;
-														case "Geography":
-															console.log("Geography inputs are not yet supported.")
-															break;
-														}
-
-													var searchClause = result.Results[i].FieldDefinitionSearchClause.Value;
-													var url = baseUrl + apiPath + "/Search"
-													var data =	{
-																"q" : recordUri,
-																"Properties" : searchClause,
-																"TrimType" : "Record"
-																}
-													$.ajax(
-														{
-														url: url,
-														data: JSON.stringify(data),
-														type: "POST",
-														contentType: 'application/json',
-														xhrFields: { withCredentials: true},
-														success: function(result)
-															{
-															switch(fieldFormat)
-																{
-																case "String":
-																	$("#" + additionalFieldId).html(result.Results[0].Fields[searchClause].Value)
-																	break;
-																case "Number":
-																	console.log("Number inputs are not yet supported.")
-																	break;
-																case "Boolean":
-																	console.log("Boolean inputs are not yet supported.")
-																	break;
-																case "Date":
-																	if(!result.Results[0].Fields[searchClause].IsClear)
-																		{
-																		$("#" + additionalFieldId).html(formatDate(result.Results[0].Fields[searchClause].DateTime, config.DateFormat))	
-																		}
-																	break;
-																case "Datetime":
-																	console.log("Datetime inputs are not yet supported.")
-																	break;
-																case "Decimal":
-																	console.log("Decimal inputs are not yet supported.")
-																	break;
-																case "Text":
-																	console.log("Text inputs are not yet supported.")
-																	break;
-																case "Currency":
-																	console.log("Currency inputs are not yet supported.")
-																	break;
-																case "Object":
-																	console.log("Object inputs are not yet supported.")
-																	break;
-																case "BigNumber":
-																	console.log("BigNumber inputs are not yet supported.")
-																	break;
-																case "Xml":
-																	console.log("Xml inputs are not yet supported.")
-																	break;
-																case "Geography":
-																	console.log("Geography inputs are not yet supported.")
-																	break;
-																}
-															}, 
-														error: function(result)
-															{
-															console.log("Oooops!")
-															}
-														})	
-													}
-											})(i)}									
-										}, 
-									error: function(result)
-										{
-										console.log("Oooops!")
-										}
-									});
-								}
+							var additionalFieldsEnabled = config.PropertiesPane.TerminalFolder.AdditionalFields
 							break;
 						case "document":
-							$("#properties-record-number").html(result.Results[0].RecordNumber.Value)
-							$("#properties-record-title").html(result.Results[0].RecordTitle.Value)
-							$("#properties-record-title").data("record-uri", result.Results[0].Uri)
-							$("#properties-record-title").data("record-record-type", result.Results[0].RecordRecordType.RecordTypeName.Value)
-							$("#properties-container").html(result.Results[0].RecordContainer.RecordNumber.Value + ": " + result.Results[0].RecordContainer.RecordTitle.Value)
-							$("#properties-record-type").html(result.Results[0].RecordRecordType.RecordTypeName.Value)
-							$("#properties-date-registered").html(dateRegistered)
-							
-							// access controls
-							var accessControlHTML = "<div>View Document Properties: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value, "record").ViewMetadata + "</div>"
-							var accessControlHTML = accessControlHTML + "<div>Update Document Properties: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value, "record").UpdateRecordMetadata + "</div>"
-							var accessControlHTML = accessControlHTML + "<div>Download Document: " + parseAccessControlString(result.Results[0].RecordAccessControl.Value, "record").ViewDocument + "</div>"
-							$("#properties-access-control").html(accessControlHTML)
-
-								
-							if(result.Results[0].RecordDestructionDate.IsClear==false)
-								{
-								$("#properties-date-due-for-destruction").html(formatDate(result.Results[0].RecordDestructionDate.DateTime, config.DateFormat))
-								}
-							if(config.PropertiesPane.IntermediateFolder.AdditionalFields=="true")
-								{
-								var recordUri = result.Results[0].Uri
-								var recordType = result.Results[0].RecordRecordType.RecordTypeName.Value
-								var url = baseUrl + apiPath + "/Search"
-								var data = 	{
-											"q" : "all",
-											"Properties" : "FieldDefinitionName, FieldDefinitionIsUsedByRecordTypes, FieldDefinitionFormat, FieldDefinitionSearchClause, FieldDefinitionLength",
-											"TrimType" : "FieldDefinition",
-											"PageSize" : "1000"
-											}
-								$.ajax(
-									{
-									url: url,
-									data: JSON.stringify(data),
-									type: "POST",
-									contentType: 'application/json',
-									xhrFields: { withCredentials: true},
-									success: function(result)
-										{
-										for(i=0; i<result.TotalResults; i++)
-											{
-											(function(index)
-												{
-												if(result.Results[i].FieldDefinitionIsUsedByRecordTypes.Value.includes(recordType))
-													{
-													var fieldFormat = result.Results[i].FieldDefinitionFormat.Value
-													
-													switch(fieldFormat)
-														{
-														case "String":
-																
-															var additionalFieldId = "properties-additional-fields-" + result.Results[i].FieldDefinitionSearchClause.Value;
-												
-															var additionalPropertyHTML = '<tr><td scope="row" style="width:20%;text-align:left;padding-left:30px;">'
-
-															additionalPropertyHTML = additionalPropertyHTML + result.Results[i].FieldDefinitionName.Value
-
-															additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td>'
-																
-															additionalPropertyHTML = additionalPropertyHTML + '<td  id="properties-edit-additional-field-' + result.Results[i].FieldDefinitionSearchClause.Value + '" class="edit-properties-link"><a href="#">Edit</a></td></tr>'
-
-															$("#properties-pane > table > tbody").append(additionalPropertyHTML)
-																
-															$("#" + additionalFieldId).data("record-title", recordTitle)
-															$("#" + additionalFieldId).data("record-record-type", recordType)
-															$("#" + additionalFieldId).data("record-uri", recordUri)
-															$("#" + additionalFieldId).data("field-name", result.Results[i].FieldDefinitionSearchClause.Value)
-															$("#" + additionalFieldId).data("field-length", result.Results[i].FieldDefinitionLength.Value)
-																
-															break;
-														case "Number":
-															console.log("Number inputs are not yet supported.")
-															break;
-														case "Boolean":
-															console.log("Boolean inputs are not yet supported.")
-															break;
-														case "Date":
-															var additionalFieldId = "properties-additional-fields-" + result.Results[i].FieldDefinitionSearchClause.Value;
-												
-															var additionalPropertyHTML = '<tr><td scope="row" style="width:20%;text-align:left;padding-left:30px;">'
-
-															additionalPropertyHTML = additionalPropertyHTML + result.Results[i].FieldDefinitionName.Value
-
-															additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td><td></td></tr>'
-
-															$("#properties-pane > table > tbody").append(additionalPropertyHTML)
-															break;
-														case "Datetime":
-															console.log("Datetime inputs are not yet supported.")
-															break;
-														case "Decimal":
-															console.log("Decimal inputs are not yet supported.")
-															break;
-														case "Text":
-															console.log("Text inputs are not yet supported.")
-															break;
-														case "Currency":
-															console.log("Currency inputs are not yet supported.")
-															break;
-														case "Object":
-															console.log("Object inputs are not yet supported.")
-															break;
-														case "BigNumber":
-															console.log("BigNumber inputs are not yet supported.")
-															break;
-														case "Xml":
-															console.log("Xml inputs are not yet supported.")
-															break;
-														case "Geography":
-															console.log("Geography inputs are not yet supported.")
-															break;
-														}
-
-													var searchClause = result.Results[i].FieldDefinitionSearchClause.Value;
-													var url = baseUrl + apiPath + "/Search?q=" + recordUri + "&properties=" + searchClause + "&TrimType=Record"
-													$.ajax(
-														{
-														url: url,
-														type: "POST",
-														contentType: 'application/json',
-														xhrFields: { withCredentials: true},
-														success: function(result)
-															{
-															switch(fieldFormat)
-																{
-																case "String":
-																	$("#" + additionalFieldId).html(result.Results[0].Fields[searchClause].Value)
-																	break;
-																case "Number":
-																	console.log("Number inputs are not yet supported.")
-																	break;
-																case "Boolean":
-																	console.log("Boolean inputs are not yet supported.")
-																	break;
-																case "Date":
-																	$("#" + additionalFieldId).html(formatDate(result.Results[0].Fields[searchClause].DateTime, config.DateFormat))
-																	break;
-																case "Datetime":
-																	console.log("Datetime inputs are not yet supported.")
-																	break;
-																case "Decimal":
-																	console.log("Decimal inputs are not yet supported.")
-																	break;
-																case "Text":
-																	console.log("Text inputs are not yet supported.")
-																	break;
-																case "Currency":
-																	console.log("Currency inputs are not yet supported.")
-																	break;
-																case "Object":
-																	console.log("Object inputs are not yet supported.")
-																	break;
-																case "BigNumber":
-																	console.log("BigNumber inputs are not yet supported.")
-																	break;
-																case "Xml":
-																	console.log("Xml inputs are not yet supported.")
-																	break;
-																case "Geography":
-																	console.log("Geography inputs are not yet supported.")
-																	break;
-																}
-															}, 
-														error: function(result)
-															{
-															console.log("Oooops!")
-															}
-														})	
-													}
-											})(i)}									
-										}, 
-									error: function(result)
-										{
-										console.log("Oooops!")
-										}
-									});
-								}
+							var additionalFieldsEnabled = config.PropertiesPane.Document.AdditionalFields
 							break;
+						}	
+					
+					// If Additional Fiels are enabled for in the config file
+					if(additionalFieldsEnabled=="true")
+						{
+						var recordUri = result.Results[0].Uri
+						var recordTitle = result.Results[0].RecordTitle.Value
+						var recordType = result.Results[0].RecordRecordType.RecordTypeName.Value
+						var url = baseUrl + apiPath + "/Search"
+						var data = 	{
+									"q" : "all",
+									"Properties" : "FieldDefinitionName, FieldDefinitionIsUsedByRecordTypes, FieldDefinitionFormat, FieldDefinitionSearchClause, FieldDefinitionLength",
+									"TrimType" : "FieldDefinition",
+									"PageSize" : "1000"
+									}
+						
+						// Return all configured additional fields.
+						var result = searchAPI(data)
+							.then(function(result)
+								{
+								for(i=0; i<result.TotalResults; i++)  // for each configured additional field
+									{
+									(function(index)
+										{
+										// if the field can be used with the record type of the selected record
+										if(result.Results[i].FieldDefinitionIsUsedByRecordTypes.Value.includes(recordType))
+											{
+											// add a new row to the properties table
+											showRecordAdditionalFieldName(result.Results[i], recordTitle, recordType, recordUri)
+												
+											var fieldFormat = result.Results[i].FieldDefinitionFormat.Value
+
+											var additionalFieldId = "properties-additional-fields-" + result.Results[i].FieldDefinitionSearchClause.Value;
+
+											var searchClause = result.Results[i].FieldDefinitionSearchClause.Value;
+											
+											// get the value of the addition field for the selected record
+											var url = baseUrl + apiPath + "/Search"
+											
+											data = 	{
+													"q" : recordUri,
+													"Properties" : searchClause,
+													"TrimType" : "Record"
+													}
+
+											$.ajax(
+												{
+												url: url,
+												data: JSON.stringify(data),
+												type: "POST",
+												contentType: 'application/json',
+												xhrFields: { withCredentials: true },
+												success: function(result)
+													{
+													// add the value to the properties table
+													showRecordAdditionalFieldValue(result, fieldFormat, additionalFieldId, searchClause)
+													}, 
+												error: function(result)
+													{
+													// Do something
+													}
+												})	
+											}
+									})(i)}
+								})
+							.fail(function(result)
+								{
+								// Do something
+								})
 						}
 					}, 
 				error: function(result)
 					{
-					console.log("Oooops!")
+					// Do something
 					}
 				});
 			}
@@ -2069,7 +1798,6 @@ function attachFileToRecord(recordUri, fileName, recordContainerUri)
 						
 					// Clear search results under folder.
 					//recordContainerUri
-					console.log("recordContainerUri: " + recordContainerUri)
 					if($("#level-0-search-result-type-uri-" + recordContainerUri).length)
 						{
 						$("#level-0-search-result-type-uri-" + recordContainerUri).parent().find("ul").remove()
@@ -2174,7 +1902,7 @@ function downloadDocument(recordUri, recordTitle, recordExtension, recordMimeTyp
 					}, 
 				error: function(result)
 					{
-					console.log("Oooops!")
+					// Do something
 					}
 				});
 			}

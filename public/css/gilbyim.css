@@ -131,3 +131,17 @@ code {
     background-color: #38882f;
     border-color: #000;
 }
+
+.datepicker table tr td.day:hover, .datepicker table tr td.focused {
+    /*background: #75b540;*/
+    cursor: pointer;
+}
+
+.form-control {
+	border: 1px solid #75b540;
+}
+	
+.form-control:focus {
+	border-color: #75b540;
+	box-shadow: 0 0 0 0.2rem #75b540;
+}

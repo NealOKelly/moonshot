@@ -6,7 +6,7 @@ $(document).ready(function()
 		//var url = baseUrl + apiPath + "/Search";
 		var data = {
 					"q" : "all",
-					"Properties" : "ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern",
+					"Properties" : "ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern, ClassificationIdNumber",
 					"TrimType" : "Classification",
 					"PageSize" : "1000000"
 					};
@@ -20,7 +20,7 @@ $(document).ready(function()
 						{
 						if(!$("#classification-uri-" + classifications.Results[i].Uri).length)
 							{
-							addClassificationNode("#all-files > ul", classifications.Results[i].Uri, classifications.Results[i].ClassificationName.Value, classifications.Results[i].ClassificationCanAttachRecords.Value, classifications.Results[i].ClassificationChildPattern.Value)
+							addClassificationNode("#all-files > ul", classifications.Results[i].Uri, classifications.Results[i].ClassificationName.Value, classifications.Results[i].ClassificationCanAttachRecords.Value, classifications.Results[i].ClassificationChildPattern.Value, result.Results[i].ClassificationIdNumber.Value)
 							}
 							$("#all-files > ul").addClass("classification-hidden")
 						}
@@ -50,7 +50,6 @@ $(document).on("click", ".edit-properties-link", function()
 	{
 	var linkElement = event.target
 	var editableCellId = $("#" + $(linkElement).parent().attr("id")).parent().find("td:nth-child(2)").attr("id")
-	console.log("editableCellId: " + editableCellId)
 	switch($(event.target).html())
 		{
 		case "Edit":
@@ -104,7 +103,45 @@ $(document).on("click", ".edit-properties-link", function()
 			
 			if(editableCellId.includes("properties-additional-fields"))
 				{
-				$("#" + editableCellId).html('<form autocomplete="off"><input id="editRecordPropertiesInput" type="text" style="width:100%;" value="' + $("#" + editableCellId).html().replace('"', '&quot;') + '" maxlength="' + $("#" + editableCellId).data("field-length") + '"></form>')
+				switch($("#" + editableCellId).data("field-definition-format"))
+					{
+					case "String":
+						$("#" + editableCellId).html('<form autocomplete="off"><input id="editRecordPropertiesInput" type="text" style="width:100%;" value="' + $("#" + editableCellId).html().replace('"', '&quot;') + '" maxlength="' + $("#" + editableCellId).data("field-length") + '"></form>')
+						break;
+					case "Number":
+						console.log("Number inputs are not yet supported.")
+						break;
+					case "Boolean":
+						console.log("Boolean inputs are not yet supported.")
+						break;
+					case "Date":
+						$("#" + editableCellId).html('<form autocomplete="off"><input id="editRecordPropertiesInput" class="properties-date-input" type="text" style="width:100%;" value="' + formatDate($("#" + editableCellId).html(), "dd-mmm-yyyy", config.DateFormat) + '" data-provide="datepicker" data-date-format="' + config.DatePicker.DateFormat + '" data-date-autoclose="' + config.DatePicker.AutoClose + '" placeholder="' + config.DatePicker.Placeholder + '" data-date-start-date="' + config.DatePicker.StartDate + '" data-date-assume-nearby-year="' + config.DatePicker.AssumeNearbyYear + '" maxlength="10"></form>')
+						break;
+					case "Datetime":
+						console.log("Datetime inputs are not yet supported.")
+						break;
+					case "Decimal":
+						console.log("Decimal inputs are not yet supported.")
+						break;
+					case "Text":
+						console.log("Text inputs are not yet supported.")
+						break;
+					case "Currency":
+						console.log("Currency inputs are not yet supported.")
+						break;
+					case "Object":
+						console.log("Object inputs are not yet supported.")
+						break;
+					case "BigNumber":
+						console.log("BigNumber inputs are not yet supported.")
+						break;
+					case "Xml":
+						console.log("Xml inputs are not yet supported.")
+						break;
+					case "Geography":
+						console.log("Geography inputs are not yet supported.")
+						break;
+					}
 				}
 			else // it's a record title
 				{
@@ -119,19 +156,16 @@ $(document).on("click", ".edit-properties-link", function()
 			var url = baseUrl + apiPath + "/Record";
 			if(editableCellId.includes("properties-additional-fields"))
 				{
-				console.log("Saving Additional Field")
 				var data = 	{
 							"Uri" : $("#" + editableCellId).data("record-uri"),
 							"RecordTitle" : $("#" + editableCellId).data("record-title"),
 							"RecordRecordType" : $("#" + editableCellId).data("record-record-type"),
 							"AdditionalFields" : {}	 
 							}
-				data.AdditionalFields[$("#" + editableCellId).data("field-name")] = $("#editRecordPropertiesInput").val()
-				console.log(data)
+					data.AdditionalFields[$("#" + editableCellId).data("field-name")] = $("#editRecordPropertiesInput").val()
 				}
 			else
 				{
-				console.log("Saving Record Title")
 				var data = 	{
 							"Uri" : $("#" + editableCellId).data("record-uri"),
 							"RecordTitle" : $("#editRecordPropertiesInput").val(),
@@ -155,8 +189,7 @@ $(document).on("click", ".edit-properties-link", function()
 					var result = searchAPI(data)
 						.then(function(result)
 							{
-							$("#" + editableCellId).html($("#editRecordPropertiesInput").val())
-							$(".edit-properties-link:not(.editing) > a").css("display", "block")
+							//$("#" + editableCellId).html($("#editRecordPropertiesInput").val())
 							
 							// update the classification tree with the new title.
 							$("#record-uri-" + $("#" + editableCellId).data("record-uri") + " >span:nth-child(3)>a").html(result.Results[0].RecordTitle.Value)
@@ -239,6 +272,62 @@ $(document).on("click", ".edit-properties-link", function()
 								$("#upload-form-record-container").val(result.Results[0].RecordNumber.Value + ": " + result.Results[0].RecordTitle.Value)
 								// show upload form
 								$("#upload-form-container").show()									
+								}
+
+						
+							switch($("#" + editableCellId).data("field-definition-format"))
+								{
+								case "String":
+									$("#" + editableCellId).html($("#editRecordPropertiesInput").val())
+									$(".edit-properties-link:not(.editing) > a").css("display", "block")
+									break;
+								case "Number":
+									console.log("Number inputs are not yet supported.")
+									break;
+								case "Boolean":
+									console.log("Boolean inputs are not yet supported.")
+									break;
+								case "Date":
+									console.log('$("#editRecordPropertiesInput").val(): ' + $("#editRecordPropertiesInput").val())
+									switch($("#editRecordPropertiesInput").val().length)
+										{
+										case 0:
+											$("#" + editableCellId).html("")
+											break;
+										case 10:
+											console.log("This code is called.  Boo-yah!")
+											$("#" + editableCellId).html(formatDate($("#editRecordPropertiesInput").val(), "tenDigit", config.DateFormat))
+											break;
+										case 11:
+											$("#" + editableCellId).html(formatDate($("#editRecordPropertiesInput").val(), "dd-mmm-yyyy", config.DateFormat))												
+											break;
+										}
+										$(".edit-properties-link:not(.editing) > a").css("display", "block")
+									break;
+								case "Datetime":
+									console.log("Datetime inputs are not yet supported.")
+									break;
+								case "Decimal":
+									console.log("Decimal inputs are not yet supported.")
+									break;
+								case "Text":
+									console.log("Text inputs are not yet supported.")
+									break;
+								case "Currency":
+									console.log("Currency inputs are not yet supported.")
+									break;
+								case "Object":
+									console.log("Object inputs are not yet supported.")
+									break;
+								case "BigNumber":
+									console.log("BigNumber inputs are not yet supported.")
+									break;
+								case "Xml":
+									console.log("Xml inputs are not yet supported.")
+									break;
+								case "Geography":
+									console.log("Geography inputs are not yet supported.")
+									break;
 								}
 							})
 						.fail(function(result)
@@ -582,13 +671,13 @@ function expandCollapsedSearchResult(recordUri, level)
 							}, 
 						error: function(result)
 							{
-							console.log("Oooops!")
+							// Do something
 							}
 						});
 					}, 
 				error: function(recordTypeDefinitions)
 					{
-					console.log("Oooops!")
+					//Do something
 					}
 				});
 			}
@@ -789,17 +878,6 @@ function populateSearchResultPane(searchString, foldersOnly)
 						"TrimType" : "RecordType",
 						"PageSize" : "111"
 						}
-			var result = searchAPI(data)
-				.then(function(result)
-					{
-					console.log("then")
-					console.log(result)	
-					})
-				.fail(function(result)
-					{
-					console.log("Failed!!!")
-					})
-				
 			$.ajax(
 				{
 				url: url,
@@ -808,8 +886,6 @@ function populateSearchResultPane(searchString, foldersOnly)
 				xhrFields: { withCredentials: true},
 				success: function(recordTypeDefinitions)
 					{
-					console.log("ajax")
-					console.log(recordTypeDefinitions)
 					data = 	{
 								"q" : 'content:"'+ searchString +'" Or anyWord:' + searchString,
 								"Properties" : "RecordNumber, RecordTitle, RecordRecordType, RecordMimeType, RecordExtension",
@@ -1405,6 +1481,14 @@ $(".date-input").focus(function(event)
 //	$(event.target).val(isValidDate(oldValue)).trigger("change")
 	})
 
+$(".properties-date-input").change(function(event)
+	{
+	console.log("Change event called.")
+//	oldValue = $(event.target).val()
+//	$(event.target).val("").trigger("change")
+//	$(event.target).val(isValidDate(oldValue)).trigger("change")
+	})
+
 
 
 function isValidDate(dateString)
@@ -1412,7 +1496,6 @@ function isValidDate(dateString)
 		// First check for the pattern
 		if(!/^(\d{2}|\d{1})[\-\s\/](\d{2}|\d{1})[\-\s\/](\d{4}|\d{2})$/.test(dateString))
 			{
-			console.log("Called.")
 			return false;				
 			}
 		// Parse the date parts to integers
@@ -1442,15 +1525,10 @@ function isValidDate(dateString)
 			{
 			var today = new Date();
 			var nearbyDateThisCentury = parseInt(today.getFullYear().toString().substr(0, 2) + year)
-			console.log("nearbyDateThisCentury:" + nearbyDateThisCentury)
 			var nearbyDateLastCentury = parseInt((today.getFullYear()-100).toString().substr(0, 2) + year)
-			console.log("nearbyDateLastCentury:" + nearbyDateLastCentury)
 			var nearbyDateNextCentury = parseInt((today.getFullYear()+100).toString().substr(0, 2) + year)
-			console.log("nearbyDateNextCentury:" + nearbyDateNextCentury)	
 			deltaLastCentury = today.getFullYear() - nearbyDateLastCentury
-			console.log("deltaLastCentury: " + deltaLastCentury)
 			deltaNextCentury = nearbyDateNextCentury - today.getFullYear()
-			console.log("deltaNextCentury: " + deltaNextCentury)
 			if(nearbyDateThisCentury>today.getFullYear()) // it's in the future
 				{
 				deltaThisCentury = nearbyDateThisCentury - today.getFullYear()
@@ -1479,32 +1557,19 @@ function isValidDate(dateString)
 				{
 				year = nearbyDateThisCentury
 				}			
-			console.log("deltaThisCentury: " + deltaThisCentury)
 			}
 		else
 			{
 			var year = parseInt(parts[2], 10)	
 			}
-
-		
-
-
-		
-			console.log("year: " + year)
 		
 		// Check the ranges of month and year
 		if(year < 1000 || year > 3000 || month == 0 || month > 12)
 			{
-			console.log("Returning false because of year range validation failure.")
 			return false;
 			}
 
 		var monthLength = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
-
-
-			
-			
-		//console.log("Current MIlennium: "  + today.getFullYear().toString().substr(0, 2))
 		
 		// Adjust for leap years
 		if(year % 400 == 0 || (year % 100 != 0 && year % 4 == 0))
@@ -1516,14 +1581,11 @@ function isValidDate(dateString)
 			if(day<10)
 				{
 				day = "0" + day
-				console.log(day)
 				}
 			if(month<10)
 				{
 				month = "0" + month
-				console.log(month)
 				}
-			console.log("year.length:" + year.length)
 			return day + "-" + month + "-" + year;					
 			}
 	};
