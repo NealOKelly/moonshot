@@ -9,17 +9,25 @@
 // 8. DOWNLOAD DOCUMENT //
 // 9. MISCELLANEOUS //
 
+function getTimeStamp()
+	{
+	var timeStamp = new Date().getTime();
+	return timeStamp;
+	}
 
 // 1. AUTHENTICATION & SESSION MANAGEMENT //
 function preauthenticateApi()
 	{
+
 	// Session cookies need to be estabilished before making any AJAX calls to the API server.  This is because the first HTTP200 response
 	// (i.e what is returned by the ajax call) is actually a page served by ADFS server that uses JavaScript to POST the SAML assertion 
 	// to the API server.  As a workaround, we load a resource from the API server into an IFRAME instead.
 	return $.Deferred(function(d)
 	{
+	var startTime = getTimeStamp();	
 	if(hasPreAuthenticated)
 		{
+		//gtag('event', 'Preauthenticate', { 'Duration' :  getTimeStamp() - startTime });
 		d.resolve();
 		return;
 		}
@@ -33,6 +41,7 @@ function preauthenticateApi()
 				{
 				hasPreAuthenticated = true;
 				iFrame.remove();
+				gtag('event', 'Login', { 'login_duration' :  getTimeStamp() - startTime });
 				d.resolve();					
 				}
 			});
@@ -70,6 +79,7 @@ function getAuthenticationStatus()
 
 function displaySessionExpiredModal()
 	{
+	gtag('event', 'Session Timeout');
 	$("#loading").modal("hide")		
 	$("#connection-failed").modal("hide")
 	$("#create-folder-status").modal("hide")
@@ -214,6 +224,7 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 					var recordTypeDefinitions = result;
 					if(parentNodeType=="classification")
 						{
+						var startTime = getTimeStamp();
 						data = {
 								"q" : "classification:" + parentNodeId.substr(19),
 								"Properties" : "RecordTitle, RecordRecordType, RecordTypeContentsRule, RecordContainer", 
@@ -235,6 +246,7 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 					var result = searchAPI(data)
 						.then(function(result)
 							{
+							console.log("parentNodeType: " + parentNodeType)
 							if(!$("#" + parentNodeId + " > ul").length)
 								{
 								if(result.TotalResults>0)
@@ -309,7 +321,12 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 								}
 								sortClassificationTree(".record-title")
 							$("#" + parentNodeId + " > ul").removeClass("classification-hidden")
-
+							
+							if(parentNodeType=="classification")
+								{
+								gtag('event', 'Show Folders', { 'show_folders_duration' :  getTimeStamp() - startTime });
+								console.log(getTimeStamp() - startTime)
+								}
 							})
 						.fail(function(result)
 							{
@@ -973,7 +990,7 @@ function clearForm(form)
 			break;
 		case "upload-form":
 			$("#upload-form-record-title").val("")
-			$("#upload-form-record-type").val("")
+			//$("#upload-form-record-type").val("")
 			$("#upload-form > .additional-field > input").val("")
 			break;
 		}
@@ -1883,6 +1900,7 @@ function downloadDocument(recordUri, recordTitle, recordExtension, recordMimeTyp
 		{
 		if(isAuthenticated)
 			{
+			gtag('event', 'Download Document');
 			var url = baseUrl + apiPath + "/Record/" + recordUri + "/File/Document?SuppressLastAction=false"
 			$.ajax(
 				{

@@ -145,3 +145,15 @@ code {
 	border-color: #75b540;
 	box-shadow: 0 0 0 0.2rem #75b540;
 }
+
+.action-panel-control-container{
+	/*display: flex;*/
+	min-width: 175px;
+}
+
+.truncate {
+  /*width: 250px;*/
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

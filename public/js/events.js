@@ -156,6 +156,7 @@ $(document).on("click", ".edit-properties-link", function()
 			var url = baseUrl + apiPath + "/Record";
 			if(editableCellId.includes("properties-additional-fields"))
 				{
+				gtag('event', 'Edit Additional Properties')
 				var data = 	{
 							"Uri" : $("#" + editableCellId).data("record-uri"),
 							"RecordTitle" : $("#" + editableCellId).data("record-title"),
@@ -166,6 +167,7 @@ $(document).on("click", ".edit-properties-link", function()
 				}
 			else
 				{
+				gtag('event', 'Edit Record Title')
 				var data = 	{
 							"Uri" : $("#" + editableCellId).data("record-uri"),
 							"RecordTitle" : $("#editRecordPropertiesInput").val(),
@@ -275,60 +277,69 @@ $(document).on("click", ".edit-properties-link", function()
 								}
 
 						
-							switch($("#" + editableCellId).data("field-definition-format"))
+							if(editableCellId=="properties-record-title")
 								{
-								case "String":
-									$("#" + editableCellId).html($("#editRecordPropertiesInput").val())
-									$(".edit-properties-link:not(.editing) > a").css("display", "block")
-									break;
-								case "Number":
-									console.log("Number inputs are not yet supported.")
-									break;
-								case "Boolean":
-									console.log("Boolean inputs are not yet supported.")
-									break;
-								case "Date":
-									console.log('$("#editRecordPropertiesInput").val(): ' + $("#editRecordPropertiesInput").val())
-									switch($("#editRecordPropertiesInput").val().length)
-										{
-										case 0:
-											$("#" + editableCellId).html("")
-											break;
-										case 10:
-											console.log("This code is called.  Boo-yah!")
-											$("#" + editableCellId).html(formatDate($("#editRecordPropertiesInput").val(), "tenDigit", config.DateFormat))
-											break;
-										case 11:
-											$("#" + editableCellId).html(formatDate($("#editRecordPropertiesInput").val(), "dd-mmm-yyyy", config.DateFormat))												
-											break;
-										}
-										$(".edit-properties-link:not(.editing) > a").css("display", "block")
-									break;
-								case "Datetime":
-									console.log("Datetime inputs are not yet supported.")
-									break;
-								case "Decimal":
-									console.log("Decimal inputs are not yet supported.")
-									break;
-								case "Text":
-									console.log("Text inputs are not yet supported.")
-									break;
-								case "Currency":
-									console.log("Currency inputs are not yet supported.")
-									break;
-								case "Object":
-									console.log("Object inputs are not yet supported.")
-									break;
-								case "BigNumber":
-									console.log("BigNumber inputs are not yet supported.")
-									break;
-								case "Xml":
-									console.log("Xml inputs are not yet supported.")
-									break;
-								case "Geography":
-									console.log("Geography inputs are not yet supported.")
-									break;
+								$("#" + editableCellId).html($("#editRecordPropertiesInput").val())
+								$(".edit-properties-link:not(.editing) > a").css("display", "block")
 								}
+							else
+								{
+								switch($("#" + editableCellId).data("field-definition-format"))
+									{
+									case "String":
+										$("#" + editableCellId).html($("#editRecordPropertiesInput").val())
+										$(".edit-properties-link:not(.editing) > a").css("display", "block")
+										break;
+									case "Number":
+										console.log("Number inputs are not yet supported.")
+										break;
+									case "Boolean":
+										console.log("Boolean inputs are not yet supported.")
+										break;
+									case "Date":
+										console.log('$("#editRecordPropertiesInput").val(): ' + $("#editRecordPropertiesInput").val())
+										switch($("#editRecordPropertiesInput").val().length)
+											{
+											case 0:
+												$("#" + editableCellId).html("")
+												break;
+											case 10:
+												console.log("This code is called.  Boo-yah!")
+												$("#" + editableCellId).html(formatDate($("#editRecordPropertiesInput").val(), "tenDigit", config.DateFormat))
+												break;
+											case 11:
+												$("#" + editableCellId).html(formatDate($("#editRecordPropertiesInput").val(), "dd-mmm-yyyy", config.DateFormat))												
+												break;
+											}
+											$(".edit-properties-link:not(.editing) > a").css("display", "block")
+										break;
+									case "Datetime":
+										console.log("Datetime inputs are not yet supported.")
+										break;
+									case "Decimal":
+										console.log("Decimal inputs are not yet supported.")
+										break;
+									case "Text":
+										console.log("Text inputs are not yet supported.")
+										break;
+									case "Currency":
+										console.log("Currency inputs are not yet supported.")
+										break;
+									case "Object":
+										console.log("Object inputs are not yet supported.")
+										break;
+									case "BigNumber":
+										console.log("BigNumber inputs are not yet supported.")
+										break;
+									case "Xml":
+										console.log("Xml inputs are not yet supported.")
+										break;
+									case "Geography":
+										console.log("Geography inputs are not yet supported.")
+										break;
+									}
+								}
+
 							})
 						.fail(function(result)
 							{
@@ -408,12 +419,13 @@ $(document).on("click", "#upload-button", function()
 						additionalFieldValues.push($("#upload-form > .additional-field").eq(i).children().eq(1).val())
 						}
 					createRecord(recordTitle, recordType, recordContainerUri, fileName + "." + extension, additionalFieldKeys, additionalFieldValues)
+					gtag('event', 'Upload Document');					
 					})
 				}
 			}
 		else
 			{
-			$("#session-expired").modal("show")
+			displaySessionExpiredModal()
 			}
 		});
 	})
@@ -449,10 +461,12 @@ $(document).on("click", "#search-button", function()
 		if($("#folders-only").is(":checked"))
 			{
 			populateSearchResultPane($("#search-input").val(), "true")		
+			gtag('event', 'Search (Folders Only)');
 			}
 		else
 			{
-			populateSearchResultPane($("#search-input").val(), "false")		
+			populateSearchResultPane($("#search-input").val(), "false")	
+			gtag('event', 'Search (All Records)');
 			}
 			//if($("#folders-only").val())
 		
@@ -513,7 +527,10 @@ function expandCollapsedSearchResult(recordUri, level)
 
 								$("#level-" + level + "-search-result-recordTitle-uri-"  + recordUri).after('<ul><li class="no-results" style="color:grey;">- No records found.</li></ul>')
 
-								$("#level-" + level + "-search-result-recordType-uri-"  + recordUri).after('<ul><li class="no-results" style="color:grey;">- None</li></ul>')	
+								$("#level-" + level + "-search-result-recordType-uri-"  + recordUri).after('<ul><li class="no-results" style="color:grey;">- None</li></ul>')
+									
+								$("#level-" + level + "-search-result-download-uri-"  + recordUri).after('<ul><li class="no-results" style="color:grey;"><!--Intentionally Blank--></li></ul>')
+									
 								}
 							else
 								{
@@ -683,7 +700,7 @@ function expandCollapsedSearchResult(recordUri, level)
 			}
 		else
 			{
-			$("#session-expired").modal("show")
+			displaySessionExpiredModal()
 			}
 		});
 	}
@@ -871,6 +888,8 @@ function populateSearchResultPane(searchString, foldersOnly)
 		{
 		if(isAuthenticated)
 			{
+			var startTime = getTimeStamp();
+				
 			url = baseUrl + apiPath + "/RecordType?q=all&properties=RecordTypeLevel, RecordTypeContentsRule, RecordTypeName&pageSize=1000000"
 			var data = 	{
 						"q" : "all",
@@ -878,6 +897,7 @@ function populateSearchResultPane(searchString, foldersOnly)
 						"TrimType" : "RecordType",
 						"PageSize" : "111"
 						}
+			searchString = "*" + searchString + "*";
 			$.ajax(
 				{
 				url: url,
@@ -887,7 +907,7 @@ function populateSearchResultPane(searchString, foldersOnly)
 				success: function(recordTypeDefinitions)
 					{
 					data = 	{
-								"q" : 'content:"'+ searchString +'" Or anyWord:' + searchString,
+								"q" : 'content:"' + searchString + '" Or anyWord:' + searchString,
 								"Properties" : "RecordNumber, RecordTitle, RecordRecordType, RecordMimeType, RecordExtension",
 								"TrimType" : "Record",
 								"PageSize" : "1000",
@@ -966,6 +986,11 @@ function populateSearchResultPane(searchString, foldersOnly)
 									}
 								var endHTML = '</tbody></table>'
 								$("#search-results-pane > tbody").append(thHTML)
+							
+								// here
+								gtag('event', 'Search', { 'search_duration' :  getTimeStamp() - startTime });
+								console.log(getTimeStamp() - startTime)
+									
 								hideLoadingSpinner()	
 								}	
 							})
@@ -982,7 +1007,7 @@ function populateSearchResultPane(searchString, foldersOnly)
 			}
 		else
 			{
-			$("#session-expired").modal("show")
+			displaySessionExpiredModal()
 			}
 		});	
 	}
@@ -1008,7 +1033,7 @@ function addSearchResult(record, type)
 	resultRowHTML = resultRowHTML + '<td><ul><li id="level-0-search-result-recordType-uri-' + record.Uri + '">' + record.RecordRecordType.RecordTypeName.Value + '</li></ul></td>'
 	if(type=="document")
 		{
-		resultRowHTML = resultRowHTML + '<td style="text-align:center;"><ul><li id="level-0-search-result-download-uri-' + record.Uri + '"><span class="download-grey"></span></li></ul></td></tr>'
+		resultRowHTML = resultRowHTML + '<td style="text-align:center;"><ul><li id="level-0-search-result-download-uri-' + record.Uri + '"><span class="download-grey"></span></li></ul></td>'
 		}
 	else
 		{
@@ -1362,6 +1387,7 @@ $(document).on("click", ".record-title>a", function()
 // Click on collpased caret
 $(document).on("click", ".collapsed", function()
 	{
+	gtag('event', 'Expand Classification');
 	var parentNodeId = $(event.target).parent().attr("id");
 	$("#" + parentNodeId + " > span.collapsed").addClass("expanded")
 	$("#" + parentNodeId + " > span.collapsed").removeClass("collapsed")
@@ -1378,10 +1404,12 @@ $(document).on("click", ".collapsed", function()
 		if($(this).parent().hasClass("classification-can-attach-records"))
 			{
 			refreshFolderNodes("classification", $(this).parent().attr("id"))
+			gtag('event', 'Browse (to Folder)');
 			}
 		if($(this).parent().hasClass("folder-intermediate"))
 			{
 			refreshFolderNodes("record", $(this).parent().attr("id"))
+			gtag('event', 'Browse (to Sub Folder)');
 			}
 		});
 	})
@@ -1399,6 +1427,7 @@ $(document).on("change", "#upload-form-file", function()
 // Click on expanded caret
 $(document).on("click", ".expanded", function()
 	{
+	gtag('event', 'Collapse Classification');
 	var parentNodeId = $(event.target).parent().attr("id");
 	$("#" + parentNodeId + " > ul").addClass("classification-hidden")
 	$("#" + parentNodeId + " > span.expanded").addClass("collapsed")
@@ -1424,6 +1453,7 @@ $(document).on("click", "#create-folder-button", function()
 			additionalFieldKeys.push($("#new-folder-form > .additional-field").eq(i).attr("data-search-clause-name"))
 			additionalFieldValues.push($("#new-folder-form > .additional-field").eq(i).children().eq(1).val())
 			}
+		gtag('event', 'Create Folder');
 		createFolder(recordTitle, recordClassificationUri, recordContainerUri, recordType, additionalFieldKeys, additionalFieldValues)
 		}
 	else
@@ -1440,6 +1470,7 @@ $(document).on("click", "#create-folder-button", function()
 			additionalFieldKeys.push($("#new-sub-folder-form > .additional-field").eq(i).attr("data-search-clause-name"))
 			additionalFieldValues.push($("#new-sub-folder-form > .additional-field").eq(i).children().eq(1).val())
 			}
+		gtag('event', 'Create Sub Folder');
 		createFolder(recordTitle, recordClassificationUri, recordContainerUri, recordType, additionalFieldKeys, additionalFieldValues)
 		}
 	})
@@ -1596,6 +1627,7 @@ function isValidDate(dateString)
 // Click re-athentication button
 $(document).on("click", "#reauthenticate-button", function()
 	{
+	gtag('event', 'Click Reauthenticate Button');
 	removeAPISessionCookies();
 	$(location).attr("href","/logout");
 	})
@@ -1603,6 +1635,7 @@ $(document).on("click", "#reauthenticate-button", function()
 // Click logout link
 $(document).on("click", "#logout", function()
 	{
+	gtag('event', 'Logout');
 	removeAPISessionCookies();
 	$(location).attr("href", "/logout");
 	})

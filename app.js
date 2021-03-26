@@ -94,7 +94,7 @@ app.get('/authentication-status', function(req, res, next)
 		{
 		res.send(false)
 		}
-});
+	});
 
 app.get('/logout', function(req, res)
 	{
