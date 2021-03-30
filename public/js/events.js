@@ -400,12 +400,23 @@ $(document).on("click", "#upload-button", function()
 		{
 		if(isAuthenticated)
 			{
-			if($("#upload-form-file").prop('files').length > 0)
+			if($("#drop-zone").data("file"))
+					{
+					console.log("Use the drag and dropped file.")
+					file = $("#drop-zone").data("file")
+					console.log("The filename is: " + file.name)
+					$("#dropped-filename").html("")
+					var extension = getFileExtension(file.name);
+					}
+				else
+					{
+					file = $("#upload-form-file").prop('files')[0];
+					var extension = getFileExtension($("#upload-form-file").val().substr(12))
+					}
+			if($("#upload-form-file").prop('files').length > 0 || $("#drop-zone").data("file"))
 				{
 				$("#upload-status").modal("show")
-				file = $("#upload-form-file").prop('files')[0];
 				var fileName = uuidv4();
-				var extension = getFileExtension($("#upload-form-file").val().substr(12))
 				uploadFile(fileName, extension, file).then(function()
 					{
 					var recordTitle = $("#upload-form-record-title").val()
@@ -422,6 +433,15 @@ $(document).on("click", "#upload-button", function()
 					gtag('event', 'Upload Document');					
 					})
 				}
+				$("#dropped-file-filetype-icon").removeClass()
+				$("#dropped-file-filetype-icon").addClass("fiv-viv")
+				
+				if($("#drop-zone").data("file"))
+					{
+					$("#drop-zone").removeData("file")		
+					}
+				$("#file-details-container").css("display", "none")
+				$("#browse-button-container").css("display", "inline-block")
 			}
 		else
 			{
@@ -429,6 +449,16 @@ $(document).on("click", "#upload-button", function()
 			}
 		});
 	})
+
+$("#browse-button").click(function()
+	{
+	$("#upload-form-file").trigger("click"); // opening dialog
+	gtag('event', 'Browse for File')
+	document.activeElement.blur()
+	return false; // avoiding navigation
+    });
+
+
 
 $(document).on("click", "#search-button", function()
 	{
@@ -1418,10 +1448,120 @@ $(document).on("click", ".collapsed", function()
 $(document).on("change", "#upload-form-file", function()
 	{
 	var fileName = $("#upload-form-file").val().substr(12)
-	$("#upload-form-file-label").html(fileName)
 	var extension = getFileExtension($("#upload-form-file").val().substr(12))
+	$("#browse-button-container").css("display", "none")
+	$("#dropped-file-filetype-icon").addClass("fiv-icon-" + extension)
+	$("#dropped-file-name").html(fileName)
+	$("#file-details-container").css("display", "inline-block")
 	var recordTitle = fileName.substr(0, fileName.length - (extension.length + 1))
 	$("#upload-form-record-title").val(recordTitle)
+	})
+
+// This prevent dragOver and drop behaviours at a document level
+$(document).on(
+	{
+    dragover: function()
+		{
+        return false;
+    	},
+    drop: function()
+		{
+        return false;
+    	}
+	});
+
+$("#x-icon").on(
+	{
+    dragover: function()
+		{
+        return false;
+    	},
+    drop: function()
+		{
+        return false;
+    	}
+	});
+
+$("#browse-button").on(
+	{
+    dragover: function()
+		{
+        return false;
+    	},
+    drop: function()
+		{
+        return false;
+    	}
+	});
+
+
+function dragstart_handler(ev)
+	{
+ 	//console.log("dragStart: target.id = " + ev.target.id);
+ 	// Add this element's id to the drag payload so the drop handler will
+ 	// know which element to add to its tree
+ 	ev.dataTransfer.setData("text/plain", ev.target.id);
+ 	ev.dataTransfer.effectAllowed = "move";
+	}
+
+
+function dropHandler(ev)
+	{
+  	console.log('File(s) dropped');
+
+  	// Prevent default behavior (Prevent file from being opened)
+  	ev.preventDefault();
+
+  	if(ev.dataTransfer.items) 
+		{
+    	// Use DataTransferItemList interface to access the file(s)
+	  	if(ev.dataTransfer.items.length>1)
+			{
+			console.log("This code is called.")
+			$("#drag-and-drop-error").modal("show")
+			}
+		else
+			{
+			if(ev.dataTransfer.items[0].kind === 'file')
+				{
+        		var file = ev.dataTransfer.items[0].getAsFile();
+				$("#drop-zone").data("file", file)
+				$("#browse-button-container").css("display", "none")
+				$("#file-details-container").css("display", "inline-block")
+				$("#dropped-file-filetype-icon").addClass("fiv-icon-" + getFileExtension(file.name))
+				var recordTitle = file.name.substr(0, file.name.length - (getFileExtension(file.name).length + 1))
+				$("#dropped-file-name").html(file.name)
+				$("#upload-form-record-title").val(recordTitle)
+				gtag('event', 'Drop File')
+      			}
+			}
+  		}
+	}
+
+function dragOverHandler(ev)
+	{
+  	//console.log('File(s) in drop zone');
+	// Prevent default behavior (Prevent file from being opened)
+  	ev.preventDefault();
+	}
+
+$(document).on("click", "#drag-and-drop-error-ok-button", function()
+	{
+	$("#drag-and-drop-error").modal("hide")
+	})
+
+$(document).on("click", "#x-icon", function()
+	{
+	console.log("x-icon clicked.")
+	$("#dropped-file-filetype-icon").removeClass()
+	$("#dropped-file-filetype-icon").addClass("fiv-viv")
+	$("#dropped-file-name").html("")
+	$("#file-details-container").css("display", "none")
+	$("#browse-button-container").css("display", "inline-block")
+	$("#upload-form-record-title").val("")
+	$("#drop-zone").removeData("file")
+	$("#upload-form-file").parent().html( $("#upload-form-file").parent().html() )
+	gtag('event', 'Clear File Control')
 	})
 
 // Click on expanded caret

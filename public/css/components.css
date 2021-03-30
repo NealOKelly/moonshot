@@ -494,3 +494,14 @@ th.sorted-up::after{
 	color: #FFF;
 	text-decoration: underline;
 }
+
+#x-icon{
+	display: inline-block;
+	text-align: center;
+	content: "";
+	background-image: url("../img/bootstrap-icons/x.svg");
+	background-size: cover;
+	background-repeat: no-repeat;
+	width: 24px;
+    height: 24px;
+}
