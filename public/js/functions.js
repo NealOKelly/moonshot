@@ -989,11 +989,23 @@ function clearForm(form)
 			$("#new-sub-folder-form > .additional-field > input").val("")
 			break;
 		case "upload-form":
+			$("#dropped-file-filetype-icon").removeClass()
+			$("#dropped-file-filetype-icon").addClass("fiv-viv")
+			$("#dropped-file-filetype-icon").addClass("fiv-icon-blank")
+			$("#dropped-file-name").html("")
+			$("#file-details-container").css("display", "none")
+			$("#browse-button-container").css("display", "inline-block")
 			$("#upload-form-record-title").val("")
-			//$("#upload-form-record-type").val("")
+			$("#drop-zone").removeData("file")
+			resetFileInput("#upload-form-file")
 			$("#upload-form > .additional-field > input").val("")
 			break;
 		}
+	}
+
+function resetFileInput(id)
+	{
+	$(id).wrap("<form>").closest("form").get(0).reset();
 	}
 
 

@@ -3,7 +3,7 @@
 	<h1 class="text-center display-4" style="color:#000033;font-size:1.75rem;">Add a document to this folder?</h1>
 	<br>
 	<form id="upload-form" autocomplete="off">
-		<label for="record-type-input" class="display-4" style="color:#000033;font-size:1.25rem;"><span>File </span><span style="font-size:1rem;">(drag &amp; drop or browse)</span></label>
+		<label for="record-type-input" class="display-4" style="color:#000033;font-size:1.25rem;"><span>File </span><span style="font-size:1rem;">(drag &amp; drop, or browse)</span></label>
 		
 		
 		<div id="drop-zone" style="width:100%;background-color:#555;height:100px;color:#fff;margin-bottom:1rem;" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
@@ -21,7 +21,7 @@
 				<div class="d-flex justify-content-end"><span id="x-icon"></span></div>
 				<div style="width:100%;height:76%;" class="d-flex align-items-center">
 					<div style="width:100%;margin-top:-24px;flex-wrap:wrap;" class="d-flex justify-content-center">
-						<div><span id="dropped-file-filetype-icon" class="fiv-viv"></span></div>
+						<div><span id="dropped-file-filetype-icon" class="fiv-viv fiv-icon-blank"></span></div>
 						<div style="flex-basis:100%;height:0;"><!-- break --></div>
 						<div><span id="dropped-file-name"></span></div>				
 					</div>
@@ -34,7 +34,7 @@
 		
 		<div id="upload-form-file-container" class="custom-file mb-3 truncate" style="display: none;">
 			<input id="upload-form-file" name="upload" type="file" class="custom-file-input" id="validatedCustomFile">
-			<label id="upload-form-file-label" class="custom-file-label" for="upload-form-file">Choose file...</label>
+			<!--<label id="upload-form-file-label" class="custom-file-label" for="upload-form-file">Choose file...</label>-->
 		</div>
 		<div class="mb-3">
 			<label for="upload-form-record-title" class="display-4" style="color:#000033;font-size:1.25rem;">Record Title</label>

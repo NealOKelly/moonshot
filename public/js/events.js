@@ -1,3 +1,12 @@
+///// CONTENTS /////
+// 1. READY //
+// 2. NAVBAR //
+// 3. CLASSIFICATION & FOLDER TREE //
+// 4. RECORDS LIST PANEL //
+// 5. RIGHT PANEL //
+// 6. PROPERTIES PANEL //
+
+// 1. READY //
 $(document).ready(function()
 	{
 	$('#loading').modal('show')
@@ -42,6 +51,38 @@ $(document).ready(function()
 				})
 		})
 	});
+// END READY //
+
+// 2. NAVBAR //
+
+
+// END NAVBAR //
+
+// 3. CLASSIFICATION & FOLDER TREE //
+$(document).on("click", "#all-files>span.folder", function()
+	{
+	hideNewRecordForms()
+	$("#properties-pane").hide()
+	$("#properties-pane-placeholder").html('<img id="properties-pane-logo" src="img/gilbyim-logo-inline-white-2.png">') // I don't understand why this code is necessary.
+	$("#classification-treeview li").removeClass("node-selected")
+	$("#all-files").addClass("node-selected")
+	$("#all-files>span>a").css("font-weight", "bold")
+	$("#properties-pane-placeholder").css("display", "block")
+	})
+
+$(document).on("click", "#all-files > span.folder-open", function()
+	{
+	hideNewRecordForms()
+	$("#properties-pane").hide()
+	$("#properties-pane-placeholder").html('<img id="properties-pane-logo" src="img/gilbyim-logo-inline-white-2.png">') // I don't understand why this code is necessary.
+	$("#classification-treeview li").removeClass("node-selected")
+	$("#all-files").addClass("node-selected")
+	$("#all-files>span>a").css("font-weight", "bold")
+	$("#properties-pane-placeholder").css("display", "block")
+	})
+
+// END CLASSIFICATION & FOLDER TREE //
+
 
 
 //////// Handle User-Initiated Events  /////////
@@ -361,28 +402,6 @@ $(document).on("click", "#edit-properties-error-ok-button", function()
 	})
 
 $(document).on("click", "#all-files>span>a", function()
-	{
-	hideNewRecordForms()
-	$("#properties-pane").hide()
-	$("#properties-pane-placeholder").html('<img id="properties-pane-logo" src="img/gilbyim-logo-inline-white-2.png">') // I don't understand why this code is necessary.
-	$("#classification-treeview li").removeClass("node-selected")
-	$("#all-files").addClass("node-selected")
-	$("#all-files>span>a").css("font-weight", "bold")
-	$("#properties-pane-placeholder").css("display", "block")
-	})
-
-$(document).on("click", "#all-files > span.folder", function()
-	{
-	hideNewRecordForms()
-	$("#properties-pane").hide()
-	$("#properties-pane-placeholder").html('<img id="properties-pane-logo" src="img/gilbyim-logo-inline-white-2.png">') // I don't understand why this code is necessary.
-	$("#classification-treeview li").removeClass("node-selected")
-	$("#all-files").addClass("node-selected")
-	$("#all-files>span>a").css("font-weight", "bold")
-	$("#properties-pane-placeholder").css("display", "block")
-	})
-
-$(document).on("click", "#all-files > span.folder-open", function()
 	{
 	hideNewRecordForms()
 	$("#properties-pane").hide()
@@ -860,6 +879,7 @@ $(document).on("click", "#search-results li", function()
 								{
 								populateAdditionalFields("folder-terminal").then(function()
 									{
+									clearForm("upload-form")
 									$("#upload-form-container").removeClass("upload-form-hidden")
 									})
 								})	
@@ -1263,6 +1283,22 @@ $(document).on("click", ".folder", function()
 		drawPropertiesTable("folder-intermediate")
 		getRecordProperties("folder-intermediate", node.attr("id").substr(11))
 		}
+	if(node.hasClass("folder-terminal"))
+		{
+		getRecords(node.attr("id").substr(11))
+		populateContainerField("folder-terminal", node.attr("id").substr(11))
+		$("#upload-form-record-type").html("")
+		populateRecordTypeField("folder-terminal", node.attr("id").substr(11)).then(function()
+			{
+			populateAdditionalFields("folder-terminal").then(function()
+				{
+				clearForm("upload-form")
+				$("#upload-form-container").removeClass("upload-form-hidden")					
+				})
+			})
+		drawPropertiesTable("folder-terminal")
+		getRecordProperties("folder-terminal", node.attr("id").substr(11))	
+		}
 	})
 
 // Click on open folder icon //
@@ -1311,6 +1347,7 @@ $(document).on("click", ".folder-open", function()
 				{
 				populateAdditionalFields("folder-terminal").then(function()
 					{
+					clearForm("upload-form")
 					$("#upload-form-container").removeClass("upload-form-hidden")					
 					})
 				})
@@ -1405,6 +1442,7 @@ $(document).on("click", ".record-title>a", function()
 				{
 				populateAdditionalFields("folder-terminal").then(function()
 					{
+					clearForm("upload-form")
 					$("#upload-form-container").removeClass("upload-form-hidden")					
 					})
 				})
@@ -1470,28 +1508,12 @@ $(document).on(
     	}
 	});
 
-$("#x-icon").on(
-	{
-    dragover: function()
-		{
-        return false;
-    	},
-    drop: function()
-		{
-        return false;
-    	}
-	});
-
 $("#browse-button").on(
 	{
     dragover: function()
 		{
         return false;
     	},
-    drop: function()
-		{
-        return false;
-    	}
 	});
 
 
@@ -1553,14 +1575,7 @@ $(document).on("click", "#drag-and-drop-error-ok-button", function()
 $(document).on("click", "#x-icon", function()
 	{
 	console.log("x-icon clicked.")
-	$("#dropped-file-filetype-icon").removeClass()
-	$("#dropped-file-filetype-icon").addClass("fiv-viv")
-	$("#dropped-file-name").html("")
-	$("#file-details-container").css("display", "none")
-	$("#browse-button-container").css("display", "inline-block")
-	$("#upload-form-record-title").val("")
-	$("#drop-zone").removeData("file")
-	$("#upload-form-file").parent().html( $("#upload-form-file").parent().html() )
+	clearForm("upload-form")
 	gtag('event', 'Clear File Control')
 	})
 
@@ -1633,14 +1648,10 @@ $(document).on("click", "#test-button", function()
 	})
 
 
-
-
 $(".date-input").keyup(function(event){
     var keycode = (event.keyCode ? event.keyCode : event.which);
     if(keycode == '13'){
-        //alert('You pressed a "enter" key in textbox');  
 
-		
     }
 });
 
