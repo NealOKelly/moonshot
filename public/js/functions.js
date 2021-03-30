@@ -18,7 +18,6 @@ function getTimeStamp()
 // 1. AUTHENTICATION & SESSION MANAGEMENT //
 function preauthenticateApi()
 	{
-
 	// Session cookies need to be estabilished before making any AJAX calls to the API server.  This is because the first HTTP200 response
 	// (i.e what is returned by the ajax call) is actually a page served by ADFS server that uses JavaScript to POST the SAML assertion 
 	// to the API server.  As a workaround, we load a resource from the API server into an IFRAME instead.
@@ -104,6 +103,16 @@ function removeAPISessionCookies()
 // END AUTHENTICATION & SESSION MANAGEMENT //
 
 // 2. CLASSIFICATION & FOLDER TREE //
+function doAllFilesSelected()
+	{
+	hideNewRecordForms()
+	$("#properties-pane").hide()
+	$("#properties-pane-placeholder").html('<img id="properties-pane-logo" src="img/gilbyim-logo-inline-white-2.png">') // I don't understand why this code is necessary.
+	$("#classification-treeview li").removeClass("node-selected")
+	$("#all-files").addClass("node-selected")
+	$("#all-files>span>a").css("font-weight", "bold")
+	$("#properties-pane-placeholder").css("display", "block")	
+	}
 
 function refreshClassificationNodes(parentNodeId) 
 	{
@@ -190,7 +199,6 @@ function refreshClassificationNodes(parentNodeId)
 		});
 	}
 
-
 function addClassificationNode(rootNode, classificationUri, classificationName, canAttachRecords, classificationChildPattern, classificationNumber)
 	{
 	$(rootNode).append("<li id='classification-uri-" + classificationUri + "' data-classification-number='" + classificationNumber + "'><span class='collapsed'></span><span class='folder'></span><span class='classification-name'><a>" + classificationName + "</a></span></li>")
@@ -203,7 +211,6 @@ function addClassificationNode(rootNode, classificationUri, classificationName, 
 		$("#classification-uri-" + classificationUri).addClass("classification-can-have-children")		
 		}
 	}
-
 
 function refreshFolderNodes(parentNodeType, parentNodeId)
 	{
@@ -353,8 +360,7 @@ function addIntermediateFolderNode(parentNodeId, recordUri, recordTitle)
 
 function addTerminalFolderNode(parentNodeId, recordUri, recordTitle)
 	{
-	$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + recordUri + "' class='folder-terminal'><span class='collapsed'></span><span class='folder-fill'></span><span class='record-title'><a>" + recordTitle + "</a></span></li>")
-
+	$("#" + parentNodeId + " > ul").append("<li id='record-uri-" + recordUri + "' class='folder-terminal'><span class='collapsed'></span><span class='folder'></span><span class='record-title'><a>" + recordTitle + "</a></span></li>")
 	}
 
 function sortClassificationTree(sortBy)
@@ -473,6 +479,461 @@ function getRecords(recordUri)
 					{
 					// Do something
 					})
+			}
+		else
+			{
+			displaySessionExpiredModal()
+			}
+		});
+	}
+
+function sortGrid(id, colNum, type, currentState)
+	{
+	let tbody = grid.querySelector('tbody');
+	let rowsArray = Array.from(tbody.rows);
+
+	// compare(a, b) compares two rows, need for sorting
+	let compare;
+		
+	switch (type)
+		{
+		case 'number':
+			compare = function(rowA, rowB)
+			{
+            return rowA.cells[colNum].innerHTML - rowB.cells[colNum].innerHTML;
+			};
+			break;
+        case 'string':
+			compare = function(rowA, rowB)
+				{
+				return rowA.cells[colNum].innerHTML > rowB.cells[colNum].innerHTML ? 1 : -1;
+				};
+          	break;
+		}
+
+		//Set all columns to unsorted
+		for(i=1; i<($("#grid tr > th" ).length); i++)
+			{
+			$("#grid tr > th:nth-child(" + i + ")").addClass("unsorted")
+			$("#grid tr > th:nth-child(" + i + ")").removeClass("sorted-up")
+			$("#grid tr > th:nth-child(" + i + ")").removeClass("sorted-down")
+			}
+
+		// sort
+		rowsArray.sort(compare);
+		if(currentState=="sorted-down")
+			{
+			rowsArray.reverse();
+			$("#" + id).addClass("sorted-up")
+			$("#" + id).removeClass("unsorted")
+			}
+		else
+			{
+			$("#" + id).addClass("sorted-down")
+			$("#" + id).removeClass("unsorted")
+			}
+		
+		tbody.append(...rowsArray);
+    }
+
+function populateSearchResultPane(searchString, foldersOnly)
+	{
+	getAuthenticationStatus().then(function () 
+		{
+		if(isAuthenticated)
+			{
+			var startTime = getTimeStamp();
+				
+			url = baseUrl + apiPath + "/RecordType?q=all&properties=RecordTypeLevel, RecordTypeContentsRule, RecordTypeName&pageSize=1000000"
+			var data = 	{
+						"q" : "all",
+						"Properties" : "RecordTypeLevel, RecordTypeContentsRule, RecordTypeName",
+						"TrimType" : "RecordType",
+						"PageSize" : "111"
+						}
+			searchString = "*" + searchString + "*";
+			$.ajax(
+				{
+				url: url,
+				type: "GET",
+				contentType: 'application/json',
+				xhrFields: { withCredentials: true},
+				success: function(recordTypeDefinitions)
+					{
+					data = 	{
+								"q" : 'content:"' + searchString + '" Or anyWord:' + searchString,
+								"Properties" : "RecordNumber, RecordTitle, RecordRecordType, RecordMimeType, RecordExtension",
+								"TrimType" : "Record",
+								"PageSize" : "1000",
+								"SortBy" : "typedTitle"
+								}
+					var result = searchAPI(data)
+						.then(function(result)
+							{
+							if(result.TotalResults==0)
+								{
+								$("#search-results-pane").html("<div class='no-records display-4'>Your search did not return any records.</div>")
+								hideLoadingSpinner()	
+								}
+							else
+								{
+								var thHTML = '<table id="search-results" class="table table-sm">'
+								thHTML = thHTML + '<thead style="background-color:#ffffff;"><tr>'
+								thHTML = thHTML + '<th style="text-align:left;padding-left:30px;width:12%;";>Type</th>'
+								thHTML = thHTML + '<th style="text-align:left;width:15%;">Number</th>'
+								thHTML = thHTML + '<th id="th-record-title" style="text-align:left;">Title</th>'
+								thHTML = thHTML + '<th id="th-date-registered" style="text-align:left;">Record Type</th>'
+								thHTML = thHTML + '<th>Download</th></tr></thead><tbody>'
+								$("#search-results-pane").append(thHTML)
+							
+								for(x=0; x<result.TotalResults; x++)
+									{
+									for(i=0; i<recordTypeDefinitions.TotalResults; i++)
+										{
+										if(recordTypeDefinitions.Results[i].Uri==result.Results[x].RecordRecordType.Uri)
+											{
+											if(!config.ExcludedRecordTypes.includes(result.Results[x].RecordRecordType.RecordTypeName.Value))
+												{
+												switch(recordTypeDefinitions.Results[i].RecordTypeContentsRule.Value)
+													{
+													case "ByLevel":
+														if(recordTypeDefinitions.Results[i].RecordTypeLevel.Value>="5")
+															{
+															addSearchResult(result.Results[x], "folder-intermediate")
+															}
+														else
+															{
+															if(recordTypeDefinitions.Results[i].RecordTypeLevel.Value<"5")
+																{
+																if(foldersOnly=="false")
+																	{
+																	addSearchResult(result.Results[x], "folder-terminal")	
+																	}
+																}
+															}
+														break;
+													case "ByLevelInclusive":
+														addSearchResult(result.Results[x], "folder-intermediate")
+														break;
+													case "ByBehavior":
+														if(foldersOnly=="false")
+															{
+															addSearchResult(result.Results[x], "folder-terminal")		
+															}
+														break;
+													case "ByList":
+														if(recordTypeDefinitions.Results[i].RecordTypeLevel.Value>="4")
+															{
+															addSearchResult(result.Results[x], "folder-intermediate")
+															}
+														break;
+													case "Prevented":
+														if(foldersOnly=="false")
+															{
+														addSearchResult(result.Results[x], "document")
+															}
+														break;
+													}	
+												}
+											}
+										}
+									}
+								var endHTML = '</tbody></table>'
+								$("#search-results-pane > tbody").append(thHTML)
+							
+								// here
+								gtag('event', 'Search', { 'search_duration' :  getTimeStamp() - startTime });
+								console.log(getTimeStamp() - startTime)
+									
+								hideLoadingSpinner()	
+								}	
+							})
+						.fail(function(result)
+							{
+							console.log("Oooops!")
+							})
+					}, 
+				error: function(recordTypeDefinitions)
+					{
+					console.log()
+					}
+				});
+			}
+		else
+			{
+			displaySessionExpiredModal()
+			}
+		});	
+	}
+
+function addSearchResult(record, type)
+	{
+	if(type=="document")
+		{
+		resultRowHTML = '<tr><td>'
+		resultRowHTML = resultRowHTML + '<ul><li id="level-0-search-result-type-uri-' + record.Uri + '" style="padding-left:45px;" data-record-title="' + record.RecordTitle.Value + '" data-record-extension="' + record.RecordExtension.Value + '" data-record-mime-type="' + record.RecordMimeType.Value + '">'
+		
+		resultRowHTML = resultRowHTML + '<span class="fiv-viv fiv-icon-blank fiv-icon-' + record.RecordExtension.Value.toLowerCase() + '" arial-label="' + record.RecordExtension.Value.toUpperCase() + '" data-bs-toggle="tooltip" data-bs-original-title="' + record.RecordExtension.Value.toUpperCase() + '" data-bs-placement="right">'
+			
+		resultRowHTML = resultRowHTML +	'</span></li></ul></td>'	
+		}
+	else
+		{
+		resultRowHTML = '<tr>'
+		resultRowHTML = resultRowHTML + '<td><ul><li id="level-0-search-result-type-uri-' + record.Uri + '"><span class="search-result-caret-collapsed"></span><span class="search-result-folder"></span></li></ul></td>'
+		}
+	resultRowHTML = resultRowHTML + '<td><ul><li id="level-0-search-result-recordNumber-uri-' + record.Uri + '" class="' + type + '">' + record.RecordNumber.Value + '</li></ul></td>'
+	resultRowHTML = resultRowHTML + '<td><ul><li id="level-0-search-result-recordTitle-uri-' + record.Uri + '">' + record.RecordTitle.Value + '</li></ul></td>'
+	resultRowHTML = resultRowHTML + '<td><ul><li id="level-0-search-result-recordType-uri-' + record.Uri + '">' + record.RecordRecordType.RecordTypeName.Value + '</li></ul></td>'
+	if(type=="document")
+		{
+		resultRowHTML = resultRowHTML + '<td style="text-align:center;"><ul><li id="level-0-search-result-download-uri-' + record.Uri + '"><span class="download-grey"></span></li></ul></td>'
+		}
+	else
+		{
+		resultRowHTML = resultRowHTML + '<td style="text-align:center;"><ul><li id="level-0-search-result-download-uri-' + record.Uri + '"><!--Intentionally Blank--></li></ul></td>'	
+		}
+	
+	resultRowHTML = resultRowHTML + '</tr>'
+	$("#search-results").append(resultRowHTML)
+	var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+	var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) 
+		{
+  		return new bootstrap.Tooltip(tooltipTriggerEl)
+		})
+	}
+
+function highlightSelectedSearchResult(uri, level)
+	{
+	if($("#level-" + level + "-search-result-recordNumber-uri-" + uri).css("font-weight")!="700")
+		{
+		$("#search-results li").css("font-weight", "normal")
+		$("[id*='-search-result-download-uri-'] span").removeClass("download")
+		$("[id*='-search-result-download-uri-'] span").addClass("download-grey")
+		$("#level-" + level + "-search-result-recordNumber-uri-" + uri).css("font-weight", "bold")
+		$("#level-" + level + "-search-result-recordTitle-uri-" + uri).css("font-weight", "bold")
+		$("#level-" + level + "-search-result-recordType-uri-" + uri).css("font-weight", "bold")
+		if($("#level-" + level + "-search-result-recordNumber-uri-" + uri).hasClass("document"))
+			{
+			$("#level-" + level + "-search-result-download-uri-" + uri + ">span").removeClass("download-grey")
+			$("#level-" + level + "-search-result-download-uri-" + uri + ">span").addClass("download")
+			}
+		}
+	}
+
+function expandCollapsedSearchResult(recordUri, level)
+	{
+	var newTypeNodeId;
+	var newRecordNumberNodeId;
+	var newRecordTitleNodeId;
+	var newRecordTypeNodeId;
+	var newDownloadNodeId;
+
+	$("#" + $(event.target).parent().attr("id") + " >span:nth-child(1)").addClass("search-result-caret-expanded")
+	$("#" + $(event.target).parent().attr("id") + " >span:nth-child(1)").removeClass("search-result-caret-collapsed")
+	$("#" + $(event.target).parent().attr("id") + " >span:nth-child(2)").addClass("search-result-folder-open")
+	$("#" + $(event.target).parent().attr("id") + " >span:nth-child(2)").addClass("search-result-folder")
+
+	getAuthenticationStatus().then(function () 
+		{
+		if(isAuthenticated)
+			{
+			url = baseUrl + apiPath + "/RecordType?q=all&properties=RecordTypeLevel, RecordTypeContentsRule, RecordTypeName&pageSize=1000000"
+			$.ajax(
+				{
+				url: url,
+				type: "GET",
+				contentType: 'application/json',
+				xhrFields: { withCredentials: true},
+				success: function(recordTypeDefinitions)
+					{
+					var url = baseUrl + apiPath + "/Search?q=all and container:" + recordUri + "&properties=RecordTitle,RecordNumber,RecordRecordType,RecordMimeType,RecordExtension&trimtype=Record&pageSize=1000&sortBy=typedTitle"
+					$.ajax(
+						{
+						url: url,
+						type: "POST",
+						contentType: 'application/json',
+						xhrFields: { withCredentials: true},
+						success: function(result)
+							{
+							if(result.TotalResults==0)
+								{
+								$("#level-" + level + "-search-result-type-uri-" + recordUri).after('<ul><li class="no-results" style="padding-left:40px;"><span class="file-earmark-grey"></span></li></ul>')
+
+								$("#level-" + level + "-search-result-recordNumber-uri-"  + recordUri).after('<ul><li class="no-results"  style="color:grey;">- None</li></ul>')
+
+								$("#level-" + level + "-search-result-recordTitle-uri-"  + recordUri).after('<ul><li class="no-results" style="color:grey;">- No records found.</li></ul>')
+
+								$("#level-" + level + "-search-result-recordType-uri-"  + recordUri).after('<ul><li class="no-results" style="color:grey;">- None</li></ul>')
+									
+								$("#level-" + level + "-search-result-download-uri-"  + recordUri).after('<ul><li class="no-results" style="color:grey;"><!--Intentionally Blank--></li></ul>')
+									
+								}
+							else
+								{
+								for(i=0; i<result.TotalResults; i++)
+									{
+									var nodeType;
+									for(x=0; x<result.TotalResults; x++)
+										{
+										for(y=0; y<recordTypeDefinitions.TotalResults; y++)
+											{
+											if(recordTypeDefinitions.Results[y].Uri==result.Results[x].RecordRecordType.Uri)
+												{
+												if(!config.ExcludedRecordTypes.includes(result.Results[x].RecordRecordType.RecordTypeName.Value))
+													{
+													switch(recordTypeDefinitions.Results[y].RecordTypeContentsRule.Value)
+														{
+														case "ByLevel":
+															if(recordTypeDefinitions.Results[y].RecordTypeLevel.Value>="5")
+																{
+																nodeType = "folder-intermediate"
+																}
+															else
+																{
+																if(recordTypeDefinitions.Results[y].RecordTypeLevel.Value<"5")
+																	{
+																	nodeType = "folder-terminal"	
+																	}
+																}
+															break;
+														case "ByLevelInclusive":
+															nodeType = "folder-intermediate"
+															break;
+														case "ByBehavior":
+															nodeType = "folder-terminal"
+															break;
+														case "ByList":
+															if(recordTypeDefinitions.Results[y].RecordTypeLevel.Value>="4")
+																{
+																nodeType = "folder-intermediate"
+																}
+															break;
+														case "Prevented":
+															nodeType = "document"
+															break;
+														}	
+													}
+												}
+											}
+										}
+									var isDocument = false;
+									if(nodeType=="document")
+										{
+										isDocument=true;
+										}
+										
+									// column 1
+									if(i==0) // first row
+										{
+										if(isDocument) // is a document
+											{
+											$("#level-" + level + "-search-result-type-uri-" + recordUri).after("<ul><li id='level-" + (level + 1) + "-search-result-type-uri-" + result.Results[i].Uri + "' style='padding-left:40px;' data-record-title='" + result.Results[i].RecordTitle.Value + "' data-record-extension='" + result.Results[i].RecordExtension.Value + "'  data-record-mime-type='" + result.Results[i].RecordMimeType.Value + "'><span class='fiv-viv fiv-icon-blank fiv-icon-" + result.Results[i].RecordExtension.Value.toLowerCase() + "' data-bs-toggle='tooltip' data-bs-original-title='" + result.Results[i].RecordExtension.Value.toUpperCase() + "' data-bs-placement='right'></span></li></ul>")
+
+											newTypeNodeId="#level-" + (level + 1) + "-search-result-type-uri-" + result.Results[i].Uri	
+											}
+										else  // is a folder
+											{
+											$("#level-" + level + "-search-result-type-uri-" + recordUri).after("<ul><li id='level-" + (level + 1) + "-search-result-type-uri-" + result.Results[i].Uri + "'><span class='search-result-caret-collapsed'></span><span class='search-result-folder'></span></li></ul>")
+
+											newTypeNodeId="#level-" + (level + 1) + "-search-result-type-uri-" + result.Results[i].Uri
+											}
+										}
+									else // subsequent rows
+										{
+										if(isDocument) // is a document
+											{
+											$(newTypeNodeId).parent().append("<li id='level-" + (level + 1) + "-search-result-type-uri-" + result.Results[i].Uri + "' style='padding-left:40px;' data-record-title='" + result.Results[i].RecordTitle.Value + "' data-record-extension='" + result.Results[i].RecordExtension.Value + "'  data-record-mime-type='" + result.Results[i].RecordMimeType.Value + "'><span class='fiv-viv fiv-icon-blank fiv-icon-" + result.Results[i].RecordExtension.Value.toLowerCase() + "' data-bs-toggle='tooltip' data-bs-original-title='" + result.Results[i].RecordExtension.Value.toUpperCase() + "' data-bs-placement='right'></span></li>")	
+											}
+										else  // is a folder
+											{
+											$($(newTypeNodeId)).parent().append("<li id='level-" + (level + 1) + "-search-result-type-uri-" + result.Results[i].Uri + "'><span class='search-result-caret-collapsed'></span><span class='search-result-folder'></span></li>")	
+											}	
+										}
+
+									// column 2
+									if(i==0)  // first row	
+										{
+										$("#level-" + level + "-search-result-recordNumber-uri-" + recordUri).after("<ul><li id='level-" + (level + 1) + "-search-result-recordNumber-uri-" + result.Results[i].Uri + "' class='" + nodeType + "'>- " + result.Results[i].RecordNumber.Value + "</li></ul>")
+
+										newRecordNumberNodeId="#level-" + (level + 1) + "-search-result-recordNumber-uri-" + result.Results[i].Uri
+										}
+									else // subsequent rows
+										{
+										$(newRecordNumberNodeId).parent().append("<li id='level-" + (level + 1) + "-search-result-recordNumber-uri-" + result.Results[i].Uri + "' ' class='" + nodeType + "'>- " + result.Results[i].RecordNumber.Value + "</li>")	
+										}
+
+									// column 3
+									if(i==0)  // first row
+										{
+										$("#level-" + level + "-search-result-recordTitle-uri-" + recordUri).after("<ul><li id='level-" + (level + 1) + "-search-result-recordTitle-uri-" + result.Results[i].Uri + "'>- " + result.Results[i].RecordTitle.Value + "</li></ul>")
+
+										newRecordTitleNodeId="#level-" + (level + 1) + "-search-result-recordTitle-uri-" + result.Results[i].Uri	
+										}
+									else // subsequent rows
+										{
+										$(newRecordTitleNodeId).parent().append("<li id='level-" + (level + 1) + "-search-result-recordTitle-uri-" + result.Results[i].Uri + "'>- " + result.Results[i].RecordTitle.Value + "</li>")	
+										}
+
+									// column 4
+									if(i==0)  // first row
+										{
+										$("#level-" + level + "-search-result-recordType-uri-" + recordUri).after("<ul><li id='level-" + (level + 1) + "-search-result-recordType-uri-" + result.Results[i].Uri + "'>- " + result.Results[i].RecordRecordType.RecordTypeName.Value + "</li></ul>")
+
+										newRecordTypeNodeId = "#level-" + (level + 1) + "-search-result-recordType-uri-" + result.Results[i].Uri	
+										}
+									else // subsequent rows
+										{
+										$(newRecordTypeNodeId).parent().append("<li id='level-" + (level + 1) + "-search-result-recordType-uri-" + result.Results[i].Uri + "'>- " + result.Results[i].RecordRecordType.RecordTypeName.Value + "</li>")	
+										}
+
+									// column 5
+									if(i==0)  // first row
+										{
+										if(isDocument) // is a document
+											{
+											$("#level-" + level + "-search-result-download-uri-" + recordUri).after("<ul style='padding-left:0;'><li id='level-" + (level + 1) + "-search-result-download-uri-" + result.Results[i].Uri + "'><span class='download-grey'></span></li></ul>")	
+
+											newDownloadNodeId = "#level-" + (level + 1) + "-search-result-download-uri-" + result.Results[i].Uri	
+											}
+										else // is a folder
+											{
+											$("#level-" + level + "-search-result-download-uri-" + recordUri).after("<ul style='padding-left:0;'><li id='level-" + (level + 1) + "-search-result-download-uri-" + result.Results[i].Uri + "'><!--Intentionally Blank--></li></ul>")
+
+											newDownloadNodeId = "#level-" + (level + 1) + "-search-result-download-uri-" + result.Results[i].Uri	
+											}
+										}
+									else // subsequent rows
+										{
+										if(isDocument) // is a document
+											{
+											$(newDownloadNodeId).parent().append("<li id='level-" + (level + 1) + "-search-result-download-uri-" + result.Results[i].Uri + "'><span class='download-grey'></span></li>")	
+											}
+										else // is a folder
+											{
+											$(newDownloadNodeId).parent().append("<li id='level-" + (level + 1) + "-search-result-download-uri-" + result.Results[i].Uri + "'><!--Intentionally Blank--></li>")	
+											}	
+										}
+
+									}	
+									var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+									var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) 
+										{
+										return new bootstrap.Tooltip(tooltipTriggerEl)
+										})
+								}
+							}, 
+						error: function(result)
+							{
+							// Do something
+							}
+						});
+					}, 
+				error: function(recordTypeDefinitions)
+					{
+					//Do something
+					}
+				});
 			}
 		else
 			{
@@ -1976,7 +2437,6 @@ function showLoadingSpinner()
 	$("#loading").modal('show');
 	}
 
-
 function hideLoadingSpinner() 
 	{
 	setTimeout(function()
@@ -1985,5 +2445,104 @@ function hideLoadingSpinner()
 		},
 		300); // this delay ensure the modal has properly been show before attempting to hide it.
 	}
+
+function isValidDate(dateString)
+	{
+		// First check for the pattern
+		if(!/^(\d{2}|\d{1})[\-\s\/](\d{2}|\d{1})[\-\s\/](\d{4}|\d{2})$/.test(dateString))
+			{
+			return false;				
+			}
+		// Parse the date parts to integers
+		if(dateString.includes("/"))
+			{
+			var parts = dateString.split("/");				
+			}
+		if(dateString.includes("-"))
+			{
+			var parts = dateString.split("-");				
+			}
+		if(dateString.includes(" "))
+			{
+			var parts = dateString.split(" ");				
+			}
+		if(parts.length!=3)
+			{
+			return false;
+			}
+		
+		var day = parseInt(parts[0], 10);
+		var month = parseInt(parts[1], 10);
+		//var year = parseInt(parts[2], 10);
+		var year = parts[2];
+
+		if(year<100)
+			{
+			var today = new Date();
+			var nearbyDateThisCentury = parseInt(today.getFullYear().toString().substr(0, 2) + year)
+			var nearbyDateLastCentury = parseInt((today.getFullYear()-100).toString().substr(0, 2) + year)
+			var nearbyDateNextCentury = parseInt((today.getFullYear()+100).toString().substr(0, 2) + year)
+			deltaLastCentury = today.getFullYear() - nearbyDateLastCentury
+			deltaNextCentury = nearbyDateNextCentury - today.getFullYear()
+			if(nearbyDateThisCentury>today.getFullYear()) // it's in the future
+				{
+				deltaThisCentury = nearbyDateThisCentury - today.getFullYear()
+				}
+			else
+				{
+				deltaThisCentury = today.getFullYear() - nearbyDateThisCentury
+				}
+			if(deltaLastCentury<deltaNextCentury && deltaLastCentury<deltaThisCentury)
+				{
+				year = nearbyDateLastCentury
+				}
+			else if(deltaNextCentury<deltaLastCentury && deltaNextCentury<deltaThisCentury)
+				{
+				year = nearbyDateNextCentury
+				}
+			else if(deltaThisCentury<deltaLastCentury && deltaThisCentury<deltaLastCentury)
+				{
+				year = nearbyDateThisCentury
+				}
+			else if(deltaThisCentury==deltaLastCentury)
+				{
+				year = nearbyDateLastCentury
+				}
+			else if(deltaThisCentury==deltaNextCentury)
+				{
+				year = nearbyDateThisCentury
+				}			
+			}
+		else
+			{
+			var year = parseInt(parts[2], 10)	
+			}
+		
+		// Check the ranges of month and year
+		if(year < 1000 || year > 3000 || month == 0 || month > 12)
+			{
+			return false;
+			}
+
+		var monthLength = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
+		
+		// Adjust for leap years
+		if(year % 400 == 0 || (year % 100 != 0 && year % 4 == 0))
+			monthLength[1] = 29;
+
+		// Check the range of the day
+		if(day > 0 && day <= monthLength[month - 1])
+			{
+			if(day<10)
+				{
+				day = "0" + day
+				}
+			if(month<10)
+				{
+				month = "0" + month
+				}
+			return day + "-" + month + "-" + year;					
+			}
+	};
 
 // END MSICELLANEOUS //
