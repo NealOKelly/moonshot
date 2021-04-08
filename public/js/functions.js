@@ -107,7 +107,7 @@ function doAllFilesSelected()
 	{
 	hideNewRecordForms()
 	$("#properties-pane").hide()
-	$("#properties-pane-placeholder").html('<img id="properties-pane-logo" src="img/gilbyim-logo-inline-white-2.png">') // I don't understand why this code is necessary.
+	$("#properties-pane-placeholder").html('<img id="properties-pane-logo" src="img/gilbyim-logo-inline-white-2.png" alt="GilbyIM powered by Micro Focus Logo">') // I don't understand why this code is necessary.
 	$("#classification-treeview li").removeClass("node-selected")
 	$("#all-files").addClass("node-selected")
 	$("#all-files>span>a").css("font-weight", "bold")

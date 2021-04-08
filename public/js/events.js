@@ -5,6 +5,8 @@
 // 4. RECORDS LIST PANEL //
 // 5. RIGHT PANEL //
 // 6. PROPERTIES PANEL //
+// 7. MODALS //
+// 8. MISCELLANEOUS //
 
 // 1. READY //
 $(document).ready(function()
@@ -12,7 +14,6 @@ $(document).ready(function()
 	$('#loading').modal('show')
 	preauthenticateApi().then(function()
 		{
-		//var url = baseUrl + apiPath + "/Search";
 		var data = {
 					"q" : "all",
 					"Properties" : "ClassificationName, ClassificationParentClassification, ClassificationCanAttachRecords, ClassificationChildPattern, ClassificationIdNumber",
@@ -84,7 +85,7 @@ $(document).on("click", "#search-button", function()
 
 		// clear properties pane on search
 		$("#properties-pane").hide()
-		$("#properties-pane-placeholder").html('<img id="properties-pane-logo" src="img/gilbyim-logo-inline-white-2.png">') // I don't understand why this code is necessary.
+		$("#properties-pane-placeholder").html('<img id="properties-pane-logo" src="img/gilbyim-logo-inline-white-2.png" alt="GilbyIM powered by Micro Focus Logo">') // I don't understand why this code is necessary.
 		$("#properties-pane-placeholder").show()
 		$("#search-results-pane").show()
 		if($("#folders-only").is(":checked"))
@@ -511,6 +512,55 @@ $(document).on("click", ".search-result-caret-expanded", function()
 // END RECORDS LIST PANEL //
 
 // 5. RIGHT PANEL //
+$(document).on("change", "#new-folder-form-record-type", function()
+	{
+	populateAdditionalFields("classification")
+	})
+
+$(document).on("change", "#new-sub-folder-form-record-type", function()
+	{
+	populateAdditionalFields("folder-intermediate")
+	})
+
+// Create Folder
+$(document).on("click", "#create-folder-button", function()
+	{
+	if($("#new-folder-form-record-title").val().length)
+		{
+		$("#create-folder-status").modal("show")
+		recordTitle = $("#new-folder-form-record-title").val()
+		recordClassificationUri = $("#new-folder-form-record-classification").data("classificationUri")
+		var recordContainerUri;
+		recordType = $("#new-folder-form-record-type").val()
+		var additionalFieldKeys = [];
+		var additionalFieldValues = [];
+		for(i=0; i<$("#new-folder-form > .additional-field").length; i++)
+			{
+			additionalFieldKeys.push($("#new-folder-form > .additional-field").eq(i).attr("data-search-clause-name"))
+			additionalFieldValues.push($("#new-folder-form > .additional-field").eq(i).children().eq(1).val())
+			}
+		gtag('event', 'Create Folder');
+		createFolder(recordTitle, recordClassificationUri, recordContainerUri, recordType, additionalFieldKeys, additionalFieldValues)
+		}
+	else
+		{
+		$("#create-folder-status").modal("show")
+		recordTitle = $("#new-sub-folder-form-record-title").val()
+		var recordClassificationUri;
+		recordContainerUri = $("#new-sub-folder-form-record-container").data("recordUri")
+		recordType = $("#new-sub-folder-form-record-type").val()
+		var additionalFieldKeys = [];
+		var additionalFieldValues = [];
+		for(i=0; i<$("#new-sub-folder-form > .additional-field").length; i++)
+			{
+			additionalFieldKeys.push($("#new-sub-folder-form > .additional-field").eq(i).attr("data-search-clause-name"))
+			additionalFieldValues.push($("#new-sub-folder-form > .additional-field").eq(i).children().eq(1).val())
+			}
+		gtag('event', 'Create Sub Folder');
+		createFolder(recordTitle, recordClassificationUri, recordContainerUri, recordType, additionalFieldKeys, additionalFieldValues)
+		}
+	})
+
 // Upload Form
 $("#browse-button").click(function()
 	{
@@ -562,27 +612,23 @@ function dragstart_handler(event)
  	event.dataTransfer.effectAllowed = "move";
 	}
 
-
-function dropHandler(ev)
+function dropHandler(event)
 	{
-  	console.log('File(s) dropped');
-
   	// Prevent default behavior (Prevent file from being opened)
-  	ev.preventDefault();
+  	event.preventDefault();
 
-  	if(ev.dataTransfer.items) 
+  	if(event.dataTransfer.items) 
 		{
     	// Use DataTransferItemList interface to access the file(s)
-	  	if(ev.dataTransfer.items.length>1)
+	  	if(event.dataTransfer.items.length>1)
 			{
-			console.log("This code is called.")
 			$("#drag-and-drop-error").modal("show")
 			}
 		else
 			{
-			if(ev.dataTransfer.items[0].kind === 'file')
+			if(event.dataTransfer.items[0].kind === 'file')
 				{
-        		var file = ev.dataTransfer.items[0].getAsFile();
+        		var file = event.dataTransfer.items[0].getAsFile();
 				$("#drop-zone").data("file", file)
 				$("#browse-button-container").css("display", "none")
 				$("#file-details-container").css("display", "inline-block")
@@ -596,16 +642,18 @@ function dropHandler(ev)
   		}
 	}
 
-function dragOverHandler(ev)
+function dragOverHandler(event)
 	{
 	// Prevent default behavior (Prevent file from being opened)
-  	ev.preventDefault();
+  	event.preventDefault();
 	}
 
-
-
-
-
+$(document).on("click", "#x-icon", function()
+	{
+	console.log("x-icon clicked.")
+	clearForm("upload-form")
+	gtag('event', 'Clear File Control')
+	})
 
 $(document).on("click", "#upload-button", function()
 	{
@@ -664,9 +712,7 @@ $(document).on("click", "#upload-button", function()
 	})
 // END RIGHT PANEL //
 
-
-//////// Handle User-Initiated Events  /////////
-
+// 6. PROPERTIES PANEL //
 $(document).on("click", ".edit-properties-link", function()
 	{
 	var linkElement = event.target
@@ -972,29 +1018,14 @@ $(document).on("click", ".edit-properties-link", function()
 		}
 	})
 
-$(document).on("click", "#edit-properties-error-ok-button", function()
-	{
-	dismissEditPropertiesError()
-	})
+$(".date-input").keyup(function(event){
+    var keycode = (event.keyCode ? event.keyCode : event.which);
+    if(keycode == '13'){
+    }
+});
+// END PROPERTIES PANEL //
 
-
-
-
-
-
-$(document).on("click", "#upload-status-ok-button", function()
-	{
-	$("#upload-status").modal("hide")
-	setTimeout(function()
-		{
-		$("#upload-progress-bar").removeClass("bg-danger")
-		$("#upload-progress-bar").addClass("bg-success")
-		$("#upload-progress-bar").css("width", "0%")
-		$("#upload-status-ok-button").css("display", "none")
-		},
-		1000);
-	})
-
+// 7. MODALS //
 $(document).on("click", "#create-folder-ok-button", function()
 	{
     $("#create-folder-status").modal("hide")
@@ -1009,83 +1040,38 @@ $(document).on("click", "#create-folder-ok-button", function()
 		1000);
 	})
 
-
 $(document).on("click", "#drag-and-drop-error-ok-button", function()
 	{
 	$("#drag-and-drop-error").modal("hide")
 	})
 
-$(document).on("click", "#x-icon", function()
+$(document).on("click", "#upload-status-ok-button", function()
 	{
-	console.log("x-icon clicked.")
-	clearForm("upload-form")
-	gtag('event', 'Clear File Control')
-	})
-
-// Create Folder
-$(document).on("click", "#create-folder-button", function()
-	{
-	if($("#new-folder-form-record-title").val().length)
+	$("#upload-status").modal("hide")
+	setTimeout(function()
 		{
-		$("#create-folder-status").modal("show")
-		recordTitle = $("#new-folder-form-record-title").val()
-		recordClassificationUri = $("#new-folder-form-record-classification").data("classificationUri")
-		var recordContainerUri;
-		recordType = $("#new-folder-form-record-type").val()
-		var additionalFieldKeys = [];
-		var additionalFieldValues = [];
-		for(i=0; i<$("#new-folder-form > .additional-field").length; i++)
-			{
-			additionalFieldKeys.push($("#new-folder-form > .additional-field").eq(i).attr("data-search-clause-name"))
-			additionalFieldValues.push($("#new-folder-form > .additional-field").eq(i).children().eq(1).val())
-			}
-		gtag('event', 'Create Folder');
-		createFolder(recordTitle, recordClassificationUri, recordContainerUri, recordType, additionalFieldKeys, additionalFieldValues)
-		}
-	else
-		{
-		$("#create-folder-status").modal("show")
-		recordTitle = $("#new-sub-folder-form-record-title").val()
-		var recordClassificationUri;
-		recordContainerUri = $("#new-sub-folder-form-record-container").data("recordUri")
-		recordType = $("#new-sub-folder-form-record-type").val()
-		var additionalFieldKeys = [];
-		var additionalFieldValues = [];
-		for(i=0; i<$("#new-sub-folder-form > .additional-field").length; i++)
-			{
-			additionalFieldKeys.push($("#new-sub-folder-form > .additional-field").eq(i).attr("data-search-clause-name"))
-			additionalFieldValues.push($("#new-sub-folder-form > .additional-field").eq(i).children().eq(1).val())
-			}
-		gtag('event', 'Create Sub Folder');
-		createFolder(recordTitle, recordClassificationUri, recordContainerUri, recordType, additionalFieldKeys, additionalFieldValues)
-		}
+		$("#upload-progress-bar").removeClass("bg-danger")
+		$("#upload-progress-bar").addClass("bg-success")
+		$("#upload-progress-bar").css("width", "0%")
+		$("#upload-status-ok-button").css("display", "none")
+		},
+		1000);
 	})
 
-$(document).on("change", "#new-folder-form-record-type", function()
+$(document).on("click", "#edit-properties-error-ok-button", function()
 	{
-	populateAdditionalFields("classification")
+	dismissEditPropertiesError()
 	})
 
-$(document).on("change", "#new-sub-folder-form-record-type", function()
-	{
-	populateAdditionalFields("folder-intermediate")
-	})
-
-
-$(".date-input").keyup(function(event){
-    var keycode = (event.keyCode ? event.keyCode : event.which);
-    if(keycode == '13'){
-    }
-});
-
-// Click re-athentication button
 $(document).on("click", "#reauthenticate-button", function()
 	{
 	gtag('event', 'Click Reauthenticate Button');
 	removeAPISessionCookies();
 	$(location).attr("href","/logout");
 	})
+// END MODALS //
 
+// 8. MISCELLANEOUS //
 $(window).on("beforeunload", function()
 	{
     removeAPISessionCookies();  // belt and braces
@@ -1111,3 +1097,4 @@ $(document).on("click", ".recents>a", function()
 	{
 	alert("Give me strength!")
 	})
+// END MISCELLANEOUS //

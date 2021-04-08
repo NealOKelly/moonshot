@@ -3,8 +3,7 @@
 	<h1 class="text-center display-4" style="color:#000033;font-size:1.75rem;">Add a document to this folder?</h1>
 	<br>
 	<form id="upload-form" autocomplete="off">
-		<label for="record-type-input" class="display-4" style="color:#000033;font-size:1.25rem;"><span>File </span><span style="font-size:1rem;">(drag &amp; drop, or browse)</span></label>
-		
+		<span class="display-4" style="color:#000033;font-size:1.25rem;">File </span><span style="font-size:1rem;">(drag &amp; drop, or browse)</span>		
 		
 		<div id="drop-zone" style="width:100%;background-color:#555;height:100px;color:#fff;margin-bottom:1rem;" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
 				<div  id="browse-button-container" style="height:100%;width:100%;">
@@ -34,7 +33,7 @@
 		
 		<div id="upload-form-file-container" class="custom-file mb-3 truncate" style="display: none;">
 			<input id="upload-form-file" name="upload" type="file" class="custom-file-input" id="validatedCustomFile">
-			<!--<label id="upload-form-file-label" class="custom-file-label" for="upload-form-file">Choose file...</label>-->
+			<label id="upload-form-file-label" class="custom-file-label" for="upload-form-file">Choose file...</label>
 		</div>
 		<div class="mb-3">
 			<label for="upload-form-record-title" class="display-4" style="color:#000033;font-size:1.25rem;">Record Title</label>
