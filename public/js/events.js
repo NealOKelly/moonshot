@@ -175,8 +175,51 @@ $(document).on("click", "span[class^='folder']", function()
 		}
 	})
 
+
+$(document).on("click", ".data-entry-form-tabs>li>a:not(.active)", function()
+	{
+	$(".data-entry-form-tabs>li>a").removeClass("active")
+	$(event.target).addClass("active")
+	//alert($(event.target).data("page-caption"))
+	$("#new-folder-form-page-items").html("")
+	populateDataEntryFormPageItems($(event.target).data("page-caption"))
+	})
+
+
+function populateDataEntryFormPageItems(pageCaption)
+	{
+
+	var data = 	{
+			"q" : "Staff Folder",
+			//"Properties" : "RecordTypeName, RecordTypeContainerRule, RecordTypeUsualBehaviour",
+			"Properties" : "DataEntryFormDefinition",
+			"TrimType" : "RecordType"
+			}
+		var result = searchAPI(data)
+			.then(function(result)
+				{
+				console.log(result)
+				var dataEntryFormDefinition = result.Results[0].DataEntryFormDefinition
+				for(i=0;i<dataEntryFormDefinition.Pages.length;i++)
+					{
+					if(dataEntryFormDefinition.Pages[i].Caption==pageCaption)
+						{
+						$("#new-folder-form-page-items").append("<ul></ul>")
+						console.log("Page Caption: " + pageCaption)
+						for(x=0;x<dataEntryFormDefinition.Pages[i].PageItems.length;x++)
+							{
+							html = '<li>' + dataEntryFormDefinition.Pages[i].PageItems[x].Caption + '</li>'
+							$("#new-folder-form-page-items>ul").append(html)
+							//console.log("PageItems:" + dataEntryFormDefinition.Pages[i].PageItems[x].Caption)
+							}
+						}
+					}
+				})
+	}
+
 $(document).on("click", ".classification-name>a", function()
 	{
+	$("#new-folder-form-tabs").html("")
 	var node = $(event.target).parent().parent();
 	hideNewRecordForms()
 	$("#search-results-pane").hide()
@@ -184,7 +227,47 @@ $(document).on("click", ".classification-name>a", function()
 	classificationTreeNodeSelected(node)
 	if(node.hasClass("classification-can-attach-records"))
 		{
-		$("#new-folder-form-record-type").html("")
+		
+		// Display the record type selector only if there is more than one record type than can be used with the classification.
+		var numberOfRecordTypes = 1;
+		if(numberOfRecordTypes>1)
+			{
+			$("#new-folder-form-record-types").css("display", "block")
+			}	
+		
+		// This query needs to be based on the selected record type.
+		var data = 	{
+					"q" : "Staff Folder",
+					//"Properties" : "RecordTypeName, RecordTypeContainerRule, RecordTypeUsualBehaviour",
+					"Properties" : "DataEntryFormDefinition",
+					"TrimType" : "RecordType"
+					}
+		var result = searchAPI(data)
+						.then(function(result)
+							{
+							var dataEntryFormDefinition = result.Results[0].DataEntryFormDefinition
+							console.log("dataEntryFormDefinition.length: " + dataEntryFormDefinition.Pages.length)
+							if(dataEntryFormDefinition.Pages.length>1)
+								{
+								var html = '<ul class="nav nav-tabs data-entry-form-tabs"></ul>'
+								$("#new-folder-form-tabs").append(html)
+								for(i=0;i<dataEntryFormDefinition.Pages.length;i++)
+									{
+									if(i==0)
+										{
+										html = '<li class="nav-item"><a class="nav-link active" aria-current="page" href="#" data-page-caption="' + dataEntryFormDefinition.Pages[i].Caption + '">' + dataEntryFormDefinition.Pages[i].Caption + '</a></li>'
+										}
+									else
+										{
+										html = '<li class="nav-item"><a class="nav-link" aria-current="page" href="#" data-page-caption="' + dataEntryFormDefinition.Pages[i].Caption + '">' + dataEntryFormDefinition.Pages[i].Caption + '</a></li>'
+										}
+										$("#new-folder-form-tabs>ul").append(html)
+									}
+								$("#new-folder-form-tabs").append("<br>")
+								$("#new-folder-form-tabs").css("display", "block")
+								}
+							populateDataEntryFormPageItems("General")
+							})
 		populateRecordTypeField("classification", node.attr("id").substr(19)).then(function()
 			{
 			populateAdditionalFields("classification").then(function()
@@ -626,6 +709,21 @@ function dropHandler(event)
 			}
 		else
 			{
+			console.log("Items Legth: " + event.dataTransfer.items.length)
+				
+			for(i=0;i<event.dataTransfer.items.length;i++)	
+				{
+				var entry = event.dataTransfer.items[i].webkitGetAsEntry();
+				if (entry.isFile)
+					{
+				  	console.log("It's a file.")
+					}
+				else if (entry.isDirectory) 
+					{
+				  	console.log("It's a directory.")
+					}
+				}
+			
 			if(event.dataTransfer.items[0].kind === 'file')
 				{
         		var file = event.dataTransfer.items[0].getAsFile();

@@ -515,3 +515,41 @@ th.sorted-up::after{
 	width: 24px;
     height: 24px;
 }
+
+
+
+/* DATA ENTRY FORM DEFINITION */
+
+/* NAV TABS */
+.data-entry-form-tabs .nav-tabs {
+    /* Remove white border at the botttom of the nav-tabs */
+	border-bottom: 1px solid #000033;
+}
+
+.data-entry-form-tabs .nav-link{
+	color: #000033;
+	border: none;
+}
+
+.data-entry-form-tabs .nav-link:hover, .data-entry-form .nav-link:focus{
+	color: #000033;
+	text-decoration: underline;
+}
+
+.data-entry-form-tabs .nav-link.active{
+	background-color: #bbbbbb;
+	color: #000033;
+	border-top: 1px solid #000033;
+	border-left: 1px solid #000033;
+	border-right: 1px solid #000033;
+	border-bottom: 1px solid #bbbbbb;
+}
+
+.data-entry-form-tabs .nav-link.active:hover{
+	cursor: default;
+	text-decoration: none;
+}
+
+.data-entry-form-tabs .nav-link.disabled{
+	border-bottom: 1px solid #000033;
+}

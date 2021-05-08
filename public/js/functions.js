@@ -2426,6 +2426,8 @@ function searchAPI(data) {
 			}, 
 		error: function(result)
 			{
+			console.log("The searchAPI function failed.")
+			console.log(result)
 			deferredObject.reject(result);
 			}
 		});	
