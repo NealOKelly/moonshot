@@ -175,108 +175,197 @@ $(document).on("click", "span[class^='folder']", function()
 		}
 	})
 
-
+//////////////////////////////////////////////////////////////////////////////////////////////
 $(document).on("click", ".data-entry-form-tabs>li>a:not(.active)", function()
 	{
 	$(".data-entry-form-tabs>li>a").removeClass("active")
 	$(event.target).addClass("active")
-	//alert($(event.target).data("page-caption"))
-	$("#new-folder-form-page-items").html("")
-	populateDataEntryFormPageItems($(event.target).data("page-caption"))
+	$("#new-folder-form-page-items>div").css("display", "none")
+	$("#new-folder-form-page-items-" + $(event.target).data("page-caption")).css("display", "block")
 	})
 
-
-function populateDataEntryFormPageItems(pageCaption)
+function populateDataEntryFormPages(formName)
 	{
-
 	var data = 	{
-			"q" : "Staff Folder",
-			//"Properties" : "RecordTypeName, RecordTypeContainerRule, RecordTypeUsualBehaviour",
+				"q" : $("#" + formName + "-record-type").val(),
+				"Properties" : "DataEntryFormDefinition",
+				"TrimType" : "RecordType"
+				}
+	var result = searchAPI(data)
+					.then(function(result)
+						{
+						$("#" + formName + "-tabs").css("display", "none")
+						// These lines are intentionally repeated.
+						$("#" + formName + "-tabs").html("")
+						$("#" + formName + "-page-items").html("")
+						// End repeated lines.
+						var dataEntryFormDefinition = result.Results[0].DataEntryFormDefinition
+//						console.log("dataEntryFormDefinition.length: " + dataEntryFormDefinition.Pages.length)
+						var html = '<ul class="nav nav-tabs data-entry-form-tabs"></ul>'
+						$("#" + formName + "-tabs").append(html)		
+						for(i=0;i<dataEntryFormDefinition.Pages.length;i++)
+							{
+							tabsHtml = '<li class="nav-item"><a class="nav-link" aria-current="page" href="#" data-page-caption="' + dataEntryFormDefinition.Pages[i].Caption + '">' + dataEntryFormDefinition.Pages[i].Caption + '</a></li>'
+							pageItemsHtml = '<div id="' + formName + '-page-items-' + dataEntryFormDefinition.Pages[i].Caption + '" style="display:none;"></div>'
+							$("#" + formName + "-tabs>ul").append(tabsHtml)
+							$("#" + formName + "-page-items").append(pageItemsHtml)
+							//$("#" + formName + "-tabs").append("<br>")
+							populateDataEntryFormPageItems(dataEntryFormDefinition.Pages[i].Caption, formName)	
+							}
+						$("#" + formName + "-tabs>ul>li:first>a").addClass("active")
+						$("#" + formName + "-page-items>div:first").css("display", "block")
+//						console.log("dataEntryFormDefinition.Pages.length:" + dataEntryFormDefinition.Pages.length)
+						if(parseInt(dataEntryFormDefinition.Pages.length)>1)
+							{
+							$("#" + formName + "-tabs").css("display", "block")
+							}
+						})		
+	}
+
+
+
+function populateDataEntryFormPageItems(pageCaption, formName)
+	{
+	var data = 	{
+			"q" : $("#new-folder-form-record-type").val(),
 			"Properties" : "DataEntryFormDefinition",
 			"TrimType" : "RecordType"
 			}
 		var result = searchAPI(data)
 			.then(function(result)
 				{
-				console.log(result)
+				
+				
 				var dataEntryFormDefinition = result.Results[0].DataEntryFormDefinition
+				console.log("dataEntryFormDefinition:")
+				console.log(dataEntryFormDefinition)
+				
 				for(i=0;i<dataEntryFormDefinition.Pages.length;i++)
 					{
 					if(dataEntryFormDefinition.Pages[i].Caption==pageCaption)
 						{
-						$("#new-folder-form-page-items").append("<ul></ul>")
-						console.log("Page Caption: " + pageCaption)
+//						console.log("Page Caption: " + pageCaption)
 						for(x=0;x<dataEntryFormDefinition.Pages[i].PageItems.length;x++)
 							{
-							html = '<li>' + dataEntryFormDefinition.Pages[i].PageItems[x].Caption + '</li>'
-							$("#new-folder-form-page-items>ul").append(html)
-							//console.log("PageItems:" + dataEntryFormDefinition.Pages[i].PageItems[x].Caption)
+							var pageItemsHtml = "";
+							if(dataEntryFormDefinition.Pages[i].PageItems[x].Type=="Line")
+								{
+								pageItemsHtml = '<div style="border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:#000033;margin-top:10px;margin-bottom:10px;"></div>'	
+									
+								}
+							else
+								{
+								// 
+								optionalHtml=""
+								if(!dataEntryFormDefinition.Pages[i].PageItems[x].Mandatory)	
+									{
+									optionalHtml = '<span style="font-size:1rem">(optional)</span>'
+									}
+									
+								readonlyHtml = ""
+								if(dataEntryFormDefinition.Pages[i].PageItems[x].Readonly)	
+									{
+									readonlyHtml = 'readonly'
+									}								
+									
+								additionalFieldHtml = ""
+								if(dataEntryFormDefinition.Pages[i].PageItems[x].Type=="Field")
+									{
+									additionalFieldHtml = " additional-field"
+									}
+									
+								switch(dataEntryFormDefinition.Pages[i].PageItems[x].Format)
+									{
+									case "String":
+										//pageItemsHtml = '<p>' + dataEntryFormDefinition.Pages[i].PageItems[x].Caption + '</p>'
+										var pageItemsHtml = '<div class="form-group' + additionalFieldHtml + '">'
+										
+										pageItemsHtml = pageItemsHtml + '<label for="' + formName + '-page-item-' +  dataEntryFormDefinition.Pages[i].PageItems[x].Name + '" class="display-4" style="color:#000033;font-size:1.25rem;"><span>' + dataEntryFormDefinition.Pages[i].PageItems[x].Caption + ' </span>' + optionalHtml + '</label>'
+											
+										pageItemsHtml = pageItemsHtml + '<input id="' + formName + '-page-item-' +  dataEntryFormDefinition.Pages[i].PageItems[x].Name + '" class="form-control" maxlength="' + dataEntryFormDefinition.Pages[i].PageItems[x].CharacterLimit + '" ' + readonlyHtml + '></div>'
+										//$("#" + formName).append(inputHTML)
+										break;
+									case "Number":
+										console.log("Number inputs are not yet supported.")
+										break;
+									case "Boolean":
+										console.log("Boolean inputs are not yet supported.")
+										break;
+									case "Date":
+										//pageItemsHtml = '<p>This is a date.</p>'
+										var pageItemsHtml = '<div class="form-group' + additionalFieldHtml + '">'
+										pageItemsHtml = pageItemsHtml + '<label for="' + formName + '-page-item-' +  dataEntryFormDefinition.Pages[i].PageItems[x].Name + '" class="display-4" style="color:#000033;font-size:1.25rem;"><span>' + dataEntryFormDefinition.Pages[i].PageItems[x].Caption + ' </span><span style="font-size:1rem">(optional)</span></label>'
+											
+										pageItemsHtml = pageItemsHtml + '<input type="text" id="' + formName + '-page-item-' +  dataEntryFormDefinition.Pages[i].PageItems[x].Name + '" class="form-control date-input" data-provide="datepicker" data-date-format="' + config.DatePicker.DateFormat + '" data-date-autoclose="' + config.DatePicker.AutoClose + '" placeholder="' + config.DatePicker.Placeholder + '" data-date-start-date="' + config.DatePicker.StartDate + '" data-date-assume-nearby-year="' + config.DatePicker.AssumeNearbyYear + '" maxlength="10"></div>'
+										
+										//$("#" + formName).append(inputHTML)											
+										break;
+									case "Datetime":
+										console.log("Datetime inputs are not yet supported.")
+										break;
+									case "Decimal":
+										console.log("Decimal inputs are not yet supported.")
+										break;
+									case "Text":
+										console.log("Text inputs are not yet supported.")
+										break;
+									case "Currency":
+										console.log("Currency inputs are not yet supported.")
+										break;
+									case "Object":
+										//pageItemsHtml = '<p>' + dataEntryFormDefinition.Pages[i].PageItems[x].Caption + '</p>'
+										console.log("Object inputs are not yet supported.")
+										break;
+									case "BigNumber":
+										console.log("BigNumber inputs are not yet supported.")
+										break;
+									case "Xml":
+										console.log("Xml inputs are not yet supported.")
+										break;
+									case "Geography":
+										console.log("Geography inputs are not yet supported.")
+										break;
+									}
+								//pageItemsHtml = '<p>' +  + '</p>'		
+								}
+							
+							$("#" + formName + "-page-items-" + dataEntryFormDefinition.Pages[i].Caption).append(pageItemsHtml)
 							}
 						}
 					}
+				$("#new-folder-form-container").removeClass("new-folder-form-hidden")
 				})
 	}
 
 $(document).on("click", ".classification-name>a", function()
 	{
-	$("#new-folder-form-tabs").html("")
-	var node = $(event.target).parent().parent();
 	hideNewRecordForms()
+	$("#new-folder-form-tabs").html("")
+	$("#new-folder-form-page-items").html("")
+	$("#new-folder-form-record-type").empty()
+	var node = $(event.target).parent().parent();
+
 	$("#search-results-pane").hide()
 	$("#records-list-pane").show()
 	classificationTreeNodeSelected(node)
 	if(node.hasClass("classification-can-attach-records"))
 		{
-		
-		// Display the record type selector only if there is more than one record type than can be used with the classification.
-		var numberOfRecordTypes = 1;
-		if(numberOfRecordTypes>1)
-			{
-			$("#new-folder-form-record-types").css("display", "block")
-			}	
-		
-		// This query needs to be based on the selected record type.
-		var data = 	{
-					"q" : "Staff Folder",
-					//"Properties" : "RecordTypeName, RecordTypeContainerRule, RecordTypeUsualBehaviour",
-					"Properties" : "DataEntryFormDefinition",
-					"TrimType" : "RecordType"
-					}
-		var result = searchAPI(data)
-						.then(function(result)
-							{
-							var dataEntryFormDefinition = result.Results[0].DataEntryFormDefinition
-							console.log("dataEntryFormDefinition.length: " + dataEntryFormDefinition.Pages.length)
-							if(dataEntryFormDefinition.Pages.length>1)
-								{
-								var html = '<ul class="nav nav-tabs data-entry-form-tabs"></ul>'
-								$("#new-folder-form-tabs").append(html)
-								for(i=0;i<dataEntryFormDefinition.Pages.length;i++)
-									{
-									if(i==0)
-										{
-										html = '<li class="nav-item"><a class="nav-link active" aria-current="page" href="#" data-page-caption="' + dataEntryFormDefinition.Pages[i].Caption + '">' + dataEntryFormDefinition.Pages[i].Caption + '</a></li>'
-										}
-									else
-										{
-										html = '<li class="nav-item"><a class="nav-link" aria-current="page" href="#" data-page-caption="' + dataEntryFormDefinition.Pages[i].Caption + '">' + dataEntryFormDefinition.Pages[i].Caption + '</a></li>'
-										}
-										$("#new-folder-form-tabs>ul").append(html)
-									}
-								$("#new-folder-form-tabs").append("<br>")
-								$("#new-folder-form-tabs").css("display", "block")
-								}
-							populateDataEntryFormPageItems("General")
-							})
 		populateRecordTypeField("classification", node.attr("id").substr(19)).then(function()
 			{
-			populateAdditionalFields("classification").then(function()
+			// Display the record type selector only if there is more than one record type than can be used with the classification.
+			$("#new-folder-form-record-type-field-container").css("display", "none")
+			if($("#new-folder-form-record-type>option").length>1)
 				{
-				$("#new-folder-form-container").removeClass("new-folder-form-hidden")	
-				})
-			})
+				$("#new-folder-form-record-type-field-container").css("display", "block")
+				}	
+			populateDataEntryFormPages("new-folder-form")
+			})		
 		}
 	})
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
 
 $(document).on("click", ".record-title>a", function()
 	{
@@ -597,7 +686,8 @@ $(document).on("click", ".search-result-caret-expanded", function()
 // 5. RIGHT PANEL //
 $(document).on("change", "#new-folder-form-record-type", function()
 	{
-	populateAdditionalFields("classification")
+	populateDataEntryFormPages("new-folder-form")
+	//populateAdditionalFields("classification")
 	})
 
 $(document).on("change", "#new-sub-folder-form-record-type", function()

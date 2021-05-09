@@ -984,6 +984,8 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 			switch(parentNodeType)
 				{
 				case "classification":
+					$("#new-folder-form-record-type").empty()
+					//$("#new-folder-form-record-type>option").remove()
 					// Returm as list of record type that are configure to behave like folders.
 					var onlyRecordTypeCount = 0;
 					var url = baseUrl + apiPath + "/Search";
@@ -999,13 +1001,14 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 							var intermediateFolderRecordTypeNames = [];
 							for(i=0; i<result.Results.length; i++)
 								{
-								// The GilbyIM Lite application requires folders (that can attach to classifications) to configured so they cannot be contained by other records.
+								// The GilbyIM Lite application requires folders (that can attach to classifications) to be configured so they cannot be contained by other records.
 								if(result.Results[i].RecordTypeContainerRule.Value=="Prevented")
 								   	{
 									intermediateFolderRecordTypeUris.push(result.Results[i].Uri)
 									intermediateFolderRecordTypeNames.push(result.Results[i].RecordTypeName.Value)
 								   	}
 								}
+							$("#new-folder-form-record-type").empty()
 							for(i=0; i<intermediateFolderRecordTypeUris.length; i++)  // for each folder Record Type, confirm if the Classification can use it.
 								{
 							   	(function(index)
