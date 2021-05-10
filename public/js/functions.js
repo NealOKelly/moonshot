@@ -1445,8 +1445,11 @@ function clearForm(form)
 	switch(form)
 		{
 		case "new-folder-form":
-			$("#new-folder-form-record-title").val("")
-			$("#new-folder-form > .additional-field > input").val("")
+			console.log('clearForm("new-folder-form") has been called.')
+			//$("#new-folder-form-page-item-RecordTypedTitle").val("")
+			$("[id^=new-folder-form-page-item-]").val("")
+			//$("#new-folder-form > .additional-field > input").val("")
+			//$("#new-folder-form-page-items .additional-field").val()
 			break;
 		case "new-sub-folder-form":
 			$("#new-sub-folder-form-record-title").val("")

@@ -1,23 +1,24 @@
 <div id="new-sub-folder-form-container" class="new-sub-folder-form-hidden" style="margin-left:30px;margin-right:30px;">
 	<br>
-	<h1 class="text-center display-4" style="color:#000033;font-size:1.75rem;">Add a sub-folder to this folder?</h1>
+	<h1 class="text-center display-4" style="color:#000033;font-size:1.75rem;">Add a folder to this classification?</h1>
 	<br>
-	<form id="new-sub-folder-form" autocomplete="off">
-		<div class="mb-3">
-			<label for="new-sub-folder-form-record-title" class="display-4" style="color:#000033;font-size:1.25rem;">Folder Title</label>
-			<input id="new-sub-folder-form-record-title" class="form-control" type="text" maxlength="254">
-		</div>
-		<div class="mb-3">
-			<label for="new-sub-folder-form-record-container" class="display-4" style="color:#000033;font-size:1.25rem;">Folder</label>
-			<input id="new-sub-folder-form-record-container" class="form-control" type="text" data-classification-uri="" readonly>
-		</div>
+
+	<div id="new-sub-folder-form-record-type-field-container" style="display:none;">
 		<div class="form-group">
 		  <label for="new-sub-folder-form-record-type" class="display-4" style="color:#000033;font-size:1.25rem;">Record Type</label>
-		  <select id="new-sub-folder-form-record-type" class="form-control">
-		  </select>
+		  <select id="new-sub-folder-form-record-type" class="form-control"></select>
 		</div>
+	</div>
+	<div id="new-sub-folder-form-tabs" class="data-entry-form-tabs" style="display:none;margin-bottom:15px;"><p></p></div>
+
+	<form id="new-sub-folder-form" autocomplete="off">
+		<div id="new-sub-folder-form-page-items"></div>
+			<div class="mb-3" style="display:none;">
+				<label for="new-sub-folder-form-record-container" class="display-4" style="color:#000033;font-size:1.25rem;">Folder</label>
+				<input id="new-sub-folder-form-record-container" class="form-control" type="text" data-classification-uri="" readonly>
+			</div>
 	</form>
 	<br>
 	<button id="create-folder-button" class="btn btn-indigo">Add</button>
-</div>			
+</div>	
 	

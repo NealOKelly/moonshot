@@ -227,7 +227,7 @@ function populateDataEntryFormPages(formName)
 function populateDataEntryFormPageItems(pageCaption, formName)
 	{
 	var data = 	{
-			"q" : $("#new-folder-form-record-type").val(),
+			"q" : $("#" + formName + "-record-type").val(),
 			"Properties" : "DataEntryFormDefinition",
 			"TrimType" : "RecordType"
 			}
@@ -278,11 +278,11 @@ function populateDataEntryFormPageItems(pageCaption, formName)
 									{
 									case "String":
 										//pageItemsHtml = '<p>' + dataEntryFormDefinition.Pages[i].PageItems[x].Caption + '</p>'
-										var pageItemsHtml = '<div class="form-group' + additionalFieldHtml + '">'
+										var pageItemsHtml = '<div class="form-group">'
 										
 										pageItemsHtml = pageItemsHtml + '<label for="' + formName + '-page-item-' +  dataEntryFormDefinition.Pages[i].PageItems[x].Name + '" class="display-4" style="color:#000033;font-size:1.25rem;"><span>' + dataEntryFormDefinition.Pages[i].PageItems[x].Caption + ' </span>' + optionalHtml + '</label>'
 											
-										pageItemsHtml = pageItemsHtml + '<input id="' + formName + '-page-item-' +  dataEntryFormDefinition.Pages[i].PageItems[x].Name + '" class="form-control" maxlength="' + dataEntryFormDefinition.Pages[i].PageItems[x].CharacterLimit + '" ' + readonlyHtml + '></div>'
+										pageItemsHtml = pageItemsHtml + '<input id="' + formName + '-page-item-' +  dataEntryFormDefinition.Pages[i].PageItems[x].Name + '" class="form-control' + additionalFieldHtml + '" maxlength="' + dataEntryFormDefinition.Pages[i].PageItems[x].CharacterLimit + '" ' + readonlyHtml + ' data-pageItem-name="' + dataEntryFormDefinition.Pages[i].PageItems[x].Name + '"></div>'
 										//$("#" + formName).append(inputHTML)
 										break;
 									case "Number":
@@ -293,10 +293,10 @@ function populateDataEntryFormPageItems(pageCaption, formName)
 										break;
 									case "Date":
 										//pageItemsHtml = '<p>This is a date.</p>'
-										var pageItemsHtml = '<div class="form-group' + additionalFieldHtml + '">'
-										pageItemsHtml = pageItemsHtml + '<label for="' + formName + '-page-item-' +  dataEntryFormDefinition.Pages[i].PageItems[x].Name + '" class="display-4" style="color:#000033;font-size:1.25rem;"><span>' + dataEntryFormDefinition.Pages[i].PageItems[x].Caption + ' </span><span style="font-size:1rem">(optional)</span></label>'
+										var pageItemsHtml = '<div class="form-group">'
+										pageItemsHtml = pageItemsHtml + '<label for="' + formName + '-page-item-' +  dataEntryFormDefinition.Pages[i].PageItems[x].Name + '" class="display-4" style="color:#000033;font-size:1.25rem;"><span>' + dataEntryFormDefinition.Pages[i].PageItems[x].Caption + ' </span>' + optionalHtml + '</label>'
 											
-										pageItemsHtml = pageItemsHtml + '<input type="text" id="' + formName + '-page-item-' +  dataEntryFormDefinition.Pages[i].PageItems[x].Name + '" class="form-control date-input" data-provide="datepicker" data-date-format="' + config.DatePicker.DateFormat + '" data-date-autoclose="' + config.DatePicker.AutoClose + '" placeholder="' + config.DatePicker.Placeholder + '" data-date-start-date="' + config.DatePicker.StartDate + '" data-date-assume-nearby-year="' + config.DatePicker.AssumeNearbyYear + '" maxlength="10"></div>'
+										pageItemsHtml = pageItemsHtml + '<input type="text" id="' + formName + '-page-item-' +  dataEntryFormDefinition.Pages[i].PageItems[x].Name + '" class="form-control date-input' + additionalFieldHtml + '" data-provide="datepicker" data-date-format="' + config.DatePicker.DateFormat + '" data-date-autoclose="' + config.DatePicker.AutoClose + '" placeholder="' + config.DatePicker.Placeholder + '" data-date-start-date="' + config.DatePicker.StartDate + '" data-date-assume-nearby-year="' + config.DatePicker.AssumeNearbyYear + '" maxlength="' + dataEntryFormDefinition.Pages[i].PageItems[x].CharacterLimit + '" data-pageItem-name="' + dataEntryFormDefinition.Pages[i].PageItems[x].Name + '"></div>'
 										
 										//$("#" + formName).append(inputHTML)											
 										break;
@@ -698,20 +698,24 @@ $(document).on("change", "#new-sub-folder-form-record-type", function()
 // Create Folder
 $(document).on("click", "#create-folder-button", function()
 	{
-	if($("#new-folder-form-record-title").val().length)
+	if($("#new-folder-form-page-item-RecordTypedTitle").val().length)
 		{
 		$("#create-folder-status").modal("show")
-		recordTitle = $("#new-folder-form-record-title").val()
+		recordTitle = $("#new-folder-form-page-item-RecordTypedTitle").val()
 		recordClassificationUri = $("#new-folder-form-record-classification").data("classificationUri")
+		//var recordClassificationUri = "534"
 		var recordContainerUri;
 		recordType = $("#new-folder-form-record-type").val()
 		var additionalFieldKeys = [];
 		var additionalFieldValues = [];
-		for(i=0; i<$("#new-folder-form > .additional-field").length; i++)
+		for(i=0; i<$("#new-folder-form-page-items .additional-field").length; i++)
 			{
-			additionalFieldKeys.push($("#new-folder-form > .additional-field").eq(i).attr("data-search-clause-name"))
-			additionalFieldValues.push($("#new-folder-form > .additional-field").eq(i).children().eq(1).val())
+			//console.log("Hello World: " + i)
+			additionalFieldKeys.push($("#new-folder-form-page-items .additional-field").eq(i).attr("data-pageItem-name"))
+			additionalFieldValues.push($("#new-folder-form-page-items .additional-field").eq(i).val())
 			}
+		console.log("additionalFieldKeys:" + additionalFieldKeys)
+		console.log("additionalFieldKeys:" + additionalFieldValues)
 		gtag('event', 'Create Folder');
 		createFolder(recordTitle, recordClassificationUri, recordContainerUri, recordType, additionalFieldKeys, additionalFieldValues)
 		}
