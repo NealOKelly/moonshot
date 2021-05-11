@@ -1236,6 +1236,7 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 						var result = searchAPI(data)
 							.then(function(result)
 								{
+								$("#upload-form-record-type").html("")
 								for(i=0; i<config.ByListContainmentRules.Mappings.length; i++)
 									{
 									if(config.ByListContainmentRules.Mappings[i].ParentRecordType==result.Results[0].RecordRecordType.RecordTypeName.Value)

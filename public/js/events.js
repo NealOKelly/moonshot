@@ -166,17 +166,19 @@ $(document).on("click", "span[class^='folder']", function()
 		{
 		getRecords(node.attr("id").substr(11))
 		populateContainerField("folder-terminal", node.attr("id").substr(11))
-		$("#upload-form-record-type").html("")
+		//$("#upload-form-record-type").html("")
+
 		populateRecordTypeField("folder-terminal", node.attr("id").substr(11)).then(function()
+		{
+		$("#upload-form-record-type-field-container").css("display", "none")
+		if($("#upload-form-record-type>option").length>1)
 			{
-			populateAdditionalFields("folder-terminal").then(function()
-				{
-				clearForm("upload-form")
-				$("#upload-form-container").removeClass("upload-form-hidden")					
-				})
-			})
+			$("#upload-form-record-type-field-container").css("display", "block")
+			}	
+		populateDataEntryFormPages("upload-form")
+		})
 		drawPropertiesTable("folder-terminal")
-		getRecordProperties("folder-terminal", node.attr("id").substr(11))	
+		getRecordProperties("folder-terminal", node.attr("id").substr(11))
 		}
 	})
 
@@ -281,13 +283,35 @@ function populateDataEntryFormPageItems(pageCaption, formName)
 								switch(dataEntryFormDefinition.Pages[i].PageItems[x].Format)
 									{
 									case "String":
-										//pageItemsHtml = '<p>' + dataEntryFormDefinition.Pages[i].PageItems[x].Caption + '</p>'
-										var pageItemsHtml = '<div class="form-group">'
-										
-										pageItemsHtml = pageItemsHtml + '<label for="' + formName + '-page-item-' +  dataEntryFormDefinition.Pages[i].PageItems[x].Name + '" class="display-4" style="color:#000033;font-size:1.25rem;"><span>' + dataEntryFormDefinition.Pages[i].PageItems[x].Caption + ' </span>' + optionalHtml + '</label>'
+										if(dataEntryFormDefinition.Pages[i].PageItems[x].LookupSetUri)
+											{
+											//pageItemsHtml = "<p>It's a lookup</p>"
+											var pageItemsHtml = '<div class="form-group">'
+											pageItemsHtml = pageItemsHtml + '<label for="' + formName + '-page-item-' +  dataEntryFormDefinition.Pages[i].PageItems[x].Name + '" class="display-4" style="color:#000033;font-size:1.25rem;"><span>' + dataEntryFormDefinition.Pages[i].PageItems[x].Caption + ' </span>' + optionalHtml + '</label>'											
 											
-										pageItemsHtml = pageItemsHtml + '<input id="' + formName + '-page-item-' +  dataEntryFormDefinition.Pages[i].PageItems[x].Name + '" class="form-control' + additionalFieldHtml + '" maxlength="' + dataEntryFormDefinition.Pages[i].PageItems[x].CharacterLimit + '" ' + readonlyHtml + ' data-pageItem-name="' + dataEntryFormDefinition.Pages[i].PageItems[x].Name + '"></div>'
-										//$("#" + formName).append(inputHTML)
+											//<select id="upload-form-record-type" class="form-control"></select>
+											pageItemsHtml = pageItemsHtml + '<select id="' + formName + '-page-item-' +  dataEntryFormDefinition.Pages[i].PageItems[x].Name + '" class="form-control' + additionalFieldHtml + '" maxlength="' + dataEntryFormDefinition.Pages[i].PageItems[x].CharacterLimit + '" ' + readonlyHtml + ' data-pageItem-name="' + dataEntryFormDefinition.Pages[i].PageItems[x].Name + '">'
+												
+												
+												
+											
+												//console.log("dataEntryFormDefinition.Pages[i].PageItems[x].LookupValues.length: " + dataEntryFormDefinition.Pages[i].PageItems[x].LookupValues.length)
+											for(y=0;y<dataEntryFormDefinition.Pages[i].PageItems[x].LookupValues.length;y++)
+												{
+												pageItemsHtml = pageItemsHtml + "<option>" + dataEntryFormDefinition.Pages[i].PageItems[x].LookupValues[y] + "</option>"
+												}
+											pageItemsHtml = pageItemsHtml + '</select></div>'
+											}
+										else
+											{
+											//pageItemsHtml = '<p>' + dataEntryFormDefinition.Pages[i].PageItems[x].Caption + '</p>'
+											var pageItemsHtml = '<div class="form-group">'
+
+											pageItemsHtml = pageItemsHtml + '<label for="' + formName + '-page-item-' +  dataEntryFormDefinition.Pages[i].PageItems[x].Name + '" class="display-4" style="color:#000033;font-size:1.25rem;"><span>' + dataEntryFormDefinition.Pages[i].PageItems[x].Caption + ' </span>' + optionalHtml + '</label>'
+
+											pageItemsHtml = pageItemsHtml + '<input id="' + formName + '-page-item-' +  dataEntryFormDefinition.Pages[i].PageItems[x].Name + '" class="form-control' + additionalFieldHtml + '" maxlength="' + dataEntryFormDefinition.Pages[i].PageItems[x].CharacterLimit + '" ' + readonlyHtml + ' data-pageItem-name="' + dataEntryFormDefinition.Pages[i].PageItems[x].Name + '"></div>'
+											//$("#" + formName).append(inputHTML)											}
+											}
 										break;
 									case "Number":
 										console.log("Number inputs are not yet supported.")
@@ -403,15 +427,17 @@ $(document).on("click", ".record-title>a", function()
 			{
 			getRecords(node.attr("id").substr(11))
 			populateContainerField("folder-terminal", node.attr("id").substr(11))
-			$("#upload-form-record-type").html("")
+			//$("#upload-form-record-type").html("")
+
 			populateRecordTypeField("folder-terminal", node.attr("id").substr(11)).then(function()
+			{
+			$("#upload-form-record-type-field-container").css("display", "none")
+			if($("#upload-form-record-type>option").length>1)
 				{
-				populateAdditionalFields("folder-terminal").then(function()
-					{
-					clearForm("upload-form")
-					$("#upload-form-container").removeClass("upload-form-hidden")					
-					})
-				})
+				$("#upload-form-record-type-field-container").css("display", "block")
+				}	
+			populateDataEntryFormPages("upload-form")
+			})
 			drawPropertiesTable("folder-terminal")
 			getRecordProperties("folder-terminal", node.attr("id").substr(11))
 			}
@@ -844,7 +870,7 @@ function dropHandler(event)
 				$("#dropped-file-filetype-icon").addClass("fiv-icon-" + getFileExtension(file.name))
 				var recordTitle = file.name.substr(0, file.name.length - (getFileExtension(file.name).length + 1))
 				$("#dropped-file-name").html(file.name)
-				$("#upload-form-record-title").val(recordTitle)
+				$("#upload-form-page-item-RecordTypedTitle").val(recordTitle)
 				gtag('event', 'Drop File')
       			}
 			}
@@ -889,15 +915,16 @@ $(document).on("click", "#upload-button", function()
 				var fileName = uuidv4();
 				uploadFile(fileName, extension, file).then(function()
 					{
-					var recordTitle = $("#upload-form-record-title").val()
+					var recordTitle = $("#upload-form-page-item-RecordTypedTitle").val()
 					var recordType = $("#upload-form-record-type").val()
-					var recordContainerUri = $("#upload-form-record-container").data("recordUri")
+					var recordContainerUri = $("#upload-form-record-container").data("record-Uri")
 					var additionalFieldKeys = [];
 					var additionalFieldValues = [];
-					for(i=0; i<$("#upload-form > .additional-field").length; i++)
+					for(i=0; i<$("#upload-form-page-items .additional-field").length; i++)
 						{
-						additionalFieldKeys.push($("#upload-form > .additional-field").eq(i).attr("data-search-clause-name"))
-						additionalFieldValues.push($("#upload-form > .additional-field").eq(i).children().eq(1).val())
+						//console.log("Hello World: " + i)
+						additionalFieldKeys.push($("#upload-form-page-items .additional-field").eq(i).attr("data-pageItem-name"))
+						additionalFieldValues.push($("#upload-form-page-items .additional-field").eq(i).val())
 						}
 					createRecord(recordTitle, recordType, recordContainerUri, fileName + "." + extension, additionalFieldKeys, additionalFieldValues)
 					gtag('event', 'Upload Document');					
