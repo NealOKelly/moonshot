@@ -1337,112 +1337,6 @@ function helperSelectRecordType(type)
 	return deferredObject.promise();
 	}
 
-function populateAdditionalFields(parentNodeType)
-	{
-	var deferredObject = $.Deferred();
-	getAuthenticationStatus().then(function () 
-		{
-		if(isAuthenticated)
-			{
-			var data = 	{
-						"q" : "all",
-						"Properties" : "FieldDefinitionName, FieldDefinitionIsUsedByRecordTypes, FieldDefinitionFormat, FieldDefinitionSearchClause, FieldDefinitionLength",
-						"TrimType" : "FieldDefinition",
-						"PageSize" : "1000"
-						}
-			var result = searchAPI(data)
-				.then(function(result)
-					{
-					switch(parentNodeType)
-						{
-						case "classification":
-							var formName = "new-folder-form";
-							$("#" + formName + " .additional-field").remove()
-							break;
-						case "folder-intermediate":
-							var formName = "new-sub-folder-form";
-							$("#" + formName + " .additional-field").remove()
-							break;
-						case "folder-terminal":
-							var formName = "upload-form";
-							$("#" + formName + " .additional-field").remove()
-							break;
-						}
-
-						for(i=0; i<result.TotalResults; i++)
-							{
-							if(result.Results[i].FieldDefinitionIsUsedByRecordTypes.Value.includes($("#"+ formName + "-record-type").val()))
-								{
-								switch(result.Results[i].FieldDefinitionFormat.Value)
-									{
-									case "String":
-										var inputHTML = '<div class="form-group additional-field" data-search-clause-name="' + result.Results[i].FieldDefinitionSearchClause.Value + '">'
-										
-										inputHTML = inputHTML + '<label for="' + formName + '-additional-field-' + result.Results[i].FieldDefinitionSearchClause.Value + '" class="display-4" style="color:#000033;font-size:1.25rem;"><span>' + result.Results[i].FieldDefinitionName.Value + ' </span><span style="font-size:1rem">(optional)</span></label>'
-											
-										inputHTML = inputHTML + '<input id="'+ formName + '-additional-field-' + result.Results[i].FieldDefinitionSearchClause.Value + '" class="form-control" maxlength="' + result.Results[i].FieldDefinitionLength.Value + '"></div>'
-										$("#" + formName).append(inputHTML)
-										break;
-									case "Number":
-										console.log("Number inputs are not yet supported.")
-										break;
-									case "Boolean":
-										console.log("Boolean inputs are not yet supported.")
-										break;
-									case "Date":
-										var inputHTML = '<div class="form-group additional-field" data-search-clause-name="' + result.Results[i].FieldDefinitionSearchClause.Value + '">'
-										inputHTML = inputHTML + '<label for="' + formName + 'additional-field-' + result.Results[i].FieldDefinitionSearchClause.Value + '" class="display-4" style="color:#000033;font-size:1.25rem;"><span>' + result.Results[i].FieldDefinitionName.Value + ' </span><span style="font-size:1rem">(optional)</span></label>'
-											
-										inputHTML = inputHTML + '<input type="text" id="additional-field-' + formName + 'additional-field-' + result.Results[i].FieldDefinitionSearchClause.Value + '" class="form-control date-input" data-provide="datepicker" data-date-format="' + config.DatePicker.DateFormat + '" data-date-autoclose="' + config.DatePicker.AutoClose + '" placeholder="' + config.DatePicker.Placeholder + '" data-date-start-date="' + config.DatePicker.StartDate + '" data-date-assume-nearby-year="' + config.DatePicker.AssumeNearbyYear + '" maxlength="10"></div>'
-										
-										$("#" + formName).append(inputHTML)											
-										break;
-									case "Datetime":
-										console.log("Datetime inputs are not yet supported.")
-										break;
-									case "Decimal":
-										console.log("Decimal inputs are not yet supported.")
-										break;
-									case "Text":
-										console.log("Text inputs are not yet supported.")
-										break;
-									case "Currency":
-										console.log("Currency inputs are not yet supported.")
-										break;
-									case "Object":
-										console.log("Object inputs are not yet supported.")
-										break;
-									case "BigNumber":
-										console.log("BigNumber inputs are not yet supported.")
-										break;
-									case "Xml":
-										console.log("Xml inputs are not yet supported.")
-										break;
-									case "Geography":
-										console.log("Geography inputs are not yet supported.")
-										break;
-									}
-								}
-						if(i==(result.TotalResults-1))
-							{
-							deferredObject.resolve();	
-							}
-						}					
-					})
-				.fail(function(result)
-					{
-					// Do something
-					})
-			}
-		else
-			{
-			displaySessionExpiredModal()
-			deferredObject.resolve();
-			}
-		});
-		return deferredObject.promise();
-	}
-
 function clearForm(form)
 	{
 	switch(form)
@@ -1455,8 +1349,9 @@ function clearForm(form)
 			//$("#new-folder-form-page-items .additional-field").val()
 			break;
 		case "new-sub-folder-form":
-			$("#new-sub-folder-form-record-title").val("")
-			$("#new-sub-folder-form > .additional-field > input").val("")
+			$("[id^=new-folder-form-page-item-]").val("")
+			//$("#new-sub-folder-form-record-title").val("")
+			//$("#new-sub-folder-form > .additional-field > input").val("")
 			break;
 		case "upload-form":
 			$("#dropped-file-filetype-icon").removeClass()
@@ -1465,10 +1360,11 @@ function clearForm(form)
 			$("#dropped-file-name").html("")
 			$("#file-details-container").css("display", "none")
 			$("#browse-button-container").css("display", "inline-block")
-			$("#upload-form-record-title").val("")
+			//$("#upload-form-record-title").val("")
 			$("#drop-zone").removeData("file")
 			resetFileInput("#upload-form-file")
-			$("#upload-form > .additional-field > input").val("")
+			//$("#upload-form > .additional-field > input").val("")
+			$("[id^=upload-form-page-item-]").val("")
 			break;
 		}
 	}

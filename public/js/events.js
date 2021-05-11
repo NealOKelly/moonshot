@@ -659,29 +659,37 @@ $(document).on("click", "#search-results li", function()
 					switch(nodeType)
 						{
 						case "folder-intermediate":
-							$("#new-sub-folder-form-record-title").val("")
-							$("#new-sub-folder-form-record-type").html("")
-							populateContainerField("folder-intermediate", uri)
-							populateRecordTypeField("folder-intermediate", uri).then(function()
+		
+						//$("#records-list-pane").html("<div class='no-records display-4'>Browse or search to display records.</div>")
+						//$("#new-sub-folder-form-record-type").html("")
+						populateContainerField("folder-intermediate", uri)
+						populateRecordTypeField("folder-intermediate", uri).then(function()
+							{
+							// Display the record type selector only if there is more than one record type than can be used with the classification.
+							$("#new-sub-folder-form-record-type-field-container").css("display", "none")
+							if($("#new-sub-folder-form-record-type>option").length>1)
 								{
-								populateAdditionalFields("folder-intermediate").then(function()
-									{
-									$("#new-sub-folder-form-container").removeClass("new-sub-folder-form-hidden")
-									})
-								})
+								$("#new-sub-folder-form-record-type-field-container").css("display", "block")
+								}	
+							populateDataEntryFormPages("new-sub-folder-form")
+							})
+						drawPropertiesTable("folder-intermediate")
+						getRecordProperties("folder-intermediate", uri)
+		
 							break;
 						case "folder-terminal":
-							$("#upload-form-record-title").val("")
-							$("#upload-form-record-type").html("")
-							populateContainerField("folder-terminal", uri)
 							populateRecordTypeField("folder-terminal", uri).then(function()
 								{
-								populateAdditionalFields("folder-terminal").then(function()
+								populateContainerField("folder-terminal", uri)
+								$("#upload-form-record-type-field-container").css("display", "none")
+								if($("#upload-form-record-type>option").length>1)
 									{
-									clearForm("upload-form")
-									$("#upload-form-container").removeClass("upload-form-hidden")
-									})
-								})	
+									$("#upload-form-record-type-field-container").css("display", "block")
+									}	
+								populateDataEntryFormPages("upload-form")
+								})
+								drawPropertiesTable("folder-terminal")
+								getRecordProperties("folder-terminal", uri)
 							break;
 						case "document":
 							// do something
@@ -722,7 +730,8 @@ $(document).on("change", "#new-folder-form-record-type", function()
 
 $(document).on("change", "#new-sub-folder-form-record-type", function()
 	{
-	populateAdditionalFields("folder-intermediate")
+	//populateAdditionalFields("folder-intermediate")
+	populateDataEntryFormPages("new-folder-form")
 	})
 
 // Create Folder
