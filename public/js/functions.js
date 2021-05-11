@@ -959,12 +959,12 @@ function populateContainerField(parentNodeType, parentNodeUri)
 			{
 			case "folder-intermediate":
 				$("#new-sub-folder-form-record-container").val(result.Results[0].RecordNumber.Value + ": " + result.Results[0].RecordTitle.Value)
-				$("#new-sub-folder-form-record-container").data("recordUri", result.Results[0].Uri)	
+				$("#new-sub-folder-form-record-container").data("record-Uri", result.Results[0].Uri)	
 				break;
 			case "folder-terminal":
 				$("#upload-form-record-container").val("")
 				$("#upload-form-record-container").val(result.Results[0].RecordNumber.Value + ": " + result.Results[0].RecordTitle.Value)
-				$("#upload-form-record-container").data("recordUri", result.Results[0].Uri)	
+				$("#upload-form-record-container").data("record-Uri", result.Results[0].Uri)	
 				break;
 			}
 		})
@@ -1152,6 +1152,7 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 						var result = searchAPI(data)
 							.then(function(result)
 								{
+								$("#new-sub-folder-form-record-type").html("")
 								for(i=0; i<config.ByListContainmentRules.Mappings.length; i++)
 									{
 									if(config.ByListContainmentRules.Mappings[i].ParentRecordType==result.Results[0].RecordRecordType.RecordTypeName.Value)
@@ -1191,6 +1192,7 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 						var result = searchAPI(data)
 							.then(function(result)
 								{
+								$("#new-sub-folder-form-record-type").html("")
 								for(i=0; i<result.Results.length; i++)
 									{
 									if(result.Results[i].RecordTypeContainerRule.Value!="Prevented")

@@ -123,6 +123,7 @@ $(document).on("click", "#all-files>span>a", function()
 	doAllFilesSelected()
 	})
 
+//////////////////////////////////////////////////////////////////////////////////////////////
 $(document).on("click", "span[class^='folder']", function()
 	{
 	var node = $(event.target).parent();
@@ -132,27 +133,31 @@ $(document).on("click", "span[class^='folder']", function()
 	classificationTreeNodeSelected(node)
 	if(node.hasClass("classification-can-attach-records"))
 		{
-		$("#new-folder-form-record-type").html("")
 		populateRecordTypeField("classification", node.attr("id").substr(19)).then(function()
 			{
-			populateAdditionalFields("classification").then(function()
+			// Display the record type selector only if there is more than one record type than can be used with the classification.
+			$("#new-folder-form-record-type-field-container").css("display", "none")
+			if($("#new-folder-form-record-type>option").length>1)
 				{
-				$("#new-folder-form-container").removeClass("new-folder-form-hidden")	
-				})
-			})
+				$("#new-folder-form-record-type-field-container").css("display", "block")
+				}	
+			populateDataEntryFormPages("new-folder-form")
+			})		
 		}
 	if(node.hasClass("folder-intermediate"))
 		{
 		$("#records-list-pane").html("<div class='no-records display-4'>Browse or search to display records.</div>")
-		$("#new-sub-folder-form-record-title").val("")
-		$("#new-sub-folder-form-record-type").html("")
+		//$("#new-sub-folder-form-record-type").html("")
 		populateContainerField("folder-intermediate", node.attr("id").substr(11))
 		populateRecordTypeField("folder-intermediate", node.attr("id").substr(11)).then(function()
 			{
-			populateAdditionalFields("folder-intermediate").then(function()
+			// Display the record type selector only if there is more than one record type than can be used with the classification.
+			$("#new-sub-folder-form-record-type-field-container").css("display", "none")
+			if($("#new-sub-folder-form-record-type>option").length>1)
 				{
-				$("#new-sub-folder-form-container").removeClass("new-sub-folder-form-hidden")				
-				})
+				$("#new-sub-folder-form-record-type-field-container").css("display", "block")
+				}	
+			populateDataEntryFormPages("new-sub-folder-form")
 			})
 		drawPropertiesTable("folder-intermediate")
 		getRecordProperties("folder-intermediate", node.attr("id").substr(11))
@@ -175,7 +180,6 @@ $(document).on("click", "span[class^='folder']", function()
 		}
 	})
 
-//////////////////////////////////////////////////////////////////////////////////////////////
 $(document).on("click", ".data-entry-form-tabs>li>a:not(.active)", function()
 	{
 	$(".data-entry-form-tabs>li>a").removeClass("active")
@@ -333,7 +337,7 @@ function populateDataEntryFormPageItems(pageCaption, formName)
 							}
 						}
 					}
-				$("#new-folder-form-container").removeClass("new-folder-form-hidden")
+				$("#" + formName + "-container").removeClass(formName + "-hidden")
 				})
 	}
 
@@ -362,9 +366,6 @@ $(document).on("click", ".classification-name>a", function()
 			})		
 		}
 	})
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 
 
 $(document).on("click", ".record-title>a", function()
@@ -381,15 +382,17 @@ $(document).on("click", ".record-title>a", function()
 	if($(node).hasClass("folder-intermediate"))
 		{
 		$("#records-list-pane").html("<div class='no-records display-4'>Browse or search to display records.</div>")
-		$("#new-sub-folder-form-record-title").val("")
-		$("#new-sub-folder-form-record-type").html("")
+		//$("#new-sub-folder-form-record-type").html("")
 		populateContainerField("folder-intermediate", node.attr("id").substr(11))
 		populateRecordTypeField("folder-intermediate", node.attr("id").substr(11)).then(function()
 			{
-			populateAdditionalFields("folder-intermediate").then(function()
+			// Display the record type selector only if there is more than one record type than can be used with the classification.
+			$("#new-sub-folder-form-record-type-field-container").css("display", "none")
+			if($("#new-sub-folder-form-record-type>option").length>1)
 				{
-				$("#new-sub-folder-form-container").removeClass("new-sub-folder-form-hidden")				
-				})
+				$("#new-sub-folder-form-record-type-field-container").css("display", "block")
+				}	
+			populateDataEntryFormPages("new-sub-folder-form")
 			})
 		drawPropertiesTable("folder-intermediate")
 		getRecordProperties("folder-intermediate", node.attr("id").substr(11))
@@ -414,6 +417,7 @@ $(document).on("click", ".record-title>a", function()
 			}
 		}
 	})
+///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Click on collapsed caret
 $(document).on("click", ".collapsed", function()
@@ -719,24 +723,37 @@ $(document).on("click", "#create-folder-button", function()
 		gtag('event', 'Create Folder');
 		createFolder(recordTitle, recordClassificationUri, recordContainerUri, recordType, additionalFieldKeys, additionalFieldValues)
 		}
-	else
+	})
+
+// Create Sub Folder
+$(document).on("click", "#create-sub-folder-button", function()
+	{
+	console.log("Create sub folder button has been clicked.")
+	if($("#new-sub-folder-form-page-item-RecordTypedTitle").val().length)
 		{
 		$("#create-folder-status").modal("show")
-		recordTitle = $("#new-sub-folder-form-record-title").val()
+		recordTitle = $("#new-sub-folder-form-page-item-RecordTypedTitle").val()
 		var recordClassificationUri;
-		recordContainerUri = $("#new-sub-folder-form-record-container").data("recordUri")
+		recordContainerUri = $("#new-sub-folder-form-record-container").data("record-Uri")		
 		recordType = $("#new-sub-folder-form-record-type").val()
 		var additionalFieldKeys = [];
 		var additionalFieldValues = [];
-		for(i=0; i<$("#new-sub-folder-form > .additional-field").length; i++)
+		for(i=0; i<$("#new-sub-folder-form-page-items .additional-field").length; i++)
 			{
-			additionalFieldKeys.push($("#new-sub-folder-form > .additional-field").eq(i).attr("data-search-clause-name"))
-			additionalFieldValues.push($("#new-sub-folder-form > .additional-field").eq(i).children().eq(1).val())
+			//console.log("Hello World: " + i)
+			additionalFieldKeys.push($("#new-sub-folder-form-page-items .additional-field").eq(i).attr("data-pageItem-name"))
+			additionalFieldValues.push($("#new-sub-folder-form-page-items .additional-field").eq(i).val())
 			}
-		gtag('event', 'Create Sub Folder');
+		console.log("additionalFieldKeys:" + additionalFieldKeys)
+		console.log("additionalFieldKeys:" + additionalFieldValues)
+		gtag('event', 'Create Folder');
 		createFolder(recordTitle, recordClassificationUri, recordContainerUri, recordType, additionalFieldKeys, additionalFieldValues)
 		}
 	})
+
+
+
+
 
 // Upload Form
 $("#browse-button").click(function()
