@@ -1703,93 +1703,15 @@ function showRecordCoreFieldValue(record)
 	}
 
 
-
-
-function showRecordAdditionalFieldName(field, recordTitle, recordType, recordUri)
-	{
-	switch(field.FieldDefinitionFormat.Value)
-		{
-		case "String":
-
-			var additionalFieldId = "properties-additional-fields-" + field.FieldDefinitionSearchClause.Value;
-
-			var additionalPropertyHTML = '<tr><td scope="row" style="width:20%;text-align:left;padding-left:30px;">'
-
-			additionalPropertyHTML = additionalPropertyHTML + field.FieldDefinitionName.Value
-
-			additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td>'
-
-			additionalPropertyHTML = additionalPropertyHTML + '<td  id="properties-edit-additional-field-' + field.FieldDefinitionSearchClause.Value + '" class="edit-properties-link"><a href="#">Edit</a></td></tr>'
-
-			$("#properties-pane > table > tbody").append(additionalPropertyHTML)
-
-			$("#" + additionalFieldId).data("record-title", recordTitle)
-			$("#" + additionalFieldId).data("record-record-type", recordType)
-			$("#" + additionalFieldId).data("record-uri", recordUri)
-			$("#" + additionalFieldId).data("field-name", field.FieldDefinitionSearchClause.Value)
-			$("#" + additionalFieldId).data("field-length", field.FieldDefinitionLength.Value)
-			$("#" + additionalFieldId).data("field-definition-format", field.FieldDefinitionFormat.Value)
-
-			break;
-		case "Number":
-			console.log("Number inputs are not yet supported.")
-			break;
-		case "Boolean":
-			console.log("Boolean inputs are not yet supported.")
-			break;
-		case "Date":
-			var additionalFieldId = "properties-additional-fields-" + field.FieldDefinitionSearchClause.Value;
-
-			var additionalPropertyHTML = '<tr><td scope="row" style="width:20%;text-align:left;padding-left:30px;">'
-
-			additionalPropertyHTML = additionalPropertyHTML + field.FieldDefinitionName.Value
-
-			additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td>'
-
-			additionalPropertyHTML = additionalPropertyHTML + '<td  id="properties-edit-additional-field-' + field.FieldDefinitionSearchClause.Value + '" class="edit-properties-link"><a href="#">Edit</a></td></tr>'
-
-			$("#properties-pane > table > tbody").append(additionalPropertyHTML)
-
-			$("#" + additionalFieldId).data("record-title", recordTitle)
-			$("#" + additionalFieldId).data("record-record-type", recordType)
-			$("#" + additionalFieldId).data("record-uri", recordUri)
-			$("#" + additionalFieldId).data("field-name", field.FieldDefinitionSearchClause.Value)
-			$("#" + additionalFieldId).data("field-length", field.FieldDefinitionLength.Value)
-			$("#" + additionalFieldId).data("field-definition-format", field.FieldDefinitionFormat.Value)
-
-			break;
-		case "Datetime":
-			console.log("Datetime inputs are not yet supported.")
-			break;
-		case "Decimal":
-			console.log("Decimal inputs are not yet supported.")
-			break;
-		case "Text":
-			console.log("Text inputs are not yet supported.")
-			break;
-		case "Currency":
-			console.log("Currency inputs are not yet supported.")
-			break;
-		case "Object":
-			console.log("Object inputs are not yet supported.")
-			break;
-		case "BigNumber":
-			console.log("BigNumber inputs are not yet supported.")
-			break;
-		case "Xml":
-			console.log("Xml inputs are not yet supported.")
-			break;
-		case "Geography":
-			console.log("Geography inputs are not yet supported.")
-			break;
-		}	
-	}
-
 function showRecordAdditionalFieldValue(result, fieldFormat, additionalFieldId, searchClause)
 	{
+	console.log("result: ")
+	console.log(result)
+	console.log("searchClause: " + searchClause)
 	switch(fieldFormat)
 		{
 		case "String":
+			//console.log(record)
 			$("#" + additionalFieldId).html(result.Results[0].Fields[searchClause].Value)
 			break;
 		case "Number":
@@ -1832,7 +1754,91 @@ function showRecordAdditionalFieldValue(result, fieldFormat, additionalFieldId, 
 	}
 
 
+function showRecordAdditionalFieldName(field, recordTitle, recordType, recordUri)
+	{
+	console.log("field: ")
+	console.log(field)
+	switch(field.Format)
+		{
+		case "String":
 
+			var additionalFieldId = "properties-additional-fields-" + field.Name;
+
+			var additionalPropertyHTML = '<tr><td scope="row" style="width:20%;text-align:left;padding-left:30px;">'
+
+			additionalPropertyHTML = additionalPropertyHTML + field.Caption
+
+			additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td>'
+
+			additionalPropertyHTML = additionalPropertyHTML + '<td  id="properties-edit-additional-field-' + field.Name + '" class="edit-properties-link"><a href="#">Edit</a></td></tr>'
+
+			$("#properties-pane > table > tbody").append(additionalPropertyHTML)
+
+			$("#" + additionalFieldId).data("record-title", recordTitle)
+			$("#" + additionalFieldId).data("record-record-type", recordType)
+			$("#" + additionalFieldId).data("record-uri", recordUri)
+			$("#" + additionalFieldId).data("field-name", field.Name)
+			$("#" + additionalFieldId).data("field-length", field.CharacterLimit)
+			$("#" + additionalFieldId).data("field-definition-format", field.Format)
+			if(field.hasOwnProperty("LookupValues"))
+				{
+				$("#" + additionalFieldId).data("is-dropdown", true)
+				}
+
+			break;
+		case "Number":
+			console.log("Number inputs are not yet supported.")
+			break;
+		case "Boolean":
+			console.log("Boolean inputs are not yet supported.")
+			break;
+		case "Date":
+			var additionalFieldId = "properties-additional-fields-" + field.Name;
+
+			var additionalPropertyHTML = '<tr><td scope="row" style="width:20%;text-align:left;padding-left:30px;">'
+
+			additionalPropertyHTML = additionalPropertyHTML + field.Caption
+
+			additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td>'
+
+			additionalPropertyHTML = additionalPropertyHTML + '<td  id="properties-edit-additional-field-' + field.Name + '" class="edit-properties-link"><a href="#">Edit</a></td></tr>'
+
+			$("#properties-pane > table > tbody").append(additionalPropertyHTML)
+
+			$("#" + additionalFieldId).data("record-title", recordTitle)
+			$("#" + additionalFieldId).data("record-record-type", recordType)
+			$("#" + additionalFieldId).data("record-uri", recordUri)
+			$("#" + additionalFieldId).data("field-name", field.Name)
+			$("#" + additionalFieldId).data("field-length", field.CharacterLimit)
+			$("#" + additionalFieldId).data("field-definition-format", field.Format)
+
+			break;
+		case "Datetime":
+			console.log("Datetime inputs are not yet supported.")
+			break;
+		case "Decimal":
+			console.log("Decimal inputs are not yet supported.")
+			break;
+		case "Text":
+			console.log("Text inputs are not yet supported.")
+			break;
+		case "Currency":
+			console.log("Currency inputs are not yet supported.")
+			break;
+		case "Object":
+			console.log("Object inputs are not yet supported.")
+			break;
+		case "BigNumber":
+			console.log("BigNumber inputs are not yet supported.")
+			break;
+		case "Xml":
+			console.log("Xml inputs are not yet supported.")
+			break;
+		case "Geography":
+			console.log("Geography inputs are not yet supported.")
+			break;
+		}	
+	}
 function getRecordProperties(type, recordUri)
 	{
 	getAuthenticationStatus().then(function () 
@@ -1852,10 +1858,10 @@ function getRecordProperties(type, recordUri)
 				data: JSON.stringify(data),
 				contentType: 'application/json',
 				xhrFields: { withCredentials: true },
-				success: function(result)
+				success: function(selectedRecord)
 					{
 					// Core Fields
-					showRecordCoreFieldValue(result.Results[0])
+					showRecordCoreFieldValue(selectedRecord.Results[0])
 					
 					switch(type)
 						{
@@ -1869,77 +1875,90 @@ function getRecordProperties(type, recordUri)
 							var additionalFieldsEnabled = config.PropertiesPane.Document.AdditionalFields
 							break;
 						}	
-					
 					// If Additional Fiels are enabled for in the config file
 					if(additionalFieldsEnabled=="true")
 						{
-						var recordUri = result.Results[0].Uri
-						var recordTitle = result.Results[0].RecordTitle.Value
-						var recordType = result.Results[0].RecordRecordType.RecordTypeName.Value
-						var url = baseUrl + apiPath + "/Search"
-						var data = 	{
-									"q" : "all",
-									"Properties" : "FieldDefinitionName, FieldDefinitionIsUsedByRecordTypes, FieldDefinitionFormat, FieldDefinitionSearchClause, FieldDefinitionLength",
-									"TrimType" : "FieldDefinition",
-									"PageSize" : "1000"
-									}
+						var recordUri = selectedRecord.Results[0].Uri
+						var recordTitle = selectedRecord.Results[0].RecordTitle.Value
+						var recordType = selectedRecord.Results[0].RecordRecordType.RecordTypeName.Value
+																	//var fieldFormat = sele.Results[i].FieldDefinitionFormat.Value
+											//var additionalFieldId = "properties-additional-fields-" + result.Results[i].FieldDefinitionSearchClause.Value;
+										//	var searchClause = result.Results[i].FieldDefinitionSearchClause.Value;	
 						
-						// Return all configured additional fields.
-						var result = searchAPI(data)
-							.then(function(result)
+						url = baseUrl + apiPath + "/Search";
+						data = 	{
+								"q" : selectedRecord.Results[0].RecordRecordType.RecordTypeName.Value,
+								"Properties" : "DataEntryFormDefinition",
+								"TrimType" : "RecordType"
+								}
+						
+						$.ajax(
+							{
+							url: url,
+							type: "POST",
+							data: JSON.stringify(data),
+							contentType: 'application/json',
+							xhrFields: { withCredentials: true},
+							success: function(selectedRecordType)
 								{
-								for(i=0; i<result.TotalResults; i++)  // for each configured additional field
+								//console.log("DataEntryFormDefinition:")
+								//console.log(selectedRecordType)
+								
+								for(i=0;i<selectedRecordType.Results[0].DataEntryFormDefinition.Pages.length;i++)
+									
 									{
-									(function(index)
+									
+									for(x=0;x<selectedRecordType.Results[0].DataEntryFormDefinition.Pages[i].PageItems.length;x++)	
 										{
-										// if the field can be used with the record type of the selected record
-										if(result.Results[i].FieldDefinitionIsUsedByRecordTypes.Value.includes(recordType))
-											{
-											// add a new row to the properties table
-											showRecordAdditionalFieldName(result.Results[i], recordTitle, recordType, recordUri)
-												
-											var fieldFormat = result.Results[i].FieldDefinitionFormat.Value
-
-											var additionalFieldId = "properties-additional-fields-" + result.Results[i].FieldDefinitionSearchClause.Value;
-
-											var searchClause = result.Results[i].FieldDefinitionSearchClause.Value;
-											
-											// get the value of the addition field for the selected record
-											var url = baseUrl + apiPath + "/Search"
-											
-											data = 	{
-													"q" : recordUri,
-													"Properties" : searchClause,
-													"TrimType" : "Record"
-													}
-
-											$.ajax(
+										(function(index)
+										 	{
+											if(selectedRecordType.Results[0].DataEntryFormDefinition.Pages[i].PageItems[x].Type=="Field")
 												{
-												url: url,
-												data: JSON.stringify(data),
-												type: "POST",
-												contentType: 'application/json',
-												xhrFields: { withCredentials: true },
-												success: function(result)
+												//console.log("Name: " + selectedRecordType.Results[0].DataEntryFormDefinition.Pages[i].PageItems[x].Name)
+												showRecordAdditionalFieldName(selectedRecordType.Results[0].DataEntryFormDefinition.Pages[i].PageItems[x], recordTitle, recordType, recordUri)
+
+												var additionalFieldId = "properties-additional-fields-" + selectedRecordType.Results[0].DataEntryFormDefinition.Pages[i].PageItems[x].Name;
+												var searchClause = selectedRecordType.Results[0].DataEntryFormDefinition.Pages[i].PageItems[x].Name;
+												var fieldFormat = selectedRecordType.Results[0].DataEntryFormDefinition.Pages[i].PageItems[x].Format;
+												url = baseUrl + apiPath + "/Search"
+
+												console.log("recordUri: " + recordUri)
+												data = 	{
+														"q" : recordUri,
+														"Properties" : searchClause,
+														"TrimType" : "Record"
+														}
+												console.log("searchClause before ajax: " + searchClause)
+												$.ajax(
 													{
-													// add the value to the properties table
-													showRecordAdditionalFieldValue(result, fieldFormat, additionalFieldId, searchClause)
-													}, 
-												error: function(result)
-													{
-													// Do something
-													}
-												})	
-											}
-									})(i)}
-								})
-							.fail(function(result)
+													url: url,
+													data: JSON.stringify(data),
+													type: "POST",
+													contentType: 'application/json',
+													xhrFields: { withCredentials: true },
+													success: function(result)
+														{
+														// add the value to the properties table
+														showRecordAdditionalFieldValue(result, fieldFormat, additionalFieldId, searchClause)
+														}, 
+													error: function(result)
+														{
+														// Do something
+														}
+													})	
+												}											
+											})(x)
+										}
+									}
+								}, 
+							error: function(selectedRecordType)
 								{
-								// Do something
-								})
+								console.log("Oooops!")
+								}
+							});	
 						}
 					}, 
-				error: function(result)
+				error: function(selectedRecord)
 					{
 					// Do something
 					}

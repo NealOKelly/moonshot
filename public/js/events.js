@@ -1016,6 +1016,11 @@ $(document).on("click", ".edit-properties-link", function()
 				switch($("#" + editableCellId).data("field-definition-format"))
 					{
 					case "String":
+						if($("#" + editableCellId).data("is-dropdown"))
+							{
+							alert("The fucker is a dropdown.")
+							}
+							
 						$("#" + editableCellId).html('<form autocomplete="off"><input id="editRecordPropertiesInput" type="text" style="width:100%;" value="' + $("#" + editableCellId).html().replace('"', '&quot;') + '" maxlength="' + $("#" + editableCellId).data("field-length") + '"></form>')
 						break;
 					case "Number":
