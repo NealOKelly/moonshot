@@ -190,180 +190,7 @@ $(document).on("click", ".data-entry-form-tabs>li>a:not(.active)", function()
 	$("#new-folder-form-page-items-" + $(event.target).data("page-caption")).css("display", "block")
 	})
 
-function populateDataEntryFormPages(formName)
-	{
-	var data = 	{
-				"q" : $("#" + formName + "-record-type").val(),
-				"Properties" : "DataEntryFormDefinition",
-				"TrimType" : "RecordType"
-				}
-	var result = searchAPI(data)
-					.then(function(result)
-						{
-						$("#" + formName + "-tabs").css("display", "none")
-						// These lines are intentionally repeated.
-						$("#" + formName + "-tabs").html("")
-						$("#" + formName + "-page-items").html("")
-						// End repeated lines.
-						var dataEntryFormDefinition = result.Results[0].DataEntryFormDefinition
-//						console.log("dataEntryFormDefinition.length: " + dataEntryFormDefinition.Pages.length)
-						var html = '<ul class="nav nav-tabs data-entry-form-tabs"></ul>'
-						$("#" + formName + "-tabs").append(html)		
-						for(i=0;i<dataEntryFormDefinition.Pages.length;i++)
-							{
-							tabsHtml = '<li class="nav-item"><a class="nav-link" aria-current="page" href="#" data-page-caption="' + dataEntryFormDefinition.Pages[i].Caption + '">' + dataEntryFormDefinition.Pages[i].Caption + '</a></li>'
-							pageItemsHtml = '<div id="' + formName + '-page-items-' + dataEntryFormDefinition.Pages[i].Caption + '" style="display:none;"></div>'
-							$("#" + formName + "-tabs>ul").append(tabsHtml)
-							$("#" + formName + "-page-items").append(pageItemsHtml)
-							//$("#" + formName + "-tabs").append("<br>")
-							populateDataEntryFormPageItems(dataEntryFormDefinition.Pages[i].Caption, formName)	
-							}
-						$("#" + formName + "-tabs>ul>li:first>a").addClass("active")
-						$("#" + formName + "-page-items>div:first").css("display", "block")
-//						console.log("dataEntryFormDefinition.Pages.length:" + dataEntryFormDefinition.Pages.length)
-						if(parseInt(dataEntryFormDefinition.Pages.length)>1)
-							{
-							$("#" + formName + "-tabs").css("display", "block")
-							}
-						})		
-	}
 
-
-
-function populateDataEntryFormPageItems(pageCaption, formName)
-	{
-	var data = 	{
-			"q" : $("#" + formName + "-record-type").val(),
-			"Properties" : "DataEntryFormDefinition",
-			"TrimType" : "RecordType"
-			}
-		var result = searchAPI(data)
-			.then(function(result)
-				{
-				
-				
-				var dataEntryFormDefinition = result.Results[0].DataEntryFormDefinition
-				console.log("dataEntryFormDefinition:")
-				console.log(dataEntryFormDefinition)
-				
-				for(i=0;i<dataEntryFormDefinition.Pages.length;i++)
-					{
-					if(dataEntryFormDefinition.Pages[i].Caption==pageCaption)
-						{
-//						console.log("Page Caption: " + pageCaption)
-						for(x=0;x<dataEntryFormDefinition.Pages[i].PageItems.length;x++)
-							{
-							var pageItemsHtml = "";
-							if(dataEntryFormDefinition.Pages[i].PageItems[x].Type=="Line")
-								{
-								pageItemsHtml = '<div style="border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:#000033;margin-top:10px;margin-bottom:10px;"></div>'	
-									
-								}
-							else
-								{
-								// 
-								optionalHtml=""
-								if(!dataEntryFormDefinition.Pages[i].PageItems[x].Mandatory)	
-									{
-									optionalHtml = '<span style="font-size:1rem">(optional)</span>'
-									}
-									
-								readonlyHtml = ""
-								if(dataEntryFormDefinition.Pages[i].PageItems[x].Readonly)	
-									{
-									readonlyHtml = 'readonly'
-									}								
-									
-								additionalFieldHtml = ""
-								if(dataEntryFormDefinition.Pages[i].PageItems[x].Type=="Field")
-									{
-									additionalFieldHtml = " additional-field"
-									}
-									
-								switch(dataEntryFormDefinition.Pages[i].PageItems[x].Format)
-									{
-									case "String":
-										if(dataEntryFormDefinition.Pages[i].PageItems[x].LookupSetUri)
-											{
-											//pageItemsHtml = "<p>It's a lookup</p>"
-											var pageItemsHtml = '<div class="form-group">'
-											pageItemsHtml = pageItemsHtml + '<label for="' + formName + '-page-item-' +  dataEntryFormDefinition.Pages[i].PageItems[x].Name + '" class="display-4" style="color:#000033;font-size:1.25rem;"><span>' + dataEntryFormDefinition.Pages[i].PageItems[x].Caption + ' </span>' + optionalHtml + '</label>'											
-											
-											//<select id="upload-form-record-type" class="form-control"></select>
-											pageItemsHtml = pageItemsHtml + '<select id="' + formName + '-page-item-' +  dataEntryFormDefinition.Pages[i].PageItems[x].Name + '" class="form-control' + additionalFieldHtml + '" maxlength="' + dataEntryFormDefinition.Pages[i].PageItems[x].CharacterLimit + '" ' + readonlyHtml + ' data-pageItem-name="' + dataEntryFormDefinition.Pages[i].PageItems[x].Name + '">'
-												
-												
-												
-											
-												//console.log("dataEntryFormDefinition.Pages[i].PageItems[x].LookupValues.length: " + dataEntryFormDefinition.Pages[i].PageItems[x].LookupValues.length)
-											for(y=0;y<dataEntryFormDefinition.Pages[i].PageItems[x].LookupValues.length;y++)
-												{
-												pageItemsHtml = pageItemsHtml + "<option>" + dataEntryFormDefinition.Pages[i].PageItems[x].LookupValues[y] + "</option>"
-												}
-											pageItemsHtml = pageItemsHtml + '</select></div>'
-											}
-										else
-											{
-											//pageItemsHtml = '<p>' + dataEntryFormDefinition.Pages[i].PageItems[x].Caption + '</p>'
-											var pageItemsHtml = '<div class="form-group">'
-
-											pageItemsHtml = pageItemsHtml + '<label for="' + formName + '-page-item-' +  dataEntryFormDefinition.Pages[i].PageItems[x].Name + '" class="display-4" style="color:#000033;font-size:1.25rem;"><span>' + dataEntryFormDefinition.Pages[i].PageItems[x].Caption + ' </span>' + optionalHtml + '</label>'
-
-											pageItemsHtml = pageItemsHtml + '<input id="' + formName + '-page-item-' +  dataEntryFormDefinition.Pages[i].PageItems[x].Name + '" class="form-control' + additionalFieldHtml + '" maxlength="' + dataEntryFormDefinition.Pages[i].PageItems[x].CharacterLimit + '" ' + readonlyHtml + ' data-pageItem-name="' + dataEntryFormDefinition.Pages[i].PageItems[x].Name + '"></div>'
-											//$("#" + formName).append(inputHTML)											}
-											}
-										break;
-									case "Number":
-										console.log("Number inputs are not yet supported.")
-										break;
-									case "Boolean":
-										console.log("Boolean inputs are not yet supported.")
-										break;
-									case "Date":
-										//pageItemsHtml = '<p>This is a date.</p>'
-										var pageItemsHtml = '<div class="form-group">'
-										pageItemsHtml = pageItemsHtml + '<label for="' + formName + '-page-item-' +  dataEntryFormDefinition.Pages[i].PageItems[x].Name + '" class="display-4" style="color:#000033;font-size:1.25rem;"><span>' + dataEntryFormDefinition.Pages[i].PageItems[x].Caption + ' </span>' + optionalHtml + '</label>'
-											
-										pageItemsHtml = pageItemsHtml + '<input type="text" id="' + formName + '-page-item-' +  dataEntryFormDefinition.Pages[i].PageItems[x].Name + '" class="form-control date-input' + additionalFieldHtml + '" data-provide="datepicker" data-date-format="' + config.DatePicker.DateFormat + '" data-date-autoclose="' + config.DatePicker.AutoClose + '" placeholder="' + config.DatePicker.Placeholder + '" data-date-start-date="' + config.DatePicker.StartDate + '" data-date-assume-nearby-year="' + config.DatePicker.AssumeNearbyYear + '" maxlength="' + dataEntryFormDefinition.Pages[i].PageItems[x].CharacterLimit + '" data-pageItem-name="' + dataEntryFormDefinition.Pages[i].PageItems[x].Name + '"></div>'
-										
-										//$("#" + formName).append(inputHTML)											
-										break;
-									case "Datetime":
-										console.log("Datetime inputs are not yet supported.")
-										break;
-									case "Decimal":
-										console.log("Decimal inputs are not yet supported.")
-										break;
-									case "Text":
-										console.log("Text inputs are not yet supported.")
-										break;
-									case "Currency":
-										console.log("Currency inputs are not yet supported.")
-										break;
-									case "Object":
-										//pageItemsHtml = '<p>' + dataEntryFormDefinition.Pages[i].PageItems[x].Caption + '</p>'
-										console.log("Object inputs are not yet supported.")
-										break;
-									case "BigNumber":
-										console.log("BigNumber inputs are not yet supported.")
-										break;
-									case "Xml":
-										console.log("Xml inputs are not yet supported.")
-										break;
-									case "Geography":
-										console.log("Geography inputs are not yet supported.")
-										break;
-									}
-								//pageItemsHtml = '<p>' +  + '</p>'		
-								}
-							
-							$("#" + formName + "-page-items-" + dataEntryFormDefinition.Pages[i].Caption).append(pageItemsHtml)
-							}
-						}
-					}
-				$("#" + formName + "-container").removeClass(formName + "-hidden")
-				})
-	}
 
 $(document).on("click", ".classification-name>a", function()
 	{
@@ -749,12 +576,9 @@ $(document).on("click", "#create-folder-button", function()
 		var additionalFieldValues = [];
 		for(i=0; i<$("#new-folder-form-page-items .additional-field").length; i++)
 			{
-			//console.log("Hello World: " + i)
 			additionalFieldKeys.push($("#new-folder-form-page-items .additional-field").eq(i).attr("data-pageItem-name"))
 			additionalFieldValues.push($("#new-folder-form-page-items .additional-field").eq(i).val())
 			}
-		console.log("additionalFieldKeys:" + additionalFieldKeys)
-		console.log("additionalFieldKeys:" + additionalFieldValues)
 		gtag('event', 'Create Folder');
 		createFolder(recordTitle, recordClassificationUri, recordContainerUri, recordType, additionalFieldKeys, additionalFieldValues)
 		}
@@ -763,7 +587,6 @@ $(document).on("click", "#create-folder-button", function()
 // Create Sub Folder
 $(document).on("click", "#create-sub-folder-button", function()
 	{
-	console.log("Create sub folder button has been clicked.")
 	if($("#new-sub-folder-form-page-item-RecordTypedTitle").val().length)
 		{
 		$("#create-folder-status").modal("show")
@@ -775,12 +598,9 @@ $(document).on("click", "#create-sub-folder-button", function()
 		var additionalFieldValues = [];
 		for(i=0; i<$("#new-sub-folder-form-page-items .additional-field").length; i++)
 			{
-			//console.log("Hello World: " + i)
 			additionalFieldKeys.push($("#new-sub-folder-form-page-items .additional-field").eq(i).attr("data-pageItem-name"))
 			additionalFieldValues.push($("#new-sub-folder-form-page-items .additional-field").eq(i).val())
 			}
-		console.log("additionalFieldKeys:" + additionalFieldKeys)
-		console.log("additionalFieldKeys:" + additionalFieldValues)
 		gtag('event', 'Create Folder');
 		createFolder(recordTitle, recordClassificationUri, recordContainerUri, recordType, additionalFieldKeys, additionalFieldValues)
 		}
@@ -931,7 +751,6 @@ $(document).on("click", "#upload-button", function()
 					var additionalFieldValues = [];
 					for(i=0; i<$("#upload-form-page-items .additional-field").length; i++)
 						{
-						//console.log("Hello World: " + i)
 						additionalFieldKeys.push($("#upload-form-page-items .additional-field").eq(i).attr("data-pageItem-name"))
 						additionalFieldValues.push($("#upload-form-page-items .additional-field").eq(i).val())
 						}
@@ -1018,10 +837,46 @@ $(document).on("click", ".edit-properties-link", function()
 					case "String":
 						if($("#" + editableCellId).data("is-dropdown"))
 							{
-							alert("The fucker is a dropdown.")
-							}
+							var currentValue = $("#" + editableCellId).html().replace('"', '&quot;');
+							$("#" + editableCellId).html('<form autocomplete="off"><select id="editRecordPropertiesInput" style="width:100%;" maxlength="' + $("#" + editableCellId).data("field-length") + '"></select></form>')
 							
-						$("#" + editableCellId).html('<form autocomplete="off"><input id="editRecordPropertiesInput" type="text" style="width:100%;" value="' + $("#" + editableCellId).html().replace('"', '&quot;') + '" maxlength="' + $("#" + editableCellId).data("field-length") + '"></form>')
+								
+
+							data = 	{
+									"q" : $("#" + editableCellId).data("record-record-type"),
+									"Properties" : "DataEntryFormDefinition",
+									"TrimType" : "RecordType"
+									}
+							var result = searchAPI(data)
+							.then(function(result)
+								{
+								for(i=0;i<result.Results[0].DataEntryFormDefinition.Pages.length;i++)
+									{
+									for(x=0;x<result.Results[0].DataEntryFormDefinition.Pages[i].PageItems.length;x++)
+										{
+										if(result.Results[0].DataEntryFormDefinition.Pages[i].PageItems[x].Type=="Field")
+											{
+											if(result.Results[0].DataEntryFormDefinition.Pages[i].PageItems[x].Name==$("#" + editableCellId).data("field-name"))
+												{
+												if(!result.Results[0].DataEntryFormDefinition.Pages[i].PageItems[x].Mandatory)
+												   	{
+													$("#editRecordPropertiesInput").append('<option></option>')   
+												   	}
+													
+												for(z=0;z<result.Results[0].DataEntryFormDefinition.Pages[i].PageItems[x].LookupValues.length;z++)
+													{
+													$("#editRecordPropertiesInput").append('<option value="' + result.Results[0].DataEntryFormDefinition.Pages[i].PageItems[x].LookupValues[z] + '">' + result.Results[0].DataEntryFormDefinition.Pages[i].PageItems[x].LookupValues[z] + '</option>')														
+													}
+												}
+											}
+										}
+										$("#editRecordPropertiesInput option[value='" + currentValue + "']").attr('selected', 'selected');
+									}
+								})
+							}
+						else{
+							$("#" + editableCellId).html('<form autocomplete="off"><input id="editRecordPropertiesInput" type="text" style="width:100%;" value="' + $("#" + editableCellId).html().replace('"', '&quot;') + '" maxlength="' + $("#" + editableCellId).data("field-length") + '"></form>')					
+							}
 						break;
 					case "Number":
 						console.log("Number inputs are not yet supported.")

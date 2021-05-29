@@ -253,7 +253,6 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 					var result = searchAPI(data)
 						.then(function(result)
 							{
-							console.log("parentNodeType: " + parentNodeType)
 							if(!$("#" + parentNodeId + " > ul").length)
 								{
 								if(result.TotalResults>0)
@@ -332,7 +331,6 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 							if(parentNodeType=="classification")
 								{
 								gtag('event', 'Show Folders', { 'show_folders_duration' :  getTimeStamp() - startTime });
-								console.log(getTimeStamp() - startTime)
 								}
 							})
 						.fail(function(result)
@@ -643,8 +641,6 @@ function populateSearchResultPane(searchString, foldersOnly)
 							
 								// here
 								gtag('event', 'Search', { 'search_duration' :  getTimeStamp() - startTime });
-								console.log(getTimeStamp() - startTime)
-									
 								hideLoadingSpinner()	
 								}	
 							})
@@ -1342,16 +1338,10 @@ function clearForm(form)
 	switch(form)
 		{
 		case "new-folder-form":
-			console.log('clearForm("new-folder-form") has been called.')
-			//$("#new-folder-form-page-item-RecordTypedTitle").val("")
 			$("[id^=new-folder-form-page-item-]").val("")
-			//$("#new-folder-form > .additional-field > input").val("")
-			//$("#new-folder-form-page-items .additional-field").val()
 			break;
 		case "new-sub-folder-form":
 			$("[id^=new-folder-form-page-item-]").val("")
-			//$("#new-sub-folder-form-record-title").val("")
-			//$("#new-sub-folder-form > .additional-field > input").val("")
 			break;
 		case "upload-form":
 			$("#dropped-file-filetype-icon").removeClass()
@@ -1360,10 +1350,8 @@ function clearForm(form)
 			$("#dropped-file-name").html("")
 			$("#file-details-container").css("display", "none")
 			$("#browse-button-container").css("display", "inline-block")
-			//$("#upload-form-record-title").val("")
 			$("#drop-zone").removeData("file")
 			resetFileInput("#upload-form-file")
-			//$("#upload-form > .additional-field > input").val("")
 			$("[id^=upload-form-page-item-]").val("")
 			break;
 		}
@@ -1412,7 +1400,6 @@ function drawPropertiesTable(type)
 				{
 				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Record Number</td><td id="properties-record-number"></td><td></td></tr>'
 				}
-			console.log("Value: " + config.PropertiesPane.IntermediateFolder.Core.RecordTitle)
 			if(config.PropertiesPane.IntermediateFolder.Core.RecordTitle=="true")
 				{
 				tableHTML = tableHTML + '<tr><td scope="row" style="width:25%;padding-left:30px;">Record Title</td><td id="properties-record-title"></td><td id="properties-edit-record-title" class="edit-properties-link"><a href="#">Edit</a></td></tr>'
@@ -1703,15 +1690,14 @@ function showRecordCoreFieldValue(record)
 	}
 
 
+
+//  Seems to be a lot of redundant params passed here.
+
 function showRecordAdditionalFieldValue(result, fieldFormat, additionalFieldId, searchClause)
 	{
-	console.log("result: ")
-	console.log(result)
-	console.log("searchClause: " + searchClause)
 	switch(fieldFormat)
 		{
 		case "String":
-			//console.log(record)
 			$("#" + additionalFieldId).html(result.Results[0].Fields[searchClause].Value)
 			break;
 		case "Number":
@@ -1756,8 +1742,6 @@ function showRecordAdditionalFieldValue(result, fieldFormat, additionalFieldId, 
 
 function showRecordAdditionalFieldName(field, recordTitle, recordType, recordUri)
 	{
-	console.log("field: ")
-	console.log(field)
 	switch(field.Format)
 		{
 		case "String":
@@ -1839,6 +1823,8 @@ function showRecordAdditionalFieldName(field, recordTitle, recordType, recordUri
 			break;
 		}	
 	}
+
+
 function getRecordProperties(type, recordUri)
 	{
 	getAuthenticationStatus().then(function () 
@@ -1881,9 +1867,6 @@ function getRecordProperties(type, recordUri)
 						var recordUri = selectedRecord.Results[0].Uri
 						var recordTitle = selectedRecord.Results[0].RecordTitle.Value
 						var recordType = selectedRecord.Results[0].RecordRecordType.RecordTypeName.Value
-																	//var fieldFormat = sele.Results[i].FieldDefinitionFormat.Value
-											//var additionalFieldId = "properties-additional-fields-" + result.Results[i].FieldDefinitionSearchClause.Value;
-										//	var searchClause = result.Results[i].FieldDefinitionSearchClause.Value;	
 						
 						url = baseUrl + apiPath + "/Search";
 						data = 	{
@@ -1901,34 +1884,26 @@ function getRecordProperties(type, recordUri)
 							xhrFields: { withCredentials: true},
 							success: function(selectedRecordType)
 								{
-								//console.log("DataEntryFormDefinition:")
-								//console.log(selectedRecordType)
 								
 								for(i=0;i<selectedRecordType.Results[0].DataEntryFormDefinition.Pages.length;i++)
-									
 									{
-									
 									for(x=0;x<selectedRecordType.Results[0].DataEntryFormDefinition.Pages[i].PageItems.length;x++)	
 										{
 										(function(index)
 										 	{
 											if(selectedRecordType.Results[0].DataEntryFormDefinition.Pages[i].PageItems[x].Type=="Field")
 												{
-												//console.log("Name: " + selectedRecordType.Results[0].DataEntryFormDefinition.Pages[i].PageItems[x].Name)
 												showRecordAdditionalFieldName(selectedRecordType.Results[0].DataEntryFormDefinition.Pages[i].PageItems[x], recordTitle, recordType, recordUri)
 
 												var additionalFieldId = "properties-additional-fields-" + selectedRecordType.Results[0].DataEntryFormDefinition.Pages[i].PageItems[x].Name;
 												var searchClause = selectedRecordType.Results[0].DataEntryFormDefinition.Pages[i].PageItems[x].Name;
 												var fieldFormat = selectedRecordType.Results[0].DataEntryFormDefinition.Pages[i].PageItems[x].Format;
 												url = baseUrl + apiPath + "/Search"
-
-												console.log("recordUri: " + recordUri)
 												data = 	{
 														"q" : recordUri,
 														"Properties" : searchClause,
 														"TrimType" : "Record"
 														}
-												console.log("searchClause before ajax: " + searchClause)
 												$.ajax(
 													{
 													url: url,
@@ -1970,6 +1945,173 @@ function getRecordProperties(type, recordUri)
 			}
 		});
 	}
+
+function populateDataEntryFormPages(formName)
+	{
+	var data = 	{
+				"q" : $("#" + formName + "-record-type").val(),
+				"Properties" : "DataEntryFormDefinition",
+				"TrimType" : "RecordType"
+				}
+	var result = searchAPI(data)
+					.then(function(result)
+						{
+						$("#" + formName + "-tabs").css("display", "none")
+						// These lines are intentionally repeated.
+						$("#" + formName + "-tabs").html("")
+						$("#" + formName + "-page-items").html("")
+						// End repeated lines.
+						var dataEntryFormDefinition = result.Results[0].DataEntryFormDefinition
+						var html = '<ul class="nav nav-tabs data-entry-form-tabs"></ul>'
+						$("#" + formName + "-tabs").append(html)		
+						for(i=0;i<dataEntryFormDefinition.Pages.length;i++)
+							{
+							tabsHtml = '<li class="nav-item"><a class="nav-link" aria-current="page" href="#" data-page-caption="' + dataEntryFormDefinition.Pages[i].Caption + '">' + dataEntryFormDefinition.Pages[i].Caption + '</a></li>'
+							pageItemsHtml = '<div id="' + formName + '-page-items-' + dataEntryFormDefinition.Pages[i].Caption + '" style="display:none;"></div>'
+							$("#" + formName + "-tabs>ul").append(tabsHtml)
+							$("#" + formName + "-page-items").append(pageItemsHtml)
+							//$("#" + formName + "-tabs").append("<br>")
+							populateDataEntryFormPageItems(dataEntryFormDefinition.Pages[i].Caption, formName)	
+							}
+						$("#" + formName + "-tabs>ul>li:first>a").addClass("active")
+						$("#" + formName + "-page-items>div:first").css("display", "block")
+						if(parseInt(dataEntryFormDefinition.Pages.length)>1)
+							{
+							$("#" + formName + "-tabs").css("display", "block")
+							}
+						})		
+	}
+
+
+
+function populateDataEntryFormPageItems(pageCaption, formName)
+	{
+	var data = 	{
+			"q" : $("#" + formName + "-record-type").val(),
+			"Properties" : "DataEntryFormDefinition",
+			"TrimType" : "RecordType"
+			}
+		var result = searchAPI(data)
+			.then(function(result)
+				{
+				var dataEntryFormDefinition = result.Results[0].DataEntryFormDefinition
+				for(i=0;i<dataEntryFormDefinition.Pages.length;i++)
+					{
+					if(dataEntryFormDefinition.Pages[i].Caption==pageCaption)
+						{
+						for(x=0;x<dataEntryFormDefinition.Pages[i].PageItems.length;x++)
+							{
+							var pageItemsHtml = "";
+							if(dataEntryFormDefinition.Pages[i].PageItems[x].Type=="Line")
+								{
+								pageItemsHtml = '<div style="border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:#000033;margin-top:10px;margin-bottom:10px;"></div>'	
+								}
+							else
+								{
+								// 
+								optionalHtml=""
+								if(!dataEntryFormDefinition.Pages[i].PageItems[x].Mandatory)	
+									{
+									optionalHtml = '<span style="font-size:1rem">(optional)</span>'
+									}
+									
+								readonlyHtml = ""
+								if(dataEntryFormDefinition.Pages[i].PageItems[x].Readonly)	
+									{
+									readonlyHtml = 'readonly'
+									}								
+									
+								additionalFieldHtml = ""
+								if(dataEntryFormDefinition.Pages[i].PageItems[x].Type=="Field")
+									{
+									additionalFieldHtml = " additional-field"
+									}
+									
+								switch(dataEntryFormDefinition.Pages[i].PageItems[x].Format)
+									{
+									case "String":
+										if(dataEntryFormDefinition.Pages[i].PageItems[x].LookupSetUri)
+											{
+											//pageItemsHtml = "<p>It's a lookup</p>"
+											var pageItemsHtml = '<div class="form-group">'
+											pageItemsHtml = pageItemsHtml + '<label for="' + formName + '-page-item-' +  dataEntryFormDefinition.Pages[i].PageItems[x].Name + '" class="display-4" style="color:#000033;font-size:1.25rem;"><span>' + dataEntryFormDefinition.Pages[i].PageItems[x].Caption + ' </span>' + optionalHtml + '</label>'											
+											
+											//<select id="upload-form-record-type" class="form-control"></select>
+											pageItemsHtml = pageItemsHtml + '<select id="' + formName + '-page-item-' +  dataEntryFormDefinition.Pages[i].PageItems[x].Name + '" class="form-control' + additionalFieldHtml + '" maxlength="' + dataEntryFormDefinition.Pages[i].PageItems[x].CharacterLimit + '" ' + readonlyHtml + ' data-pageItem-name="' + dataEntryFormDefinition.Pages[i].PageItems[x].Name + '">'
+												
+											if(!dataEntryFormDefinition.Pages[i].PageItems[x].Mandatory)
+												{
+												pageItemsHtml = pageItemsHtml + "<option></option>"
+												}
+												
+											for(y=0;y<dataEntryFormDefinition.Pages[i].PageItems[x].LookupValues.length;y++)
+												{
+												pageItemsHtml = pageItemsHtml + "<option>" + dataEntryFormDefinition.Pages[i].PageItems[x].LookupValues[y] + "</option>"
+												}
+											pageItemsHtml = pageItemsHtml + '</select></div>'
+											}
+										else
+											{
+											//pageItemsHtml = '<p>' + dataEntryFormDefinition.Pages[i].PageItems[x].Caption + '</p>'
+											var pageItemsHtml = '<div class="form-group">'
+
+											pageItemsHtml = pageItemsHtml + '<label for="' + formName + '-page-item-' +  dataEntryFormDefinition.Pages[i].PageItems[x].Name + '" class="display-4" style="color:#000033;font-size:1.25rem;"><span>' + dataEntryFormDefinition.Pages[i].PageItems[x].Caption + ' </span>' + optionalHtml + '</label>'
+
+											pageItemsHtml = pageItemsHtml + '<input id="' + formName + '-page-item-' +  dataEntryFormDefinition.Pages[i].PageItems[x].Name + '" class="form-control' + additionalFieldHtml + '" maxlength="' + dataEntryFormDefinition.Pages[i].PageItems[x].CharacterLimit + '" ' + readonlyHtml + ' data-pageItem-name="' + dataEntryFormDefinition.Pages[i].PageItems[x].Name + '"></div>'
+											//$("#" + formName).append(inputHTML)											}
+											}
+										break;
+									case "Number":
+										console.log("Number inputs are not yet supported.")
+										break;
+									case "Boolean":
+										console.log("Boolean inputs are not yet supported.")
+										break;
+									case "Date":
+										//pageItemsHtml = '<p>This is a date.</p>'
+										var pageItemsHtml = '<div class="form-group">'
+										pageItemsHtml = pageItemsHtml + '<label for="' + formName + '-page-item-' +  dataEntryFormDefinition.Pages[i].PageItems[x].Name + '" class="display-4" style="color:#000033;font-size:1.25rem;"><span>' + dataEntryFormDefinition.Pages[i].PageItems[x].Caption + ' </span>' + optionalHtml + '</label>'
+											
+										pageItemsHtml = pageItemsHtml + '<input type="text" id="' + formName + '-page-item-' +  dataEntryFormDefinition.Pages[i].PageItems[x].Name + '" class="form-control date-input' + additionalFieldHtml + '" data-provide="datepicker" data-date-format="' + config.DatePicker.DateFormat + '" data-date-autoclose="' + config.DatePicker.AutoClose + '" placeholder="' + config.DatePicker.Placeholder + '" data-date-start-date="' + config.DatePicker.StartDate + '" data-date-assume-nearby-year="' + config.DatePicker.AssumeNearbyYear + '" maxlength="' + dataEntryFormDefinition.Pages[i].PageItems[x].CharacterLimit + '" data-pageItem-name="' + dataEntryFormDefinition.Pages[i].PageItems[x].Name + '"></div>'
+										break;
+									case "Datetime":
+										console.log("Datetime inputs are not yet supported.")
+										break;
+									case "Decimal":
+										console.log("Decimal inputs are not yet supported.")
+										break;
+									case "Text":
+										console.log("Text inputs are not yet supported.")
+										break;
+									case "Currency":
+										console.log("Currency inputs are not yet supported.")
+										break;
+									case "Object":
+										//pageItemsHtml = '<p>' + dataEntryFormDefinition.Pages[i].PageItems[x].Caption + '</p>'
+										console.log("Object inputs are not yet supported.")
+										break;
+									case "BigNumber":
+										console.log("BigNumber inputs are not yet supported.")
+										break;
+									case "Xml":
+										console.log("Xml inputs are not yet supported.")
+										break;
+									case "Geography":
+										console.log("Geography inputs are not yet supported.")
+										break;
+									}
+								//pageItemsHtml = '<p>' +  + '</p>'		
+								}
+							
+							$("#" + formName + "-page-items-" + dataEntryFormDefinition.Pages[i].Caption).append(pageItemsHtml)
+							}
+						}
+					}
+				$("#" + formName + "-container").removeClass(formName + "-hidden")
+				})
+	}
+
+
 
 function showEditPropertiesError(trimError)
 	{
@@ -2350,7 +2492,6 @@ function searchAPI(data) {
 			}, 
 		error: function(result)
 			{
-			console.log("The searchAPI function failed.")
 			console.log(result)
 			deferredObject.reject(result);
 			}
