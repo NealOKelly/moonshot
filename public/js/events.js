@@ -174,7 +174,8 @@ $(document).on("click", "span[class^='folder']", function()
 		if($("#upload-form-record-type>option").length>1)
 			{
 			$("#upload-form-record-type-field-container").css("display", "block")
-			}	
+			}
+		clearForm("upload-form")
 		populateDataEntryFormPages("upload-form")
 		})
 		drawPropertiesTable("folder-terminal")
@@ -252,6 +253,7 @@ $(document).on("click", ".record-title>a", function()
 		{
 		if($(node).hasClass("folder-terminal"))
 			{
+			
 			getRecords(node.attr("id").substr(11))
 			populateContainerField("folder-terminal", node.attr("id").substr(11))
 			//$("#upload-form-record-type").html("")
@@ -263,6 +265,7 @@ $(document).on("click", ".record-title>a", function()
 				{
 				$("#upload-form-record-type-field-container").css("display", "block")
 				}	
+			clearForm("upload-form")
 			populateDataEntryFormPages("upload-form")
 			})
 			drawPropertiesTable("folder-terminal")
