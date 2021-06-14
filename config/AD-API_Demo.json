@@ -50,6 +50,20 @@
 				[
 				"Schools Document"
 				]
+			},
+			{
+			"ParentRecordType" : "Torriano Staff Folder",
+			"ContentRecordTypes" :
+				[
+				"Torriano Staff Sub Folder"
+				]
+			},
+			{
+			"ParentRecordType" : "Torriano Staff Sub Folder",
+			"ContentRecordTypes" :
+				[
+				"Schools Document"
+				]
 			}
 		]
 	},
