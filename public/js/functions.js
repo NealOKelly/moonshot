@@ -1624,6 +1624,9 @@ function parseAccessControlString(string, type)
 		break;
 	case "record":
 		var JSONObj = { "ViewDocument" : "", "ViewMetadata" : "", "UpdateDocument" : "", "UpdateRecordMetadata" : "", "ModifyRecordAccess" : "", "DestroyRecord" : "", "ContributeContents" : "" };
+		console.log("Access Controls: ")
+		console.log(JSONObj)
+			
 		JSONObj.ViewDocument = string.substr(string.search(":")+2, string.search(";")-string.search(":")-2)
 		string = string.substr(string.search(";")+2)
 		JSONObj.ViewMetadata = string.substr(string.search(":")+2, string.search(";")-string.search(":")-2)
@@ -1639,8 +1642,8 @@ function parseAccessControlString(string, type)
 		JSONObj.ContributeContents = string.substr(string.search(":")+2)
 		break;
 		}
-		JSONObj = JSON.parse(JSON.stringify(JSONObj).replace(/<Unrestricted>/g, "<i>[Inherited]</i>"))
-		JSONObj = JSON.parse(JSON.stringify(JSONObj).replace(/[()]/g, ""))
+		//JSONObj = JSON.parse(JSON.stringify(JSONObj).replace(/<Unrestricted>/g, "<i>[Inherited]</i>"))
+		//JSONObj = JSON.parse(JSON.stringify(JSONObj).replace(/[()]/g, ""))
 		return JSONObj;
 	}
 
@@ -1676,11 +1679,24 @@ function showRecordCoreFieldValue(record)
 	$("#properties-date-registered").html(dateRegistered)
 
 	// Access Control
-	var accessControlHTML = "<div>View Folder & Contents: " + parseAccessControlString(record.RecordAccessControl.Value, "record").ViewMetadata + "</div>"
-	var accessControlHTML = accessControlHTML + "<div>Update Folder Properties: " + parseAccessControlString(record.RecordAccessControl.Value, "record").UpdateRecordMetadata + "</div>"
-	var accessControlHTML = accessControlHTML + "<div>Add Contents: " + parseAccessControlString(record.RecordAccessControl.Value, "record").ContributeContents + "</div>"
+	var accessControlHTML;
+	console.log("Access Control String: " + parseAccessControlString(record.RecordAccessControl.Value, "record").ViewMetadata)
+	if(parseAccessControlString(record.RecordAccessControl.Value, "record").ViewMetadata!="<Unrestricted>")
+		{
+		console.log("This is called.")
+		accessControlHTML = "<div>View Folder & Contents: " + parseAccessControlString(record.RecordAccessControl.Value, "record").ViewMetadata + "</div>"		
+		}
+	if(parseAccessControlString(record.RecordAccessControl.Value, "record").UpdateRecordMetadata!="<Unrestricted>")
+		{
+		accessControlHTML = accessControlHTML + "<div>Update Folder Properties: " + parseAccessControlString(record.RecordAccessControl.Value, "record").UpdateRecordMetadata + "</div>"
+		}
+	if(parseAccessControlString(record.RecordAccessControl.Value, "record").ContributeContents!="<Unrestricted>")
+		{
+		accessControlHTML = accessControlHTML + "<div>Add Contents: " + parseAccessControlString(record.RecordAccessControl.Value, "record").ContributeContents + "</div>"	
+		}
+	console.log(accessControlHTML)
 	$("#properties-access-control").html(accessControlHTML)
-	$("#properties-access-control").html(accessControlHTML)
+	
 	
 	// Date Due for Destruction	
 	if(record.RecordDestructionDate.IsClear==false)
