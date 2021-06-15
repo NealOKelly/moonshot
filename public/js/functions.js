@@ -1651,7 +1651,7 @@ function parseAccessControlString(string, type)
 	}
 
 
-function showRecordCoreFieldValue(record)
+function showRecordCoreFieldValue(record, type)
 	{
 	// Record Number
 	$("#properties-record-number").html(record.RecordNumber.Value)
@@ -1682,21 +1682,57 @@ function showRecordCoreFieldValue(record)
 	$("#properties-date-registered").html(dateRegistered)
 
 	// Access Control
-	var accessControlHTML;
-	if(parseAccessControlString(record.RecordAccessControl.Value, "record").ViewMetadata!="<Unrestricted>")
+	switch(type)
 		{
-		accessControlHTML = "<div>View Folder & Contents: " + parseAccessControlString(record.RecordAccessControl.Value, "record").ViewMetadata + "</div>"		
-		}
-	if(parseAccessControlString(record.RecordAccessControl.Value, "record").UpdateRecordMetadata!="<Unrestricted>")
-		{
-		accessControlHTML = accessControlHTML + "<div>Update Folder Properties: " + parseAccessControlString(record.RecordAccessControl.Value, "record").UpdateRecordMetadata + "</div>"
-		}
-	if(parseAccessControlString(record.RecordAccessControl.Value, "record").ContributeContents!="<Unrestricted>")
-		{
-		accessControlHTML = accessControlHTML + "<div>Add Contents: " + parseAccessControlString(record.RecordAccessControl.Value, "record").ContributeContents + "</div>"	
-		}
-	$("#properties-access-control").html(accessControlHTML)
-	
+		case "folder-intermediate":
+			var accessControlHTML;
+			if(parseAccessControlString(record.RecordAccessControl.Value, "record").ViewMetadata!="<Unrestricted>")
+				{
+				accessControlHTML = "<div>View Folder & Contents: <i>" + parseAccessControlString(record.RecordAccessControl.Value, "record").ViewMetadata + "</i></div>"		
+				}
+			if(parseAccessControlString(record.RecordAccessControl.Value, "record").UpdateRecordMetadata!="<Unrestricted>")
+				{
+				accessControlHTML = accessControlHTML + "<div>Update Folder Properties: <i>" + parseAccessControlString(record.RecordAccessControl.Value, "record").UpdateRecordMetadata + "</i></div>"
+				}
+			if(parseAccessControlString(record.RecordAccessControl.Value, "record").ContributeContents!="<Unrestricted>")
+				{
+				accessControlHTML = accessControlHTML + "<div>Add Contents: <i>" + parseAccessControlString(record.RecordAccessControl.Value, "record").ContributeContents + "</i></div>"	
+				}
+			$("#properties-access-control").html(accessControlHTML)
+			break;
+		case "folder-terminal":
+			var accessControlHTML;
+			if(parseAccessControlString(record.RecordAccessControl.Value, "record").ViewMetadata!="<Unrestricted>")
+				{
+				accessControlHTML = "<div>View Folder & Contents: <i>" + parseAccessControlString(record.RecordAccessControl.Value, "record").ViewMetadata + "</i></div>"		
+				}
+			if(parseAccessControlString(record.RecordAccessControl.Value, "record").UpdateRecordMetadata!="<Unrestricted>")
+				{
+				accessControlHTML = accessControlHTML + "<div>Update Folder Properties: <i>" + parseAccessControlString(record.RecordAccessControl.Value, "record").UpdateRecordMetadata + "</i></div>"
+				}
+			if(parseAccessControlString(record.RecordAccessControl.Value, "record").ContributeContents!="<Unrestricted>")
+				{
+				accessControlHTML = accessControlHTML + "<div>Add Contents: <i>" + parseAccessControlString(record.RecordAccessControl.Value, "record").ContributeContents + "</i></div>"	
+				}
+			$("#properties-access-control").html(accessControlHTML)
+			break;
+		case "document":
+			var accessControlHTML;
+			if(parseAccessControlString(record.RecordAccessControl.Value, "record").ViewMetadata!="<Unrestricted>")
+				{
+				accessControlHTML = "<div>View Document Properties: <i>" + parseAccessControlString(record.RecordAccessControl.Value, "record").ViewMetadata + "</i></div>"		
+				}
+			if(parseAccessControlString(record.RecordAccessControl.Value, "record").ViewDocument!="<Unrestricted>")
+				{
+				accessControlHTML = accessControlHTML + "<div>View Document: <i>" + parseAccessControlString(record.RecordAccessControl.Value, "record").ViewDocument + "</i></div>"		
+				}
+			if(parseAccessControlString(record.RecordAccessControl.Value, "record").UpdateRecordMetadata!="<Unrestricted>")
+				{
+				accessControlHTML = accessControlHTML + "<div>Edit Document Properties: <i>" + parseAccessControlString(record.RecordAccessControl.Value, "record").UpdateRecordMetadata + "</i></div>"
+				}
+			$("#properties-access-control").html(accessControlHTML)
+			break;
+		}		
 	
 	// Date Due for Destruction	
 	if(record.RecordDestructionDate.IsClear==false)
@@ -1863,7 +1899,7 @@ function getRecordProperties(type, recordUri)
 				success: function(selectedRecord)
 					{
 					// Core Fields
-					showRecordCoreFieldValue(selectedRecord.Results[0])
+					showRecordCoreFieldValue(selectedRecord.Results[0], type)
 					
 					switch(type)
 						{
