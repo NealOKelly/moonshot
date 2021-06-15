@@ -85,7 +85,7 @@
 			"RecordNumber" : "true",
 			"RecordTitle" : "true",
 			"RecordClassification" : "false",
-			"RecordRecordType" : "true",
+			"RecordRecordType" : "false",
 			"RecordDateRegistered" : "false",
 			"RecordAccessControl" : "true",
 			"RecordDestructionDate" : "true"
@@ -99,7 +99,7 @@
 			"RecordNumber" : "true",
 			"RecordTitle" : "true",	
 			"RecordContainer" : "true",
-			"RecordRecordType" : "true",
+			"RecordRecordType" : "false",
 			"RecordDateRegistered" : "true",
 			"RecordAccessControl" : "true",
 			"RecordDestructionDate" : "false"
@@ -113,7 +113,7 @@
 			"RecordNumber" : "false",
 			"RecordTitle" : "true",
 			"RecordContainer" : "true",
-			"RecordRecordType" : "true",
+			"RecordRecordType" : "false",
 			"RecordDateRegistered" : "false",
 			"RecordAccessControl" : "true",
 			"RecordDestructionDate" : "false"
