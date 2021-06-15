@@ -560,7 +560,7 @@ function populateSearchResultPane(searchString, foldersOnly)
 					{
 					data = 	{
 								"q" : 'content:"' + searchString + '" Or anyWord:' + searchString,
-								"Properties" : "RecordNumber, RecordTitle, RecordRecordType, RecordMimeType, RecordExtension",
+								"Properties" : "RecordNumber, RecordTitle, RecordRecordType, RecordMimeType, RecordExtension, DateRegistered",
 								"TrimType" : "Record",
 								"PageSize" : "1000",
 								"SortBy" : "typedTitle"
@@ -568,6 +568,7 @@ function populateSearchResultPane(searchString, foldersOnly)
 					var result = searchAPI(data)
 						.then(function(result)
 							{
+							console.log("Here's the results.")
 							if(result.TotalResults==0)
 								{
 								$("#search-results-pane").html("<div class='no-records display-4'>Your search did not return any records.</div>")
@@ -575,12 +576,13 @@ function populateSearchResultPane(searchString, foldersOnly)
 								}
 							else
 								{
+								console.log(result)
 								var thHTML = '<table id="search-results" class="table table-sm">'
 								thHTML = thHTML + '<thead style="background-color:#ffffff;"><tr>'
 								thHTML = thHTML + '<th style="text-align:left;padding-left:30px;width:12%;";>Type</th>'
 								thHTML = thHTML + '<th style="text-align:left;width:15%;">Number</th>'
 								thHTML = thHTML + '<th id="th-record-title" style="text-align:left;">Title</th>'
-								thHTML = thHTML + '<th id="th-date-registered" style="text-align:left;">Record Type</th>'
+								thHTML = thHTML + '<th id="th-date-registered" style="text-align:left;">Date Registered</th>'
 								thHTML = thHTML + '<th>Download</th></tr></thead><tbody>'
 								$("#search-results-pane").append(thHTML)
 							
@@ -680,7 +682,7 @@ function addSearchResult(record, type)
 		}
 	resultRowHTML = resultRowHTML + '<td><ul><li id="level-0-search-result-recordNumber-uri-' + record.Uri + '" class="' + type + '">' + record.RecordNumber.Value + '</li></ul></td>'
 	resultRowHTML = resultRowHTML + '<td><ul><li id="level-0-search-result-recordTitle-uri-' + record.Uri + '">' + record.RecordTitle.Value + '</li></ul></td>'
-	resultRowHTML = resultRowHTML + '<td><ul><li id="level-0-search-result-recordType-uri-' + record.Uri + '">' + record.RecordRecordType.RecordTypeName.Value + '</li></ul></td>'
+	resultRowHTML = resultRowHTML + '<td><ul><li id="level-0-search-result-dateRegistered-uri-' + record.Uri + '">' + formatDate(record.RecordDateRegistered.DateTime, "trimDate", "dd/mm/yyyy") + '</li></ul></td>'
 	if(type=="document")
 		{
 		resultRowHTML = resultRowHTML + '<td style="text-align:center;"><ul><li id="level-0-search-result-download-uri-' + record.Uri + '"><span class="download-grey"></span></li></ul></td>'
@@ -743,7 +745,7 @@ function expandCollapsedSearchResult(recordUri, level)
 				xhrFields: { withCredentials: true},
 				success: function(recordTypeDefinitions)
 					{
-					var url = baseUrl + apiPath + "/Search?q=all and container:" + recordUri + "&properties=RecordTitle,RecordNumber,RecordRecordType,RecordMimeType,RecordExtension&trimtype=Record&pageSize=1000&sortBy=typedTitle"
+					var url = baseUrl + apiPath + "/Search?q=all and container:" + recordUri + "&properties=RecordTitle,RecordNumber,RecordRecordType,RecordMimeType,RecordExtension,DateRegistered&trimtype=Record&pageSize=1000&sortBy=typedTitle"
 					$.ajax(
 						{
 						url: url,
@@ -760,7 +762,7 @@ function expandCollapsedSearchResult(recordUri, level)
 
 								$("#level-" + level + "-search-result-recordTitle-uri-"  + recordUri).after('<ul><li class="no-results" style="color:grey;">- No records found.</li></ul>')
 
-								$("#level-" + level + "-search-result-recordType-uri-"  + recordUri).after('<ul><li class="no-results" style="color:grey;">- None</li></ul>')
+								$("#level-" + level + "-search-result-dateRegistered-uri-"  + recordUri).after('<ul><li class="no-results" style="color:grey;">- None</li></ul>')
 									
 								$("#level-" + level + "-search-result-download-uri-"  + recordUri).after('<ul><li class="no-results" style="color:grey;"><!--Intentionally Blank--></li></ul>')
 									
@@ -874,13 +876,13 @@ function expandCollapsedSearchResult(recordUri, level)
 									// column 4
 									if(i==0)  // first row
 										{
-										$("#level-" + level + "-search-result-recordType-uri-" + recordUri).after("<ul><li id='level-" + (level + 1) + "-search-result-recordType-uri-" + result.Results[i].Uri + "'>- " + result.Results[i].RecordRecordType.RecordTypeName.Value + "</li></ul>")
+										$("#level-" + level + "-search-result-dateRegistered-uri-" + recordUri).after("<ul><li id='level-" + (level + 1) + "-search-result-dateRegistered-uri-" + result.Results[i].Uri + "'>- " + formatDate(result.Results[i].RecordDateRegistered.DateTime, "trimDate", "dd/mm/yyyy") + "</li></ul>")
 
-										newRecordTypeNodeId = "#level-" + (level + 1) + "-search-result-recordType-uri-" + result.Results[i].Uri	
+										newRecordTypeNodeId = "#level-" + (level + 1) + "-search-result-dateRegistered-uri-" + result.Results[i].Uri	
 										}
 									else // subsequent rows
 										{
-										$(newRecordTypeNodeId).parent().append("<li id='level-" + (level + 1) + "-search-result-recordType-uri-" + result.Results[i].Uri + "'>- " + result.Results[i].RecordRecordType.RecordTypeName.Value + "</li>")	
+										$(newRecordTypeNodeId).parent().append("<li id='level-" + (level + 1) + "-search-result-dateRegistered-uri-" + result.Results[i].Uri + "'>- " + formatDate(result.Results[i].RecordDateRegistered.DateTime, "trimDate", "dd/mm/yyyy") + "</li>")	
 										}
 
 									// column 5
@@ -1257,7 +1259,6 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 								{
 								// Do something
 								})
-
 					   }
 					else
 					   {
@@ -1557,6 +1558,10 @@ function formatDate(dateTime, inputFormat, outputFormat)
 				formattedDate = day + "-" + month + "-" + year
 				return formattedDate;
 				break;
+			case "dd/mm/yyyy":
+				formattedDate = day + "/" + month + "/" + year
+				return formattedDate;
+				break;
 			case "dd-mmm-yyyy":
 				switch(month)
 					{
@@ -1624,9 +1629,7 @@ function parseAccessControlString(string, type)
 		break;
 	case "record":
 		var JSONObj = { "ViewDocument" : "", "ViewMetadata" : "", "UpdateDocument" : "", "UpdateRecordMetadata" : "", "ModifyRecordAccess" : "", "DestroyRecord" : "", "ContributeContents" : "" };
-		console.log("Access Controls: ")
-		console.log(JSONObj)
-			
+		
 		JSONObj.ViewDocument = string.substr(string.search(":")+2, string.search(";")-string.search(":")-2)
 		string = string.substr(string.search(";")+2)
 		JSONObj.ViewMetadata = string.substr(string.search(":")+2, string.search(";")-string.search(":")-2)
@@ -1680,10 +1683,8 @@ function showRecordCoreFieldValue(record)
 
 	// Access Control
 	var accessControlHTML;
-	console.log("Access Control String: " + parseAccessControlString(record.RecordAccessControl.Value, "record").ViewMetadata)
 	if(parseAccessControlString(record.RecordAccessControl.Value, "record").ViewMetadata!="<Unrestricted>")
 		{
-		console.log("This is called.")
 		accessControlHTML = "<div>View Folder & Contents: " + parseAccessControlString(record.RecordAccessControl.Value, "record").ViewMetadata + "</div>"		
 		}
 	if(parseAccessControlString(record.RecordAccessControl.Value, "record").UpdateRecordMetadata!="<Unrestricted>")
@@ -1694,7 +1695,6 @@ function showRecordCoreFieldValue(record)
 		{
 		accessControlHTML = accessControlHTML + "<div>Add Contents: " + parseAccessControlString(record.RecordAccessControl.Value, "record").ContributeContents + "</div>"	
 		}
-	console.log(accessControlHTML)
 	$("#properties-access-control").html(accessControlHTML)
 	
 	
