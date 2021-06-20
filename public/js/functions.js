@@ -1511,7 +1511,7 @@ function getClassificationProperties(classificationUri)
 					{
 					$("#properties-classification-title").html(result.Results[0].ClassificationTitle.Value)
 					$("#properties-classification-number").html(result.Results[0].ClassificationIdNumber.Value)
-					$("#properties-classification-access-control").html( parseAccessControlString(result.Results[0].ClassificationAccessControl.Value, "classification").CanUse)
+					$("#properties-classification-access-control").html("<i>" +  stripPeopleInPrefix(parseAccessControlString(result.Results[0].ClassificationAccessControl.Value, "classification").CanUse) + "</i>") 
 					})
 				.fail(function(result)
 					{
@@ -1645,8 +1645,6 @@ function parseAccessControlString(string, type)
 		JSONObj.ContributeContents = string.substr(string.search(":")+2)
 		break;
 		}
-		//JSONObj = JSON.parse(JSON.stringify(JSONObj).replace(/<Unrestricted>/g, "<i>[Inherited]</i>"))
-		//JSONObj = JSON.parse(JSON.stringify(JSONObj).replace(/[()]/g, ""))
 		return JSONObj;
 	}
 
@@ -1681,54 +1679,118 @@ function showRecordCoreFieldValue(record, type)
 	dateRegistered = dateRegistered + record.RecordDateRegistered.DateTime.substr(11, 8)
 	$("#properties-date-registered").html(dateRegistered)
 
+	accessControls = parseAccessControlString(record.RecordAccessControl.Value, "record")
 	// Access Control
 	switch(type)
 		{
 		case "folder-intermediate":
 			var accessControlHTML;
-			if(parseAccessControlString(record.RecordAccessControl.Value, "record").ViewMetadata!="<Unrestricted>")
+			if(accessControls.ViewMetadata!="<Unrestricted>")
 				{
-				accessControlHTML = "<div>View Folder & Contents: <i>" + parseAccessControlString(record.RecordAccessControl.Value, "record").ViewMetadata + "</i></div>"		
+				if(accessControls.ViewMetadata.substr(0, 11)=="People in (")
+					{
+					accessControlHTML = "<div>View Folder & Contents: <i>" + stripPeopleInPrefix(accessControls.ViewMetadata) + "</i></div>"	
+					}
+				else
+					{
+					accessControlHTML = "<div>View Folder & Contents: <i>" + accessControls.ViewMetadata + "</i></div>"							
+					}
 				}
-			if(parseAccessControlString(record.RecordAccessControl.Value, "record").UpdateRecordMetadata!="<Unrestricted>")
+			if(accessControls.UpdateRecordMetadata!="<Unrestricted>")
 				{
-				accessControlHTML = accessControlHTML + "<div>Update Folder Properties: <i>" + parseAccessControlString(record.RecordAccessControl.Value, "record").UpdateRecordMetadata + "</i></div>"
+				if(accessControls.UpdateRecordMetadata.substr(0, 11)=="People in (")
+					{
+					accessControlHTML = accessControlHTML + "<div>Update Folder Properties: <i>" + stripPeopleInPrefix(accessControls.UpdateRecordMetadata) + "</i></div>"	
+					}
+				else
+					{
+					accessControlHTML = accessControlHTML + "<div>Update Folder Properties: <i>" + accessControls.UpdateRecordMetadata + "</i></div>"
+					}
 				}
-			if(parseAccessControlString(record.RecordAccessControl.Value, "record").ContributeContents!="<Unrestricted>")
+			if(accessControls.ContributeContents!="<Unrestricted>")
 				{
-				accessControlHTML = accessControlHTML + "<div>Add Contents: <i>" + parseAccessControlString(record.RecordAccessControl.Value, "record").ContributeContents + "</i></div>"	
+				if(accessControls.ContributeContents.substr(0, 11)=="People in (")
+					{
+					accessControlHTML = accessControlHTML + "<div>Add Contents: <i>" + stripPeopleInPrefix(accessControls.ContributeContents) + "</i></div>"	
+					}
+				else
+					{
+					accessControlHTML = accessControlHTML + "<div>Add Contents: <i>" + accessControls.ContributeContents + "</i></div>"
+					}
 				}
 			$("#properties-access-control").html(accessControlHTML)
 			break;
 		case "folder-terminal":
 			var accessControlHTML;
-			if(parseAccessControlString(record.RecordAccessControl.Value, "record").ViewMetadata!="<Unrestricted>")
+			if(accessControls.ViewMetadata!="<Unrestricted>")
 				{
-				accessControlHTML = "<div>View Folder & Contents: <i>" + parseAccessControlString(record.RecordAccessControl.Value, "record").ViewMetadata + "</i></div>"		
+				if(accessControls.ViewMetadata.substr(0, 17)=="Same As container")
+					{
+					accessControlHTML = "<div>View Folder & Contents: <i>" + accessControls.ViewMetadata.substr(0, accessControls.ViewMetadata.search(":")) + "</i></div>"
+					}
+				else
+					{
+					accessControlHTML = "<div>View Folder & Contents: <i>" + accessControls.ViewMetadata + "</i></div>"
+					}
 				}
-			if(parseAccessControlString(record.RecordAccessControl.Value, "record").UpdateRecordMetadata!="<Unrestricted>")
+			if(accessControls.UpdateRecordMetadata!="<Unrestricted>")
 				{
-				accessControlHTML = accessControlHTML + "<div>Update Folder Properties: <i>" + parseAccessControlString(record.RecordAccessControl.Value, "record").UpdateRecordMetadata + "</i></div>"
+				if(accessControls.UpdateRecordMetadata.substr(0, 17)=="Same As container")
+				   {
+				   accessControlHTML = accessControlHTML + "<div>Update Folder Properties: <i>" + accessControls.UpdateRecordMetadata.substr(0, accessControls.UpdateRecordMetadata.search(":")) + "</i></div>"
+				   }
+				else
+					{
+					accessControlHTML = accessControlHTML + "<div>Update Folder Properties: <i>" + parseAccessControlString(record.RecordAccessControl.Value, "record").UpdateRecordMetadata + "</i></div>"						
+					}
 				}
-			if(parseAccessControlString(record.RecordAccessControl.Value, "record").ContributeContents!="<Unrestricted>")
+			if(accessControls.ContributeContents!="<Unrestricted>")
 				{
-				accessControlHTML = accessControlHTML + "<div>Add Contents: <i>" + parseAccessControlString(record.RecordAccessControl.Value, "record").ContributeContents + "</i></div>"	
+				if(accessControls.ContributeContents.substr(0, 17)=="Same As container")
+					{
+					 accessControlHTML = accessControlHTML + "Add Contents: <i>" + accessControls.ContributeContents.substr(0, accessControls.ContributeContents.search(":")) + "</i></div>"					
+					}
+				else
+					{
+					accessControlHTML = accessControlHTML + "<div>Add Contents: <i>" + accessControls.ContributeContents + "</i></div>"		
+					}
 				}
 			$("#properties-access-control").html(accessControlHTML)
 			break;
 		case "document":
 			var accessControlHTML;
-			if(parseAccessControlString(record.RecordAccessControl.Value, "record").ViewMetadata!="<Unrestricted>")
+			if(accessControls.ViewMetadata!="<Unrestricted>")
 				{
-				accessControlHTML = "<div>View Document Properties: <i>" + parseAccessControlString(record.RecordAccessControl.Value, "record").ViewMetadata + "</i></div>"		
+				if(accessControls.ViewMetadata.substr(0, 17)=="Same As container")
+					{
+					accessControlHTML = "<div>View Document Properties: <i>" + stripPeopleInPrefix(accessControls.ViewMetadata.substr(accessControls.ViewMetadata.search(":")+2)) + "</i></div>"
+					}
+				else
+					{
+					accessControlHTML = "<div>View Document Properties: <i>" + accessControls.ViewMetadata + "</i></div>"
+					}
 				}
 			if(parseAccessControlString(record.RecordAccessControl.Value, "record").ViewDocument!="<Unrestricted>")
 				{
-				accessControlHTML = accessControlHTML + "<div>View Document: <i>" + parseAccessControlString(record.RecordAccessControl.Value, "record").ViewDocument + "</i></div>"		
+				if(accessControls.ViewDocument.substr(0, 17)=="Same As container")
+					{
+					accessControlHTML = accessControlHTML + "<div>View Document: <i>" + stripPeopleInPrefix(accessControls.ViewDocument.substr(accessControls.ViewDocument.search(":")+2)) + "</i></div>"
+					}
+				else
+					{
+					accessControlHTML = accessControlHTML + "<div>View Document: <i>" + accessControls.ViewDocument + "</i></div>"
+					}
 				}
 			if(parseAccessControlString(record.RecordAccessControl.Value, "record").UpdateRecordMetadata!="<Unrestricted>")
 				{
-				accessControlHTML = accessControlHTML + "<div>Edit Document Properties: <i>" + parseAccessControlString(record.RecordAccessControl.Value, "record").UpdateRecordMetadata + "</i></div>"
+				if(accessControls.UpdateRecordMetadata.substr(0, 17)=="Same As container")
+					{
+					accessControlHTML = accessControlHTML + "<div>Update Document Properties: <i>" + stripPeopleInPrefix(accessControls.UpdateRecordMetadata.substr(accessControls.UpdateRecordMetadata.search(":")+2)) + "</i></div>"
+					}
+				else
+					{
+					accessControlHTML = accessControlHTML + "<div>Update Document Properties: <i>" + accessControls.UpdateRecordMetadata + "</i></div>"
+					}
 				}
 			$("#properties-access-control").html(accessControlHTML)
 			break;
@@ -1741,6 +1803,10 @@ function showRecordCoreFieldValue(record, type)
 		}
 	}
 
+function stripPeopleInPrefix(accessControlString)
+	{
+	return "Users in " + accessControlString.substr(11).substr(0, accessControlString.substr(11).length-1);
+	}
 
 
 //  Seems to be a lot of redundant params passed here.
