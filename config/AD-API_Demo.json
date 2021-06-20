@@ -64,6 +64,20 @@
 				[
 				"Schools Document"
 				]
+			},
+			{
+			"ParentRecordType" : "Torriano Pupil Folder",
+			"ContentRecordTypes" :
+				[
+				"Torriano Pupil Sub Folder"
+				]
+			},
+			{
+			"ParentRecordType" : "Torriano Pupil Sub Folder",
+			"ContentRecordTypes" :
+				[
+				"Schools Document"
+				]
 			}
 		]
 	},
