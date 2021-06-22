@@ -568,7 +568,6 @@ function populateSearchResultPane(searchString, foldersOnly)
 					var result = searchAPI(data)
 						.then(function(result)
 							{
-							console.log("Here's the results.")
 							if(result.TotalResults==0)
 								{
 								$("#search-results-pane").html("<div class='no-records display-4'>Your search did not return any records.</div>")
@@ -576,7 +575,6 @@ function populateSearchResultPane(searchString, foldersOnly)
 								}
 							else
 								{
-								console.log(result)
 								var thHTML = '<table id="search-results" class="table table-sm">'
 								thHTML = thHTML + '<thead style="background-color:#ffffff;"><tr>'
 								thHTML = thHTML + '<th style="text-align:left;padding-left:30px;width:12%;";>Type</th>'
@@ -653,7 +651,7 @@ function populateSearchResultPane(searchString, foldersOnly)
 					}, 
 				error: function(recordTypeDefinitions)
 					{
-					console.log()
+					console.log("Oooops!")
 					}
 				});
 			}
@@ -1805,7 +1803,7 @@ function showRecordCoreFieldValue(record, type)
 
 function stripPeopleInPrefix(accessControlString)
 	{
-	return "Users in " + accessControlString.substr(11).substr(0, accessControlString.substr(11).length-1);
+	return "Users in '" + accessControlString.substr(11).substr(0, accessControlString.substr(11).length-1) + "'";
 	}
 
 
@@ -2002,16 +2000,14 @@ function getRecordProperties(type, recordUri)
 							xhrFields: { withCredentials: true},
 							success: function(selectedRecordType)
 								{
-								
 								for(i=0;i<selectedRecordType.Results[0].DataEntryFormDefinition.Pages.length;i++)
 									{
 									for(x=0;x<selectedRecordType.Results[0].DataEntryFormDefinition.Pages[i].PageItems.length;x++)	
 										{
-										(function(index)
+										(function(x)
 										 	{
 											if(selectedRecordType.Results[0].DataEntryFormDefinition.Pages[i].PageItems[x].Type=="Field")
-												{
-												showRecordAdditionalFieldName(selectedRecordType.Results[0].DataEntryFormDefinition.Pages[i].PageItems[x], recordTitle, recordType, recordUri)
+												{												showRecordAdditionalFieldName(selectedRecordType.Results[0].DataEntryFormDefinition.Pages[i].PageItems[x], recordTitle, recordType, recordUri)
 
 												var additionalFieldId = "properties-additional-fields-" + selectedRecordType.Results[0].DataEntryFormDefinition.Pages[i].PageItems[x].Name;
 												var searchClause = selectedRecordType.Results[0].DataEntryFormDefinition.Pages[i].PageItems[x].Name;
