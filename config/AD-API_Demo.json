@@ -17,6 +17,37 @@
 						"Folder",
 						"Document"
 						],
+"RecordTypeAliases" :
+	{
+	"UseApplicationConfig" : "true",
+	"RecordTypes" : 
+		[
+			{
+			"RecordTypeName" : "Staff Folder",
+			"RecordTypeDisplayAlias" : "Staff Folder"
+			},
+			{
+			"RecordTypeName" : "Staff Sub Folder",
+			"RecordTypeDisplayAlias" : "Staff Sub Folder"
+			},
+			{
+			"RecordTypeName" : "Pupil Folder",
+			"RecordTypeDisplayAlias" : "Pupil Folder"
+			},
+			{
+			"RecordTypeName" : "Pupil Sub Folder",
+			"RecordTypeDisplayAlias" : "Pupil Sub Folder"
+			},
+			{
+			"RecordTypeName" : "Torriano Staff Folder",
+			"RecordTypeDisplayAlias" : "Staff Folder"
+			},
+			{
+			"RecordTypeName" : "Torriano Staff Sub Folder",
+			"RecordTypeDisplayAlias" : "Staff Sub Folder"
+			}
+		]
+	},
 "ByListContainmentRules" : 
 	{
 	"UseApplicationConfig" : "true",

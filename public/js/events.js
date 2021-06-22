@@ -160,14 +160,11 @@ $(document).on("click", "span[class^='folder']", function()
 			populateDataEntryFormPages("new-sub-folder-form")
 			})
 		drawPropertiesTable("folder-intermediate")
-		getRecordProperties("folder-intermediate", node.attr("id").substr(11))
 		}
 	if(node.hasClass("folder-terminal"))
 		{
 		getRecords(node.attr("id").substr(11))
 		populateContainerField("folder-terminal", node.attr("id").substr(11))
-		//$("#upload-form-record-type").html("")
-
 		populateRecordTypeField("folder-terminal", node.attr("id").substr(11)).then(function()
 		{
 		$("#upload-form-record-type-field-container").css("display", "none")
@@ -179,7 +176,6 @@ $(document).on("click", "span[class^='folder']", function()
 		populateDataEntryFormPages("upload-form")
 		})
 		drawPropertiesTable("folder-terminal")
-		getRecordProperties("folder-terminal", node.attr("id").substr(11))
 		}
 	})
 
@@ -234,7 +230,6 @@ $(document).on("click", ".record-title>a", function()
 	if($(node).hasClass("folder-intermediate"))
 		{
 		$("#records-list-pane").html("<div class='no-records display-4'>Browse or search to display records.</div>")
-		//$("#new-sub-folder-form-record-type").html("")
 		populateContainerField("folder-intermediate", node.attr("id").substr(11))
 		populateRecordTypeField("folder-intermediate", node.attr("id").substr(11)).then(function()
 			{
@@ -256,8 +251,6 @@ $(document).on("click", ".record-title>a", function()
 			
 			getRecords(node.attr("id").substr(11))
 			populateContainerField("folder-terminal", node.attr("id").substr(11))
-			//$("#upload-form-record-type").html("")
-
 			populateRecordTypeField("folder-terminal", node.attr("id").substr(11)).then(function()
 			{
 			$("#upload-form-record-type-field-container").css("display", "none")
@@ -489,23 +482,18 @@ $(document).on("click", "#search-results li", function()
 					switch(nodeType)
 						{
 						case "folder-intermediate":
-		
-						//$("#records-list-pane").html("<div class='no-records display-4'>Browse or search to display records.</div>")
-						//$("#new-sub-folder-form-record-type").html("")
-						populateContainerField("folder-intermediate", uri)
-						populateRecordTypeField("folder-intermediate", uri).then(function()
-							{
-							// Display the record type selector only if there is more than one record type than can be used with the classification.
-							$("#new-sub-folder-form-record-type-field-container").css("display", "none")
-							if($("#new-sub-folder-form-record-type>option").length>1)
+							populateContainerField("folder-intermediate", uri)
+							populateRecordTypeField("folder-intermediate", uri).then(function()
 								{
-								$("#new-sub-folder-form-record-type-field-container").css("display", "block")
-								}	
-							populateDataEntryFormPages("new-sub-folder-form")
-							})
-						drawPropertiesTable("folder-intermediate")
-						getRecordProperties("folder-intermediate", uri)
-		
+								// Display the record type selector only if there is more than one record type than can be used with the classification.
+								$("#new-sub-folder-form-record-type-field-container").css("display", "none")
+								if($("#new-sub-folder-form-record-type>option").length>1)
+									{
+									$("#new-sub-folder-form-record-type-field-container").css("display", "block")
+									}	
+								populateDataEntryFormPages("new-sub-folder-form")
+								})
+							drawPropertiesTable("folder-intermediate")
 							break;
 						case "folder-terminal":
 							populateRecordTypeField("folder-terminal", uri).then(function()
@@ -555,12 +543,10 @@ $(document).on("click", ".search-result-caret-expanded", function()
 $(document).on("change", "#new-folder-form-record-type", function()
 	{
 	populateDataEntryFormPages("new-folder-form")
-	//populateAdditionalFields("classification")
 	})
 
 $(document).on("change", "#new-sub-folder-form-record-type", function()
 	{
-	//populateAdditionalFields("folder-intermediate")
 	populateDataEntryFormPages("new-folder-form")
 	})
 
@@ -572,7 +558,6 @@ $(document).on("click", "#create-folder-button", function()
 		$("#create-folder-status").modal("show")
 		recordTitle = $("#new-folder-form-page-item-RecordTypedTitle").val()
 		recordClassificationUri = $("#new-folder-form-record-classification").data("classificationUri")
-		//var recordClassificationUri = "534"
 		var recordContainerUri;
 		recordType = $("#new-folder-form-record-type").val()
 		var additionalFieldKeys = [];
@@ -678,8 +663,6 @@ function dropHandler(event)
 			}
 		else
 			{
-			console.log("Items Legth: " + event.dataTransfer.items.length)
-				
 			for(i=0;i<event.dataTransfer.items.length;i++)	
 				{
 				var entry = event.dataTransfer.items[i].webkitGetAsEntry();
@@ -717,7 +700,6 @@ function dragOverHandler(event)
 
 $(document).on("click", "#x-icon", function()
 	{
-	console.log("x-icon clicked.")
 	clearForm("upload-form")
 	gtag('event', 'Clear File Control')
 	})
@@ -730,9 +712,7 @@ $(document).on("click", "#upload-button", function()
 			{
 			if($("#drop-zone").data("file"))
 					{
-					console.log("Use the drag and dropped file.")
 					file = $("#drop-zone").data("file")
-					console.log("The filename is: " + file.name)
 					$("#dropped-filename").html("")
 					var extension = getFileExtension(file.name);
 					}
@@ -1069,19 +1049,16 @@ $(document).on("click", ".edit-properties-link", function()
 										console.log("Boolean inputs are not yet supported.")
 										break;
 									case "Date":
-										console.log('$("#editRecordPropertiesInput").val(): ' + $("#editRecordPropertiesInput").val())
 										switch($("#editRecordPropertiesInput").val().length)
 											{
 											case 0:
 												$("#" + editableCellId).html("")
 												break;
 											case 10:
-												console.log("This code is called.  Boo-yah!")
 												$("#" + editableCellId).html(formatDate($("#editRecordPropertiesInput").val(), "tenDigit", config.DateFormat))
 												break;
 											case 11:
-												$("#" + editableCellId).html(formatDate($("#editRecordPropertiesInput").val(), "dd-mmm-yyyy", config.DateFormat))												
-												break;
+												$("#" + editableCellId).html(formatDate($("#editRecordPropertiesInput").val(), "dd-mmm-yyyy", config.DateFormat))			break;
 											}
 											$(".edit-properties-link:not(.editing) > a").css("display", "block")
 										break;
