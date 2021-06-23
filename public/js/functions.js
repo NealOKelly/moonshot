@@ -1340,7 +1340,7 @@ function clearForm(form)
 			$("[id^=new-folder-form-page-item-]").val("")
 			break;
 		case "new-sub-folder-form":
-			$("[id^=new-folder-form-page-item-]").val("")
+			$("[id^=new-sub-folder-form-page-item-]").val("")
 			break;
 		case "upload-form":
 			$("#dropped-file-filetype-icon").removeClass()
@@ -2298,6 +2298,7 @@ function createFolder(recordTitle, recordClassificationUri, recordContainerUri, 
 						}
 					if(recordContainerUri != null)
 						{
+						console.log("It's a sb folder.")
 						if($("#record-uri-" + recordContainerUri + " > span:nth-child(1)").hasClass("expanded"))
 							{
 							refreshFolderNodes("record", "record-uri-" + recordContainerUri)								

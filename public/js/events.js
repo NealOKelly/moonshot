@@ -1052,13 +1052,14 @@ $(document).on("click", ".edit-properties-link", function()
 										switch($("#editRecordPropertiesInput").val().length)
 											{
 											case 0:
-												$("#" + editableCellId).html("")
+												$("#" + editableCellId).html("");
 												break;
 											case 10:
-												$("#" + editableCellId).html(formatDate($("#editRecordPropertiesInput").val(), "tenDigit", config.DateFormat))
+												$("#" + editableCellId).html(formatDate($("#editRecordPropertiesInput").val(), "tenDigit", config.DateFormat));
 												break;
 											case 11:
-												$("#" + editableCellId).html(formatDate($("#editRecordPropertiesInput").val(), "dd-mmm-yyyy", config.DateFormat))			break;
+												$("#" + editableCellId).html(formatDate($("#editRecordPropertiesInput").val(), "dd-mmm-yyyy", config.DateFormat));
+												break;
 											}
 											$(".edit-properties-link:not(.editing) > a").css("display", "block")
 										break;
