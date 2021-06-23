@@ -1790,6 +1790,10 @@ function showRecordCoreFieldValue(record, type)
 					accessControlHTML = accessControlHTML + "<div>Update Document Properties: <i>" + accessControls.UpdateRecordMetadata + "</i></div>"
 					}
 				}
+			else
+				{
+				accessControlHTML = accessControlHTML + "<div>Update Document Properties: <i>All users with the View Document Properties permission</i></div>"
+				}
 			$("#properties-access-control").html(accessControlHTML)
 			break;
 		}		
