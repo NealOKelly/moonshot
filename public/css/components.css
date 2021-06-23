@@ -553,3 +553,14 @@ th.sorted-up::after{
 .data-entry-form-tabs .nav-link.disabled{
 	border-bottom: 1px solid #000033;
 }
+
+.username{
+	color: rgb(255, 255, 255);
+	cursor: default;
+	display: block;
+	font-size: 16px;
+	font-weight: 400;
+	height: 40px;
+	line-height: 24px;
+	padding: 8px;
+}
