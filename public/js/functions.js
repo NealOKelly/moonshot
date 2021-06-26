@@ -276,6 +276,7 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 												switch(recordTypeDefinitions.Results[x].RecordTypeContentsRule.Value)
 													{
 													case "ByLevel":
+														console.log("ByLevel")
 														if(recordTypeDefinitions.Results[x].RecordTypeLevel.Value>="5")
 															{
 															addIntermediateFolderNode(parentNodeId, recordUri, recordTitle)
@@ -289,15 +290,22 @@ function refreshFolderNodes(parentNodeType, parentNodeId)
 															}
 														break;
 													case "ByLevelInclusive":
+														console.log("ByLevelInclusive")
 														addIntermediateFolderNode(parentNodeId, recordUri, recordTitle)
 														break;
 													case "ByBehavior":
+														console.log("ByBehaviour")
 														addTerminalFolderNode(parentNodeId, recordUri, recordTitle)
 														break;
 													case "ByList":
-														if(recordTypeDefinitions.Results[x].RecordTypeLevel.Value>="4")
+														console.log("ByList")
+														if(recordTypeDefinitions.Results[x].RecordTypeLevel.Value>"4")
 															{
 															addIntermediateFolderNode(parentNodeId, recordUri, recordTitle)
+															}
+														else
+															{
+															addTerminalFolderNode(parentNodeId, recordUri, recordTitle)
 															}
 														break;
 													case "Prevented":
@@ -568,6 +576,8 @@ function populateSearchResultPane(searchString, foldersOnly)
 					var result = searchAPI(data)
 						.then(function(result)
 							{
+							console.log("Search Results")
+							console.log(result)
 							if(result.TotalResults==0)
 								{
 								$("#search-results-pane").html("<div class='no-records display-4'>Your search did not return any records.</div>")
@@ -970,6 +980,36 @@ function populateContainerField(parentNodeType, parentNodeUri)
 		})
 	}
 
+function getRecordTypeDisplayAliasFromName(recordTypeName)
+	{
+	console.log("recordTypeName: " + recordTypeName)
+	if(config.RecordTypeAliases.UseApplicationConfig=="true")
+		{
+		var recordTypeDisplayAlias;
+		for(i=0;i<7;i++)
+			{
+			if(config.RecordTypeAliases.RecordTypes[i].RecordTypeName==recordTypeName)
+				{
+				recordTypeDisplayAlias=config.RecordTypeAliases.RecordTypes[i].RecordTypeDisplayAlias
+				}
+			}
+		console.log("recordTypeDisplayAlias: "+ recordTypeDisplayAlias)
+		if(recordTypeDisplayAlias!="")
+			{
+			return recordTypeDisplayAlias;
+			}
+		else
+			{
+			return recordTypeName;		
+			}
+		return recordTypeName;
+		}
+	else
+		{
+		return recordTypeName;		
+		}
+	}
+
 function populateRecordTypeField(parentNodeType, parentNodeUri)
 	{
 	var deferredObject = $.Deferred();
@@ -1019,7 +1059,7 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 											{
 											if(result.TotalResults>0)
 												{
-												$("#new-folder-form-record-type").append("<option>" + intermediateFolderRecordTypeNames[index] + "</option>")
+												$("#new-folder-form-record-type").append("<option value='" + intermediateFolderRecordTypeNames[index] + "'>" + getRecordTypeDisplayAliasFromName(intermediateFolderRecordTypeNames[index]) + "</option>")
 												onlyRecordTypeCount++;
 												}
 											if($("#new-folder-form-record-type option").length<2)
@@ -1050,7 +1090,8 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 																	{
 																	if(result.Results[x].RecordTypeContainerRule.Value=="Prevented") // filter out (again) the Record Types that can be contained by other records.
 																		{
-																		$("#new-folder-form-record-type").append("<option>" + result.Results[x].RecordTypeName.Value + "</option>")
+																		// Not tested
+																		$("#new-folder-form-record-type").append("<option>" + getRecordTypeDisplayAliasFromName(result.Results[x].RecordTypeName.Value) + "</option>")
 																		}
 																	if($("#new-folder-form-record-type option").length<2)
 																		{
@@ -1081,7 +1122,8 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 																				{
 																				if(result.Results[0].ClassificationTitle.Value==recordTypeClassification)
 																					{
-																					$("#new-folder-form-record-type").append("<option>" + recordTypeName + "</option>")
+																					// Not tested
+																					$("#new-folder-form-record-type").append("<option>" + getRecordTypeDisplayAliasFromName(recordTypeName) + "</option>")
 
 																					if($("#new-folder-form-record-type option").length<2)
 																						{
@@ -1100,7 +1142,8 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 																	   }
 																	else
 																		{
-																		$("#new-folder-form-record-type").append("<option>" + recordTypeName + "</option>")
+																		// Not tested
+																		$("#new-folder-form-record-type").append("<option>" + getRecordTypeDisplayAliasFromName(recordTypeName) + "</option>")
 																		if($("#new-folder-form-record-type option").length<2)
 																			{
 																			$("#new-folder-form-record-type").attr("readonly", true)
@@ -1155,7 +1198,8 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 										{
 										for(x=0; x<config.ByListContainmentRules.Mappings[i].ContentRecordTypes.length; x++)
 											{
-											$("#new-sub-folder-form-record-type").append("<option>" + config.ByListContainmentRules.Mappings[i].ContentRecordTypes[x] + "</option>")	
+											// Not tested
+											$("#new-sub-folder-form-record-type").append("<option>" + getRecordTypeDisplayAliasFromName(config.ByListContainmentRules.Mappings[i].ContentRecordTypes[x]) + "</option>")	
 											}
 										}
 									}
@@ -1203,7 +1247,8 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 											}
 										if(!exclude)
 											{
-											$("#new-sub-folder-form-record-type").append("<option>" + result.Results[i].RecordTypeName.Value + "</option>")		
+											// Not tested
+											$("#new-sub-folder-form-record-type").append("<option>" + getRecordTypeDisplayAliasFromName(result.Results[i].RecordTypeName.Value) + "</option>")		
 											}
 										}
 									}
@@ -1235,11 +1280,12 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 								$("#upload-form-record-type").html("")
 								for(i=0; i<config.ByListContainmentRules.Mappings.length; i++)
 									{
-									if(config.ByListContainmentRules.Mappings[i].ParentRecordType==result.Results[0].RecordRecordType.RecordTypeName.Value)
+									if(config.ByListContainmentRules.Mappings[i].ParentRecordType.replace("&amp;", "&")==result.Results[0].RecordRecordType.RecordTypeName.Value)
 										{
 										for(x=0; x<config.ByListContainmentRules.Mappings[i].ContentRecordTypes.length; x++)
 											{
-											$("#upload-form-record-type").append("<option>" + config.ByListContainmentRules.Mappings[i].ContentRecordTypes[x] + "</option>")	
+											// Not tested.
+											$("#upload-form-record-type").append("<option>" + getRecordTypeDisplayAliasFromName(config.ByListContainmentRules.Mappings[i].ContentRecordTypes[x]) + "</option>")	
 											}
 										}
 									}
@@ -1282,7 +1328,8 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 											}
 										if(!exclude)
 											{
-											$("#upload-form-record-type").append("<option>" + result.Results[i].RecordTypeName.Value + "</option>")	
+											// Not tested
+											$("#upload-form-record-type").append("<option>" + getRecordTypeDisplayAliasFromName(result.Results[i].RecordTypeName.Value) + "</option>")	
 											}
 										}
 									}
@@ -1994,7 +2041,6 @@ function getRecordProperties(type, recordUri)
 								"Properties" : "DataEntryFormDefinition",
 								"TrimType" : "RecordType"
 								}
-						
 						$.ajax(
 							{
 							url: url,
@@ -2046,7 +2092,36 @@ function getRecordProperties(type, recordUri)
 								}, 
 							error: function(selectedRecordType)
 								{
-								console.log("Oooops!")
+								console.log("Error fetching DataEntryFormDefinition for the selected record type.")
+								url = baseUrl + apiPath + "/Search"
+								myRecordType = "Torriano Staff Folder"
+								data = 	{
+										"q" : "forRecords=\"" + myRecordType + "\"",
+										"Properties" : "FieldDefinitionName, FieldDefitionFormat",
+										"SortBy" : "Format-,Name",
+										"TrimType" : "FieldDefinition"
+										}
+								$.ajax(
+										{
+										url: url,
+										data: JSON.stringify(data),
+										type: "POST",
+										contentType: 'application/json',
+										xhrFields: { withCredentials: true },
+										success: function(result)
+											{
+											console.log("Fetching FieldDefinition for the selected record type instead.")
+											for(i=0;i<result.Results.length;i++)
+												{
+												console.log('FieldDefitionName ' + i + ": " + result.Results[i].FieldDefinitionName.Value)
+												}
+												
+											}, 
+										error: function(result)
+											{
+											// Do something
+											}
+										})	
 								}
 							});	
 						}
@@ -2302,7 +2377,6 @@ function createFolder(recordTitle, recordClassificationUri, recordContainerUri, 
 						}
 					if(recordContainerUri != null)
 						{
-						console.log("It's a sb folder.")
 						if($("#record-uri-" + recordContainerUri + " > span:nth-child(1)").hasClass("expanded"))
 							{
 							refreshFolderNodes("record", "record-uri-" + recordContainerUri)								
@@ -2611,7 +2685,7 @@ function searchAPI(data) {
 			}, 
 		error: function(result)
 			{
-			console.log(result)
+			//console.log(result)
 			deferredObject.reject(result);
 			}
 		});	
@@ -2625,11 +2699,13 @@ function showLoadingSpinner()
 
 function hideLoadingSpinner() 
 	{
+	console.log("hideLOadingSpinner() has been called.")
 	setTimeout(function()
 		{
+		console.log("setTimeout() complete.")
   		$("#loading").modal('hide');
 		},
-		300); // this delay ensure the modal has properly been show before attempting to hide it.
+		1000); // this delay ensure the modal has properly been show before attempting to hide it.
 	}
 
 function isValidDate(dateString)
