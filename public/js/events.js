@@ -621,8 +621,8 @@ $(document).on("change", "#upload-form-file", function()
 	$("#dropped-file-filetype-icon").addClass("fiv-icon-" + extension)
 	$("#dropped-file-name").html(fileName)
 	$("#file-details-container").css("display", "inline-block")
-	var recordTitle = fileName.substr(0, fileName.length - (extension.length + 1))
-	$("#upload-form-record-title").val(recordTitle)
+	var recordTitle = $("#dropped-file-name").html().substr(0, fileName.length - (extension.length + 1))
+	$("#upload-form-page-item-RecordTypedTitle").val(recordTitle)
 	})
 
 // This prevents dragOver and drop behaviours at a document level
