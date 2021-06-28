@@ -248,9 +248,10 @@ $(document).on("click", ".record-title>a", function()
 		{
 		if($(node).hasClass("folder-terminal"))
 			{
-			
 			getRecords(node.attr("id").substr(11))
 			populateContainerField("folder-terminal", node.attr("id").substr(11))
+			console.log("About to populate record type field.")
+			console.log("Uri: " + node.attr("id").substr(11))
 			populateRecordTypeField("folder-terminal", node.attr("id").substr(11)).then(function()
 			{
 			$("#upload-form-record-type-field-container").css("display", "none")
@@ -547,7 +548,12 @@ $(document).on("change", "#new-folder-form-record-type", function()
 
 $(document).on("change", "#new-sub-folder-form-record-type", function()
 	{
-	populateDataEntryFormPages("new-folder-form")
+	populateDataEntryFormPages("new-sub-folder-form")
+	})
+
+$(document).on("change", "#upload-form-record-type", function()
+	{
+	populateDataEntryFormPages("upload-form")
 	})
 
 // Create Folder

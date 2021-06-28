@@ -980,26 +980,28 @@ function populateContainerField(parentNodeType, parentNodeUri)
 
 function getRecordTypeDisplayAliasFromName(recordTypeName)
 	{
-	var recordTypeDisplayAlias;
-	console.log("recordTypeName: " + recordTypeName)
-	for(z=0;z<config.RecordTypeAliases.RecordTypes.length;z++)
+	if(config.RecordTypeAliases.UseApplicationConfig=="true")
 		{
-		if(recordTypeName=="Torriano Absence & OH Sub Folder")
+		var recordTypeDisplayAlias = "";
+		for(z=0;z<config.RecordTypeAliases.RecordTypes.length;z++)
 			{
-			console.log("Alias: " + config.RecordTypeAliases.RecordTypes[z].RecordTypeName)
+			if(config.RecordTypeAliases.RecordTypes[z].RecordTypeName.replace("&amp;", "&")==recordTypeName)
+				{
+				recordTypeDisplayAlias=config.RecordTypeAliases.RecordTypes[z].RecordTypeDisplayAlias
+				}
 			}
-		if(config.RecordTypeAliases.RecordTypes[z].RecordTypeName.replace("&amp;", "&")==recordTypeName)
+		if(recordTypeDisplayAlias!="")
 			{
-			recordTypeDisplayAlias=config.RecordTypeAliases.RecordTypes[z].RecordTypeDisplayAlias
+			return recordTypeDisplayAlias;
 			}
-		}
-	if(recordTypeDisplayAlias!="")
-		{
-		return recordTypeDisplayAlias;
+		else
+			{
+			return recordTypeName;		
+			}	
 		}
 	else
 		{
-		return recordTypeName;		
+		return recordTypeName;
 		}
 	}
 
@@ -1176,10 +1178,8 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 							})
 					break;
 				case "folder-intermediate":
-					//console.log("config.ByListContainmentRules.UseApplicationConfig: " + config.ByListContainmentRules.UseApplicationConfig)
-					if(config.ByListContainmentRules.UseApplicationConfig==true)
+					if(config.ByListContainmentRules.UseApplicationConfig=="true")
 						{
-						console.log("Using Application Config.")
 						var data = 	{
 									"q" : parentNodeUri,
 									"Properties" : "RecordTitle, RecordRecordType",
@@ -1193,11 +1193,11 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 									{
 									(function(index)
 									 	{	
-										if(config.ByListContainmentRules.Mappings[index].ParentRecordType==result.Results[0].RecordRecordType.RecordTypeName.Value)
+										if(config.ByListContainmentRules.Mappings[index].ParentRecordType.replace("&amp;", "&")==result.Results[0].RecordRecordType.RecordTypeName.Value)
 											{
 											for(x=0;x<config.ByListContainmentRules.Mappings[index].ContentRecordTypes.length;x++)
 												{
-												$("#new-sub-folder-form-record-type").append("<option value='" + config.ByListContainmentRules.Mappings[index].ContentRecordTypes[x].replace("&amp;", "&") + "'>" + getRecordTypeDisplayAliasFromName(config.ByListContainmentRules.Mappings[index].ContentRecordTypes[x]) + "</option>")
+												$("#new-sub-folder-form-record-type").append("<option value='" + config.ByListContainmentRules.Mappings[index].ContentRecordTypes[x] + "'>" + getRecordTypeDisplayAliasFromName(config.ByListContainmentRules.Mappings[index].ContentRecordTypes[x].replace("&amp;", "&")) + "</option>")
 													
 												if($("#new-folder-form-record-type option").length<2)
 													{
@@ -1228,12 +1228,10 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 						{
 						// This currently returns all record type that do not have a Prevented containment rule; 
 						// i.e. documents as well as folders.  Need to add logic to exclude Record Types with
-						// a containment of greater that 4, etc.
+						// a containment of greater than 4, etc.
 						// 
-						// It also returns Record Tyoes for which the user does not have Can Use permissions.  This needs resolving.
-							
-							
-						console.log("NOT using Application Config.")
+						// It also returns Record Types for which the user does not have Can Use permissions.  This needs resolving.
+						
 						var url = baseUrl + apiPath + "/Search"
 						var data = 	{
 									"q" : "all",
@@ -1248,10 +1246,8 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 									{
 									(function(index)
 										{
-										console.log("Index:" + index)
 										if(result.Results[index].RecordTypeContainerRule.Value!="Prevented")
 											{
-											//console.log("Thuis record tyoe us not prevented.")
 											var exclude = false;
 											for(x=0; x<config.ExcludedRecordTypes.length; x++)
 												{
@@ -1263,6 +1259,15 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 											if(!exclude)
 												{
 												$("#new-sub-folder-form-record-type").append("<option value='" + result.Results[index].RecordTypeName.Value + "'>" + getRecordTypeDisplayAliasFromName(result.Results[index].RecordTypeName.Value) + "</option>")
+												
+												if($("#new-folder-form-record-type option").length<2)
+													{
+													$("#new-folder-form-record-type").attr("readonly", true)
+													}
+												else
+													{
+													$("#new-folder-form-record-type").attr("readonly", false)
+													}
 												}
 											}
 										if(index==result.Results.length-1)
@@ -1284,7 +1289,7 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 				case "folder-terminal":
 					$("#upload-form-record-title").val("")
 					$("#upload-form-record-type").html("")
-					if(config.ByListContainmentRules.UseApplicationConfig==true)
+					if(config.ByListContainmentRules.UseApplicationConfig=="true")
 					   {
 						console.log("Using Application Config.")
 						var url = baseUrl + apiPath + "/Search"
@@ -1316,10 +1321,15 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 													}
 												}
 											}
+										if(index==config.ByListContainmentRules.Mappings.length-1)
+											{
+											helperSelectRecordType("folder-terminal").then(function()
+												{
+												deferredObject.resolve();	
+												})
+											}
 										})(i)
 									}
-
-								//deferredObject.resolve();
 								})
 							.fail(function(result)
 								{
@@ -1336,33 +1346,48 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 						var result = searchAPI(data)
 							.then(function(result)
 								{
-								for(i=0; i<result.Results.length;i++)
+								console.log(result)
+								console.log("result.Results.length: " + result.Results.length)
+								for(i=0; i<result.Results.length; i++)
 									{
-									if(result.Results[i].RecordTypeContainerRule.Value!="Prevented")
-										{
-										var exclude = false;
-										for(x=0; x<config.ExcludedRecordTypes.length; x++)
+									(function(index)
+									 	{
+										console.log("index: " + index)
+										if(result.Results[index].RecordTypeUsualBehaviour.Value=="Document")
 											{
-											if(result.Results[i].RecordTypeName.Value==config.ExcludedRecordTypes[x])
+											console.log("Record Type: " + result.Results[index].RecordTypeName.Value)
+											var exclude = false;
+											for(x=0; x<config.ExcludedRecordTypes.length; x++)
 												{
-												exclude = true;
+												if(result.Results[index].RecordTypeName.Value==config.ExcludedRecordTypes[x])
+													{
+													exclude = true;
+													}
+												}
+											if(!exclude)
+												{
+												$("#upload-form-record-type").append("<option value='" + result.Results[index].RecordTypeName.Value + "'>" + getRecordTypeDisplayAliasFromName(result.Results[index].RecordTypeName.Value) + "</option>")
+													
+												if($("#upload-form-record-type option").length<2)
+													{
+													$("#upload-form-record-type").attr("readonly", "true")
+													}
+												else
+													{
+													$("#upload-form-record-type").attr("readonly", false)
+													}
 												}
 											}
-										if(!exclude)
+										if(index==result.Results.length-1)
 											{
-											$("#upload-form-record-type").append("<option value'" + result.Results[i].RecordTypeName.Value + "'>" + getRecordTypeDisplayAliasFromName(result.Results[i].RecordTypeName.Value) + "</option>")	
+											helperSelectRecordType("folder-terminal").then(function()
+												{
+												deferredObject.resolve();	
+												})
 											}
 										}
+									)(i)
 									}
-								if($("#upload-form-record-type option").length<2)
-									{
-									$("#upload-form-record-type").attr("readonly", "true")
-									}
-								else
-									{
-									$("#upload-form-record-type").attr("readonly", false)
-									}
-								deferredObject.resolve();
 								})
 							.fail(function(result)
 								{
@@ -1393,6 +1418,7 @@ function helperSelectRecordType(type)
 			$('select[id=new-sub-folder-form-record-type] option:nth-child(1)').selected = true;			
 			break;
 		case "folder-terminal":
+			$('select[id=upload-form-record-type] option:nth-child(1)').selected = true;
 			// Do something
 			break;
 		}

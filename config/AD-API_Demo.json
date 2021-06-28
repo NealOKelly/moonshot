@@ -23,28 +23,16 @@
 	"RecordTypes" : 
 		[
 			{
-			"RecordTypeName" : "Staff Folder",
-			"RecordTypeDisplayAlias" : "Staff Folder"
-			},
-			{
-			"RecordTypeName" : "Staff Sub Folder",
-			"RecordTypeDisplayAlias" : "Staff Sub Folder"
-			},
-			{
-			"RecordTypeName" : "Pupil Folder",
-			"RecordTypeDisplayAlias" : "Pupil Folder"
-			},
-			{
-			"RecordTypeName" : "Pupil Sub Folder",
-			"RecordTypeDisplayAlias" : "Pupil Sub Folder"
-			},
-			{
 			"RecordTypeName" : "Torriano Staff Folder",
 			"RecordTypeDisplayAlias" : "Staff Folder"
 			},
 			{
 			"RecordTypeName" : "Torriano Staff Sub Folder",
-			"RecordTypeDisplayAlias" : "Staff Sub Folder"
+			"RecordTypeDisplayAlias" : "Other Staff Sub Folder"
+			},
+			{
+			"RecordTypeName" : "Torriano Absence & OH Sub Folder",
+			"RecordTypeDisplayAlias" : "Absence Sub Folder"
 			}
 		]
 	},
@@ -86,7 +74,8 @@
 			"ParentRecordType" : "Torriano Staff Folder",
 			"ContentRecordTypes" :
 				[
-				"Torriano Staff Sub Folder"
+				"Torriano Staff Sub Folder",
+				"Torriano Absence & OH Sub Folder"
 				]
 			},
 			{
@@ -108,7 +97,12 @@
 			"ContentRecordTypes" :
 				[
 				"Schools Document"
-				]
+				],
+			"ParentRecordType" : "Torriano Absence & OH Sub Folder",
+			"ContentRecordTypes" :
+				[
+				"Schools Document"
+				]			
 			}
 		]
 	},
