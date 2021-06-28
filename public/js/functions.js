@@ -1005,6 +1005,9 @@ function getRecordTypeDisplayAliasFromName(recordTypeName)
 		}
 	}
 
+
+
+
 function populateRecordTypeField(parentNodeType, parentNodeUri)
 	{
 	var deferredObject = $.Deferred();
@@ -1034,38 +1037,39 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 					// or not that it is the same as the selected classification.
 						
 						
-					$("#new-folder-form-record-type").empty()
+					//$("#new-folder-form-record-type").empty()
 					// Return as list of record type that are configure to behave like folders.
-					var onlyRecordTypeCount = 0;
+					//var onlyRecordTypeCount = 0;
 					var url = baseUrl + apiPath + "/Search";
 					var data = 	{
 								"q" : "behaviour:folder",
 								"Properties" : "RecordTypeName, RecordTypeContainerRule, RecordTypeUsualBehaviour, RecordTypeClassification, RecordTypeClassificationMandatory", 
 								"TrimType" : "RecordType"
 								}
-					var result = searchAPI(data)
-						.then(function(result)
+					var recordTypes = searchAPI(data)
+						.then(function(recordTypes)
 							{
 							var intermediateFolderRecordTypeUris = [];
 							var intermediateFolderRecordTypeNames = [];
 							var intermediateFolderRecordTypeClassification = [];
 							var intermediateFolderRecordTypeClassificationMandatory = [];
-							for(i=0; i<result.Results.length; i++)
+							for(i=0; i<recordTypes.Results.length; i++)
 								{
 								// The GilbyIM Lite application requires folders (that can attach to classifications) to be configured so they cannot be contained by other records.
-								if(result.Results[i].RecordTypeContainerRule.Value=="Prevented")
+								if(recordTypes.Results[i].RecordTypeContainerRule.Value=="Prevented")
 								   	{
-									intermediateFolderRecordTypeUris.push(result.Results[i].Uri)
-									intermediateFolderRecordTypeNames.push(result.Results[i].RecordTypeName.Value)
-									if(result.Results[i].RecordTypeClassificationMandatory.Value==true)
+									intermediateFolderRecordTypeUris.push(recordTypes.Results[i].Uri)
+									intermediateFolderRecordTypeNames.push(recordTypes.Results[i].RecordTypeName.Value)
+									if(recordTypes.Results[i].RecordTypeClassificationMandatory.Value==true)
 									   {
-									   intermediateFolderRecordTypeClassification.push(result.Results[i].RecordTypeClassification.ClassificationTitle.Value)
+									   intermediateFolderRecordTypeClassification.push(recordTypes.Results[i].RecordTypeClassification.ClassificationTitle.Value)
 									   }
-										intermediateFolderRecordTypeClassificationMandatory.push(result.Results[i].RecordTypeClassificationMandatory.Value)
+										intermediateFolderRecordTypeClassificationMandatory.push(recordTypes.Results[i].RecordTypeClassificationMandatory.Value)
 									
 								   	}
 								}
 							$("#new-folder-form-record-type").empty()
+							var onlyRecordTypeCount = 0;
 							for(i=0; i<intermediateFolderRecordTypeUris.length; i++)  // for each folder Record Type, confirm if the Classification can use it.
 								{
 							   	(function(index)
@@ -1103,8 +1107,8 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 															"TrimType" : "Classification"
 															}
 
-													var result = searchAPI(data)
-														.then(function(result)
+													var classification = searchAPI(data)
+														.then(function(classification)
 															{
 															//console.log("The classification title is: " + result.Results[0].ClassificationTitle.Value)
 															for(x=0;x<intermediateFolderRecordTypeUris.length;x++)
@@ -1115,7 +1119,7 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 																	//console.log("Record Type " + intermediateFolderRecordTypeNames[x] + " has a mandatory starting classification.")	
 																	
 																	//console.log("The mandatory starting classification for " + intermediateFolderRecordTypeNames[x] + " is " + intermediateFolderRecordTypeClassification[x] + ".")
-																	if(intermediateFolderRecordTypeClassification[x]==result.Results[0].ClassificationTitle.Value)
+																	if(intermediateFolderRecordTypeClassification[x]==classification.Results[0].ClassificationTitle.Value)
 																		{
 																		//console.log("The mandatory Starting Classification for this Record Type is the selected Classification.")
 																		
@@ -1172,7 +1176,7 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 							   		})(i);
 								} // end of outer for loop							
 							})
-						.fail(function(result)
+						.fail(function(recordTypes)
 							{
 							// Do something
 							})
@@ -2038,6 +2042,74 @@ function showRecordAdditionalFieldName(field, recordTitle, recordType, recordUri
 		}	
 	}
 
+function showRecordAdditionalFieldNameReadOnly(field, recordTitle, recordType, recordUri)
+	{
+	//console.log("This is called.")
+	//console.log("Format: " + field.FieldDefinitionFormat.Value)
+	switch(field.FieldDefinitionFormat.Value)
+		{
+		case "String":
+
+			var additionalFieldId = "properties-additional-fields-" + field.FieldDefinitionSearchClause.Value;
+
+			var additionalPropertyHTML = '<tr><td scope="row" style="width:20%;text-align:left;padding-left:30px;">'
+
+			additionalPropertyHTML = additionalPropertyHTML + field.FieldDefinitionName.Value
+
+			additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td>'
+
+			additionalPropertyHTML = additionalPropertyHTML + '<td></td></tr>'
+
+			$("#properties-pane > table > tbody").append(additionalPropertyHTML)
+			break;
+		case "Number":
+			console.log("Number inputs are not yet supported.")
+			break;
+		case "Boolean":
+			console.log("Boolean inputs are not yet supported.")
+			break;
+		case "Date":
+			var additionalFieldId = "properties-additional-fields-" + field.FieldDefinitionSearchClause.Value;
+
+			var additionalPropertyHTML = '<tr><td scope="row" style="width:20%;text-align:left;padding-left:30px;">'
+
+			additionalPropertyHTML = additionalPropertyHTML + field.FieldDefinitionName.Value
+
+			additionalPropertyHTML = additionalPropertyHTML + '</td><td id="' + additionalFieldId + '" style="text-align:left;"></td>'
+
+			additionalPropertyHTML = additionalPropertyHTML + '<td></td></tr>'
+
+			$("#properties-pane > table > tbody").append(additionalPropertyHTML)
+
+			break;
+		case "Datetime":
+			console.log("Datetime inputs are not yet supported.")
+			break;
+		case "Decimal":
+			console.log("Decimal inputs are not yet supported.")
+			break;
+		case "Text":
+			console.log("Text inputs are not yet supported.")
+			break;
+		case "Currency":
+			console.log("Currency inputs are not yet supported.")
+			break;
+		case "Object":
+			console.log("Object inputs are not yet supported.")
+			break;
+		case "BigNumber":
+			console.log("BigNumber inputs are not yet supported.")
+			break;
+		case "Xml":
+			console.log("Xml inputs are not yet supported.")
+			break;
+		case "Geography":
+			console.log("Geography inputs are not yet supported.")
+			break;
+		}	
+	}
+
+
 
 function getRecordProperties(type, recordUri)
 	{
@@ -2141,34 +2213,33 @@ function getRecordProperties(type, recordUri)
 								{
 								console.log("Error fetching DataEntryFormDefinition for the selected record type.")
 								url = baseUrl + apiPath + "/Search"
-								myRecordType = "Torriano Staff Folder"
 								data = 	{
-										"q" : "forRecords=\"" + myRecordType + "\"",
-										"Properties" : "FieldDefinitionName, FieldDefitionFormat",
+										"q" : "forRecords=\"" + recordType + "\"",
+										"Properties" : "FieldDefinitionName, FieldDefinitionFormat, FieldDefinitionSearchClause",
 										"SortBy" : "Format-,Name",
 										"TrimType" : "FieldDefinition"
 										}
-								$.ajax(
+								var fieldDefinitions = searchAPI(data)
+									.then(function(fieldDefinitions)
 										{
-										url: url,
-										data: JSON.stringify(data),
-										type: "POST",
-										contentType: 'application/json',
-										xhrFields: { withCredentials: true },
-										success: function(result)
+										console.log("Fetching FieldDefinition for the selected record type instead.")
+										console.log(fieldDefinitions)
+										for(i=0;i<fieldDefinitions.Results.length;i++)
 											{
-											console.log("Fetching FieldDefinition for the selected record type instead.")
-											for(i=0;i<result.Results.length;i++)
+											(function(index)
 												{
-												console.log('FieldDefitionName ' + i + ": " + result.Results[i].FieldDefinitionName.Value)
-												}
-												
-											}, 
-										error: function(result)
-											{
-											// Do something
+												console.log("i: " + index)
+												//console.log('FieldDefitionName ' + i + ": " + result.Results[i].FieldDefinitionName.Value)
+												showRecordAdditionalFieldNameReadOnly(fieldDefinitions.Results[index], recordTitle, recordType, recordUri)	
+												//console.log("searchClause: " + result.Results[index].FieldDefinitionName.Value)
+
+												searchClause = fieldDefinitions.Results[index].FieldDefinitionSearchClause.Value
+												console.log("searchClause: " + searchClause)
+												getAdditionalFieldValue(recordUri, searchClause)
+												//console.log("searchClause: " + result.Results[index].FieldDefinitionSearchClause.Value)
+												})(i)
 											}
-										})	
+										})
 								}
 							});	
 						}
@@ -2185,6 +2256,43 @@ function getRecordProperties(type, recordUri)
 			}
 		});
 	}
+
+function getAdditionalFieldValue(recordUri, searchClause)
+	{
+	var deferredObject = $.Deferred();
+	data = 	{
+			"q" : recordUri,
+			"Properties" : searchClause,
+			"TrimType" : "Record"
+			}	
+	var result = searchAPI(data)
+		.then(function(result)
+		{
+		var html;
+		console.log("The inner search clause: " + searchClause)
+		console.log(result)
+		if(result.Results[0].Fields[searchClause].hasOwnProperty("DateTime"))
+			{
+			//console.log(result.Results[0].Fields[searchClause].DateTime.IsClear)
+			if(!result.Results[0].Fields[searchClause].IsClear)
+				{
+				console.log(formatDate(result.Results[0].Fields[searchClause].DateTime, "trimDate", "dd-mmm-yyyy"))
+				html = formatDate(result.Results[0].Fields[searchClause].DateTime, "trimDate", "dd-mmm-yyyy")
+				//console.log(result.Results[0].Fields[searchClause].DateTime)					
+				}
+			}
+		else
+			{
+			console.log(result.Results[0].Fields[searchClause].Value)
+			html = result.Results[0].Fields[searchClause].Value
+			}
+		$("#properties-additional-fields-" + searchClause).html(html)
+		})
+	deferredObject.resolve();
+	return deferredObject.promise();
+	}
+
+
 
 function populateDataEntryFormPages(formName)
 	{
