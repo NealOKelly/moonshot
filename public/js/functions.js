@@ -1006,7 +1006,6 @@ function getRecordTypeDisplayAliasFromName(recordTypeName)
 		}
 	}
 
-
 function hasClassificationOnlyRule(classificationUri, recordTypeUri)
 	{
 	var deferredObject = $.Deferred();	
@@ -1112,22 +1111,11 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 								{
 							   	(function(index)
 								 	{
-									var addRecordType = hasClassificationOnlyRule(parentNodeUri, intermediateFolderRecordTypeUris[index]).then(function(addRecordType)						{
-									console.log("addRecordType: " + addRecordType)	
-									})
-									data = 	{
-											"q" : "uri:" + parentNodeUri + ",recordType:" + intermediateFolderRecordTypeUris[index],
-											"Properties" : "ClassificationTitle",
-											"TrimType" : "Classification"
-											}
-									var classificationOnly = searchAPI(data)
-										.then(function(classificationOnly)
+									var addRecordType = hasClassificationOnlyRule(parentNodeUri, intermediateFolderRecordTypeUris[index]).then(function(addRecordType)							{
+										console.log("addRecordType: " + addRecordType)	
+										if(addRecordType)
 											{
-											if(classificationOnly.TotalResults>0) // The Record Type is configured as a Classification Only Record Type for this Classification.
-												{
-												$("#new-folder-form-record-type").append("<option value='" + intermediateFolderRecordTypeNames[index] + "'>" + getRecordTypeDisplayAliasFromName(intermediateFolderRecordTypeNames[index]) + "</option>")
-												onlyRecordTypeCount++;
-												}
+											$("#new-folder-form-record-type").append("<option value='" + intermediateFolderRecordTypeNames[index] + "'>" + getRecordTypeDisplayAliasFromName(intermediateFolderRecordTypeNames[index]) + "</option>")
 											if($("#new-folder-form-record-type option").length<2)
 												{
 												$("#new-folder-form-record-type").attr("readonly", true)
@@ -1136,50 +1124,36 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 												{
 												$("#new-folder-form-record-type").attr("readonly", false)
 												}
-											lastIndex = intermediateFolderRecordTypeUris.length - 1
-											if(index==lastIndex)
+												onlyRecordTypeCount++;	
+											}
+										lastIndex = intermediateFolderRecordTypeUris.length - 1
+										if(index==lastIndex)
+											{
+											if(onlyRecordTypeCount==0) // i.e. the selected classification does not have an Only Record Types rule configured.
 												{
-												if(onlyRecordTypeCount==0) // i.e. the selected classification does not have an Only Record Types rule configured.
-													{
-													//console.log("The selected Classification does not have an Only Record Types rule configured.")
-													data = {
-															"q" : parentNodeUri,
-															"Properties" : "ClassificationTitle",
-															"TrimType" : "Classification"
-															}
+												//console.log("The selected Classification does not have an Only Record Types rule configured.")
+												data = {
+														"q" : parentNodeUri,
+														"Properties" : "ClassificationTitle",
+														"TrimType" : "Classification"
+														}
 
-													var classification = searchAPI(data)
-														.then(function(classification)
+												var classification = searchAPI(data)
+													.then(function(classification)
+														{
+														//console.log("The classification title is: " + result.Results[0].ClassificationTitle.Value)
+														for(x=0;x<intermediateFolderRecordTypeUris.length;x++)
 															{
-															//console.log("The classification title is: " + result.Results[0].ClassificationTitle.Value)
-															for(x=0;x<intermediateFolderRecordTypeUris.length;x++)
+																//console.log("intermediateFolderRecordTypeClassificationMandatory[x]: " + intermediateFolderRecordTypeClassificationMandatory[x])
+															if(intermediateFolderRecordTypeClassificationMandatory[x]==true)
 																{
-																	//console.log("intermediateFolderRecordTypeClassificationMandatory[x]: " + intermediateFolderRecordTypeClassificationMandatory[x])
-																if(intermediateFolderRecordTypeClassificationMandatory[x]==true)
-																	{
-																	//console.log("Record Type " + intermediateFolderRecordTypeNames[x] + " has a mandatory starting classification.")	
-																	
-																	//console.log("The mandatory starting classification for " + intermediateFolderRecordTypeNames[x] + " is " + intermediateFolderRecordTypeClassification[x] + ".")
-																	if(intermediateFolderRecordTypeClassification[x]==classification.Results[0].ClassificationTitle.Value)
-																		{
-																		//console.log("The mandatory Starting Classification for this Record Type is the selected Classification.")
-																		
-																		$("#new-folder-form-record-type").append("<option value='" + intermediateFolderRecordTypeNames[x] + "'>" + getRecordTypeDisplayAliasFromName(intermediateFolderRecordTypeNames[x]) + "</option>")
+																//console.log("Record Type " + intermediateFolderRecordTypeNames[x] + " has a mandatory starting classification.")	
 
-																		if($("#new-folder-form-record-type option").length<2)
-																			{
-																			$("#new-folder-form-record-type").attr("readonly", true)
-																			}
-																		else
-																			{
-																			$("#new-folder-form-record-type").attr("readonly", false)
-																			}
-																		}
-																	}
-																else
+																//console.log("The mandatory starting classification for " + intermediateFolderRecordTypeNames[x] + " is " + intermediateFolderRecordTypeClassification[x] + ".")
+																if(intermediateFolderRecordTypeClassification[x]==classification.Results[0].ClassificationTitle.Value)
 																	{
-																	//console.log("Record Type " + intermediateFolderRecordTypeNames[x] + " does NOT have a mandatory starting classification.")	
-																	
+																	//console.log("The mandatory Starting Classification for this Record Type is the selected Classification.")
+
 																	$("#new-folder-form-record-type").append("<option value='" + intermediateFolderRecordTypeNames[x] + "'>" + getRecordTypeDisplayAliasFromName(intermediateFolderRecordTypeNames[x]) + "</option>")
 
 																	if($("#new-folder-form-record-type option").length<2)
@@ -1191,29 +1165,41 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 																		$("#new-folder-form-record-type").attr("readonly", false)
 																		}
 																	}
-																if(x==intermediateFolderRecordTypeUris.length-1)
+																}
+															else
+																{
+																//console.log("Record Type " + intermediateFolderRecordTypeNames[x] + " does NOT have a mandatory starting classification.")	
+
+																$("#new-folder-form-record-type").append("<option value='" + intermediateFolderRecordTypeNames[x] + "'>" + getRecordTypeDisplayAliasFromName(intermediateFolderRecordTypeNames[x]) + "</option>")
+
+																if($("#new-folder-form-record-type option").length<2)
 																	{
-																	helperSelectRecordType("classification").then(function()
-																		{
-																		deferredObject.resolve();	
-																		})
+																	$("#new-folder-form-record-type").attr("readonly", true)
+																	}
+																else
+																	{
+																	$("#new-folder-form-record-type").attr("readonly", false)
 																	}
 																}
-															})
-													} // end of onlyRecordTypeCount==0; i.e. the selected classification does not have an Only Record Types rule configured.
-												else
+															if(x==intermediateFolderRecordTypeUris.length-1)
+																{
+																helperSelectRecordType("classification").then(function()
+																	{
+																	deferredObject.resolve();	
+																	})
+																}
+															}
+														})
+												} // end of onlyRecordTypeCount==0; i.e. the selected classification does not have an Only Record Types rule configured.
+											else
+												{
+												helperSelectRecordType("classification").then(function()
 													{
-													helperSelectRecordType("classification").then(function()
-														{
-														deferredObject.resolve();	
-														})														
-													}
-												}											
-											})
-										.fail(function(result)
-											{
-											// Do something
-											})
+													deferredObject.resolve();	
+													})														
+												}
+											}									
+										})
 							   		})(i);
 								} // end of outer for loop							
 							})
