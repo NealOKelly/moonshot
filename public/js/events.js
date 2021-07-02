@@ -8,6 +8,9 @@
 // 7. MODALS //
 // 8. MISCELLANEOUS //
 
+var gettingRecordType = false;
+
+
 // 1. READY //
 $(document).ready(function()
 	{
@@ -133,48 +136,64 @@ $(document).on("click", "span[class^='folder']", function()
 	classificationTreeNodeSelected(node)
 	if(node.hasClass("classification-can-attach-records"))
 		{
-		populateRecordTypeField("classification", node.attr("id").substr(19)).then(function()
+		if(!gettingRecordType)
 			{
-			// Display the record type selector only if there is more than one record type than can be used with the classification.
-			$("#new-folder-form-record-type-field-container").css("display", "none")
-			if($("#new-folder-form-record-type>option").length>1)
+			gettingRecordType = true;
+			populateRecordTypeField("classification", node.attr("id").substr(19)).then(function()
 				{
-				$("#new-folder-form-record-type-field-container").css("display", "block")
-				}	
-			populateDataEntryFormPages("new-folder-form")
-			})		
+				gettingRecordType = false;
+				// Display the record type selector only if there is more than one record type than can be used with the classification.
+				$("#new-folder-form-record-type-field-container").css("display", "none")
+				if($("#new-folder-form-record-type>option").length>1)
+					{
+					$("#new-folder-form-record-type-field-container").css("display", "block")
+					}	
+				populateDataEntryFormPages("new-folder-form")
+				})	
+			}
 		}
 	if(node.hasClass("folder-intermediate"))
 		{
 		$("#records-list-pane").html("<div class='no-records display-4'>Browse or search to display records.</div>")
 		//$("#new-sub-folder-form-record-type").html("")
 		populateContainerField("folder-intermediate", node.attr("id").substr(11))
-		populateRecordTypeField("folder-intermediate", node.attr("id").substr(11)).then(function()
+		
+		if(!gettingRecordType)
 			{
-			// Display the record type selector only if there is more than one record type than can be used with the classification.
-			$("#new-sub-folder-form-record-type-field-container").css("display", "none")
-			if($("#new-sub-folder-form-record-type>option").length>1)
+			gettingRecordType = true;
+			populateRecordTypeField("folder-intermediate", node.attr("id").substr(11)).then(function()
 				{
-				$("#new-sub-folder-form-record-type-field-container").css("display", "block")
-				}	
-			populateDataEntryFormPages("new-sub-folder-form")
-			})
+				gettingRecordType = false;
+				$("#new-sub-folder-form-record-type-field-container").css("display", "none")
+				if($("#new-sub-folder-form-record-type>option").length>1)
+					{
+					$("#new-sub-folder-form-record-type-field-container").css("display", "block")
+					}	
+				populateDataEntryFormPages("new-sub-folder-form")
+				})	
+			}
 		drawPropertiesTable("folder-intermediate")
 		}
 	if(node.hasClass("folder-terminal"))
 		{
 		getRecords(node.attr("id").substr(11))
 		populateContainerField("folder-terminal", node.attr("id").substr(11))
-		populateRecordTypeField("folder-terminal", node.attr("id").substr(11)).then(function()
-		{
-		$("#upload-form-record-type-field-container").css("display", "none")
-		if($("#upload-form-record-type>option").length>1)
+		
+		if(!gettingRecordType)
 			{
-			$("#upload-form-record-type-field-container").css("display", "block")
+			gettingRecordType = true;
+			populateRecordTypeField("folder-terminal", node.attr("id").substr(11)).then(function()
+				{
+				gettingRecordType = false;
+				$("#upload-form-record-type-field-container").css("display", "none")
+				if($("#upload-form-record-type>option").length>1)
+					{
+					$("#upload-form-record-type-field-container").css("display", "block")
+					}
+				clearForm("upload-form")
+				populateDataEntryFormPages("upload-form")
+				})	
 			}
-		clearForm("upload-form")
-		populateDataEntryFormPages("upload-form")
-		})
 		drawPropertiesTable("folder-terminal")
 		}
 	})
@@ -202,16 +221,21 @@ $(document).on("click", ".classification-name>a", function()
 	classificationTreeNodeSelected(node)
 	if(node.hasClass("classification-can-attach-records"))
 		{
-		populateRecordTypeField("classification", node.attr("id").substr(19)).then(function()
+		if(!gettingRecordType)
 			{
-			// Display the record type selector only if there is more than one record type than can be used with the classification.
-			$("#new-folder-form-record-type-field-container").css("display", "none")
-			if($("#new-folder-form-record-type>option").length>1)
+			gettingRecordType = true;
+			populateRecordTypeField("classification", node.attr("id").substr(19)).then(function()
 				{
-				$("#new-folder-form-record-type-field-container").css("display", "block")
-				}	
-			populateDataEntryFormPages("new-folder-form")
-			})		
+				gettingRecordType = false;
+				// Display the record type selector only if there is more than one record type than can be used with the classification.
+				$("#new-folder-form-record-type-field-container").css("display", "none")
+				if($("#new-folder-form-record-type>option").length>1)
+					{
+					$("#new-folder-form-record-type-field-container").css("display", "block")
+					}	
+				populateDataEntryFormPages("new-folder-form")
+				})	
+			}	
 		}
 	})
 
@@ -231,16 +255,22 @@ $(document).on("click", ".record-title>a", function()
 		{
 		$("#records-list-pane").html("<div class='no-records display-4'>Browse or search to display records.</div>")
 		populateContainerField("folder-intermediate", node.attr("id").substr(11))
-		populateRecordTypeField("folder-intermediate", node.attr("id").substr(11)).then(function()
+			
+		if(!gettingRecordType)
 			{
-			// Display the record type selector only if there is more than one record type than can be used with the classification.
-			$("#new-sub-folder-form-record-type-field-container").css("display", "none")
-			if($("#new-sub-folder-form-record-type>option").length>1)
+			gettingRecordType = true;
+			populateRecordTypeField("folder-intermediate", node.attr("id").substr(11)).then(function()
 				{
-				$("#new-sub-folder-form-record-type-field-container").css("display", "block")
-				}	
-			populateDataEntryFormPages("new-sub-folder-form")
-			})
+				gettingRecordType = false;
+				// Display the record type selector only if there is more than one record type than can be used with the classification.
+				$("#new-sub-folder-form-record-type-field-container").css("display", "none")
+				if($("#new-sub-folder-form-record-type>option").length>1)
+					{
+					$("#new-sub-folder-form-record-type-field-container").css("display", "block")
+					}	
+				populateDataEntryFormPages("new-sub-folder-form")
+				})	
+			}
 		drawPropertiesTable("folder-intermediate")
 		getRecordProperties("folder-intermediate", node.attr("id").substr(11))
 		}
@@ -252,16 +282,22 @@ $(document).on("click", ".record-title>a", function()
 			populateContainerField("folder-terminal", node.attr("id").substr(11))
 			console.log("About to populate record type field.")
 			console.log("Uri: " + node.attr("id").substr(11))
-			populateRecordTypeField("folder-terminal", node.attr("id").substr(11)).then(function()
-			{
-			$("#upload-form-record-type-field-container").css("display", "none")
-			if($("#upload-form-record-type>option").length>1)
+				
+			if(!gettingRecordType)
 				{
-				$("#upload-form-record-type-field-container").css("display", "block")
-				}	
-			clearForm("upload-form")
-			populateDataEntryFormPages("upload-form")
-			})
+				gettingRecordType = true;
+				populateRecordTypeField("folder-terminal", node.attr("id").substr(11)).then(function()
+					{
+					gettingRecordType = false;
+					$("#upload-form-record-type-field-container").css("display", "none")
+					if($("#upload-form-record-type>option").length>1)
+						{
+						$("#upload-form-record-type-field-container").css("display", "block")
+						}	
+					clearForm("upload-form")
+					populateDataEntryFormPages("upload-form")
+					})	
+				}			
 			drawPropertiesTable("folder-terminal")
 			getRecordProperties("folder-terminal", node.attr("id").substr(11))
 			}
@@ -484,29 +520,40 @@ $(document).on("click", "#search-results li", function()
 						{
 						case "folder-intermediate":
 							populateContainerField("folder-intermediate", uri)
-							populateRecordTypeField("folder-intermediate", uri).then(function()
+								
+							if(!gettingRecordType)
 								{
-								// Display the record type selector only if there is more than one record type than can be used with the classification.
-								$("#new-sub-folder-form-record-type-field-container").css("display", "none")
-								if($("#new-sub-folder-form-record-type>option").length>1)
+								gettingRecordType = true;
+								populateRecordTypeField("folder-intermediate", uri).then(function()
 									{
-									$("#new-sub-folder-form-record-type-field-container").css("display", "block")
-									}	
-								populateDataEntryFormPages("new-sub-folder-form")
-								})
+									gettingRecordType = false;
+									// Display the record type selector only if there is more than one record type than can be used with the classification.
+									$("#new-sub-folder-form-record-type-field-container").css("display", "none")
+									if($("#new-sub-folder-form-record-type>option").length>1)
+										{
+										$("#new-sub-folder-form-record-type-field-container").css("display", "block")
+										}	
+									populateDataEntryFormPages("new-sub-folder-form")
+									})	
+								}
 							drawPropertiesTable("folder-intermediate")
 							break;
 						case "folder-terminal":
-							populateRecordTypeField("folder-terminal", uri).then(function()
+								
+							if(!gettingRecordType)
 								{
-								populateContainerField("folder-terminal", uri)
-								$("#upload-form-record-type-field-container").css("display", "none")
-								if($("#upload-form-record-type>option").length>1)
+								gettingRecordType = true;
+								populateRecordTypeField("folder-terminal", uri).then(function()
 									{
-									$("#upload-form-record-type-field-container").css("display", "block")
-									}	
-								populateDataEntryFormPages("upload-form")
-								})
+									gettingRecordType = false;
+									$("#upload-form-record-type-field-container").css("display", "none")
+									if($("#upload-form-record-type>option").length>1)
+										{
+										$("#upload-form-record-type-field-container").css("display", "block")
+										}	
+									populateDataEntryFormPages("upload-form")
+									})	
+								}	
 								drawPropertiesTable("folder-terminal")
 								getRecordProperties("folder-terminal", uri)
 							break;
