@@ -982,6 +982,7 @@ function getRecordTypeDisplayAliasFromName(recordTypeName)
 	{
 	if(config.RecordTypeAliases.UseApplicationConfig=="true")
 		{
+		console.log("Using application cofig to get record type.")
 		var recordTypeDisplayAlias = "";
 		for(z=0;z<config.RecordTypeAliases.RecordTypes.length;z++)
 			{
@@ -1006,7 +1007,43 @@ function getRecordTypeDisplayAliasFromName(recordTypeName)
 	}
 
 
-
+function hasClassificationOnlyRule(classificationUri, recordTypeUri)
+	{
+	var deferredObject = $.Deferred();	
+	getAuthenticationStatus().then(function () 
+		{
+		if(isAuthenticated)
+			{
+			data = 	{
+					"q" : "uri:" + classificationUri + ",recordType:" + recordTypeUri,
+					"Properties" : "ClassificationTitle",
+					"TrimType" : "Classification"
+					}
+			var result = searchAPI(data)
+				.then(function(result)
+					{
+					if(result.TotalResults>0)
+						{
+						deferredObject.resolve(true);
+						}
+					else
+						{
+						deferredObject.resolve(false);
+						}
+					})
+				.fail(function(result)
+					{
+					console.log("Failed!!!")
+					})
+			}
+		else
+			{
+			displaySessionExpiredModal()
+			deferredObject.resolve();
+			}
+		})
+		return deferredObject.promise();
+	}
 
 function populateRecordTypeField(parentNodeType, parentNodeUri)
 	{
@@ -1015,6 +1052,7 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 		{
 		if(isAuthenticated)
 			{
+			console.log("populateRecordTypeField() has been called.")
 			switch(parentNodeType)
 				{
 				case "classification":
@@ -1074,15 +1112,18 @@ function populateRecordTypeField(parentNodeType, parentNodeUri)
 								{
 							   	(function(index)
 								 	{
+									var addRecordType = hasClassificationOnlyRule(parentNodeUri, intermediateFolderRecordTypeUris[index]).then(function(addRecordType)						{
+									console.log("addRecordType: " + addRecordType)	
+									})
 									data = 	{
-											"q" : "uri:" + parentNodeUri + ",recordType:" + intermediateFolderRecordTypeUris[i],
+											"q" : "uri:" + parentNodeUri + ",recordType:" + intermediateFolderRecordTypeUris[index],
 											"Properties" : "ClassificationTitle",
 											"TrimType" : "Classification"
 											}
-									var result = searchAPI(data)
-										.then(function(result)
+									var classificationOnly = searchAPI(data)
+										.then(function(classificationOnly)
 											{
-											if(result.TotalResults>0) // The Record Type is configured as a Classification Only Record Type for this Classification.
+											if(classificationOnly.TotalResults>0) // The Record Type is configured as a Classification Only Record Type for this Classification.
 												{
 												$("#new-folder-form-record-type").append("<option value='" + intermediateFolderRecordTypeNames[index] + "'>" + getRecordTypeDisplayAliasFromName(intermediateFolderRecordTypeNames[index]) + "</option>")
 												onlyRecordTypeCount++;
